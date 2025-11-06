@@ -1,0 +1,19 @@
+import { createContext } from "react";
+
+// --- Tipagens ---
+
+interface User {
+  id: string;
+  username: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  isLoading: boolean;
+  login: (username: string, password_param: string) => Promise<boolean>;
+  logout: () => void;
+}
+
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined
+);
