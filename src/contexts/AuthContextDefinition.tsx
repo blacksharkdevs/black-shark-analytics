@@ -1,7 +1,5 @@
 import { createContext } from "react";
 
-// --- Tipagens ---
-
 interface User {
   id: string;
   username: string;

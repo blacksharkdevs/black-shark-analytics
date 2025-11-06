@@ -5,8 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/common/ui/toaster";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import RegisterPage from "./pages/Register/Register";
-
-const DashboardLayout = () => <div>Dashboard em construção!</div>;
+import DashboardLayout from "./pages/Dashboard/DashboardLayout";
 
 function RootProviders({ children }: { children: React.ReactNode }) {
   return (
