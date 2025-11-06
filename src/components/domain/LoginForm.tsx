@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { motion } from "framer-motion";
+import {
+  motion,
+  useAnimation,
+  type AnimationDefinition,
+  type Variants,
+} from "framer-motion";
 import { Button } from "@/components/common/ui/button";
 import { Input } from "@/components/common/ui/input";
 import { Label } from "@/components/common/ui/label";
@@ -16,8 +21,10 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, Eye, EyeOff } from "lucide-react";
-import SharkIcon from "@/assets/images/icons/shark-white-bg.png";
-import { DotLoader } from "../common/ui/dotLoader";
+import { DotLoader } from "../common/ui/DotLoader";
+import { SharkSwim } from "../common/SharkSwin";
+import { useNavigate } from "react-router-dom";
+import { LoadingScreen } from "../common/LoadingScreen";
 
 const loginSchema = z.object({
   username: z.string().min(1, { message: "O nome de usuário é obrigatório" }),
@@ -28,18 +35,41 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const AnimatedCard = motion(Card);
 
-const shakeVariants = {
-  shake: {
-    x: [0, -15, 15, -10, 10, -5, 5, 0],
+const fadeVariants: Variants = {
+  initial: {
+    y: 150,
+    opacity: 0,
+  },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 200,
+      damping: 20,
+      delay: 0.1,
+    },
+  },
+};
+
+const shakeAnimation: AnimationDefinition = {
+  x: [0, -15, 15, -10, 10, -5, 5, 0],
+  transition: {
+    type: "tween",
+    duration: 0.8,
+    ease: "easeInOut",
   },
 };
 
 export function LoginForm() {
   const { login, isLoading } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const controls = useAnimation();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [isShake, setIsShake] = useState(false);
+  const [isLoginSuccess, setIsLoginSuccess] = useState(false);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -49,13 +79,17 @@ export function LoginForm() {
     },
   });
 
+  useEffect(() => {
+    controls.start("visible");
+  }, [controls]);
+
   const onSubmit = async (data: LoginFormValues) => {
     const success = await login(data.username, data.password);
 
-    if (!success) {
-      // 🚨 ATIVANDO O SHAKE NO ERRO
-      setIsShake(true);
-      setTimeout(() => setIsShake(false), 900); // Tempo maior para o shake (de acordo com a duration)
+    if (success) {
+      setIsLoginSuccess(true);
+    } else {
+      controls.start(shakeAnimation);
 
       toast({
         title: "Falha no Login",
@@ -65,25 +99,33 @@ export function LoginForm() {
     }
   };
 
+  useEffect(() => {
+    if (isLoginSuccess) {
+      const timer = setTimeout(() => {
+        navigate("/dashboard", { replace: true });
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isLoginSuccess, navigate]);
+
+  if (isLoginSuccess) {
+    return <LoadingScreen />;
+  }
+
   return (
     <AnimatedCard
-      variants={shakeVariants}
-      // Animação de entrada inicial e a animação de shake
-      animate={isShake ? "shake" : { y: 0, opacity: 1 }}
+      variants={fadeVariants}
+      animate={controls}
       initial="initial"
-      transition={
-        isShake
-          ? { type: "tween", duration: 0.8, ease: "easeInOut" }
-          : { type: "spring", stiffness: 100, delay: 0.1 }
-      }
-      className="w-full max-w-md shadow-2xl bg-blackshark-card border border-blackshark-accent rounded-none" // Adicionei rounded-none
+      className="w-full max-w-md border rounded-none shadow-2xl bg-blackshark-card border-blackshark-accent"
     >
       <CardHeader className="text-center">
         <div className="flex justify-center mb-4">
-          <img src={SharkIcon} alt="Black Shark Icon" className="w-16 h-16" />
+          <SharkSwim width={170} />
         </div>
 
-        <CardTitle className="text-3xl font-headline tracking-tight text-blackshark-primary">
+        <CardTitle className="text-3xl tracking-tight font-headline text-blackshark-primary">
           Black Shark Analytics
         </CardTitle>
         <CardDescription className="text-blackshark-accent">
@@ -102,7 +144,7 @@ export function LoginForm() {
               placeholder="blackshark"
               {...form.register("username")}
               disabled={isLoading}
-              className="bg-blackshark-card border border-blackshark-accent text-blackshark-primary focus:ring-blackshark-accent rounded-none"
+              className="border rounded-none bg-blackshark-card border-blackshark-accent text-blackshark-primary focus:ring-blackshark-accent"
               aria-invalid={form.formState.errors.username ? "true" : "false"}
             />
             {form.formState.errors.username && (
@@ -123,7 +165,7 @@ export function LoginForm() {
                 placeholder="••••••••"
                 disabled={isLoading}
                 {...form.register("password")}
-                className="bg-blackshark-card border border-blackshark-accent text-blackshark-primary focus:ring-blackshark-accent pr-10 rounded-none"
+                className="pr-10 border rounded-none bg-blackshark-card border-blackshark-accent text-blackshark-primary focus:ring-blackshark-accent"
                 aria-invalid={form.formState.errors.password ? "true" : "false"}
               />
               <Button
@@ -135,9 +177,9 @@ export function LoginForm() {
                 disabled={isLoading}
               >
                 {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
+                  <EyeOff className="w-4 h-4" />
                 ) : (
-                  <Eye className="h-4 w-4" />
+                  <Eye className="w-4 h-4" />
                 )}
               </Button>
             </div>
@@ -150,20 +192,20 @@ export function LoginForm() {
 
           <Button
             type="submit"
-            className="w-full bg-blackshark-primary hover:bg-blackshark-primary/90 text-blackshark-background rounded-none"
+            className="w-full rounded-none bg-blackshark-primary hover:bg-blackshark-primary/90 text-blackshark-background"
             disabled={isLoading}
           >
             {isLoading ? (
               <DotLoader />
             ) : (
               <>
-                <LogIn className="mr-2 h-4 w-4 text-blackshark-background" />
+                <LogIn className="w-4 h-4 mr-2 text-blackshark-background" />
                 Login
               </>
             )}
           </Button>
         </form>
-        <p className="mt-4 text-center text-sm text-blackshark-accent">
+        <p className="mt-4 text-sm text-center text-blackshark-accent">
           Dica: Use o usuário `blackshark` ou as credenciais da sua migração do
           DB.
         </p>

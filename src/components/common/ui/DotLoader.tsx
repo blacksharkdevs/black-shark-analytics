@@ -26,19 +26,25 @@ const loadingDotVariants: Variants = {
   },
 };
 
-export function DotLoader() {
+interface DotLoaderProps {
+  color?: "black" | "white";
+}
+
+export function DotLoader({ color = "black" }: DotLoaderProps) {
   return (
     <motion.div
       variants={loadingContainerVariants}
       initial="start"
       animate="end"
-      className="flex justify-center items-center space-x-1"
+      className="flex items-center justify-center space-x-1"
     >
       {[...Array(3)].map((_, i) => (
         <motion.span
           key={i}
           variants={loadingDotVariants}
-          className="block h-2 w-2 rounded-full bg-blackshark-background"
+          className={`block w-2 h-2 rounded-full ${
+            color === "black" ? "bg-blackshark-background" : "bg-white"
+          }`}
         />
       ))}
     </motion.div>

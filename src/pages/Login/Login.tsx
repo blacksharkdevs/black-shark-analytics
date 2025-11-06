@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { LoginForm } from "@/components/domain/LoginForm";
 import { useAuth } from "@/hooks/useAuth";
 import { OceanBackground } from "@/components/layout/OceanBackground";
+import { OceanSoundPlayer } from "@/components/common/OceanSoundPlayer";
 
 export default function LoginPage() {
   const { user, isLoading } = useAuth();
@@ -15,7 +16,8 @@ export default function LoginPage() {
   }, [user, isLoading, navigate]);
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen bg-blackshark-background p-4">
+    <div className="relative flex items-center justify-center min-h-screen p-4 bg-blackshark-background">
+      <OceanSoundPlayer />
       <OceanBackground />
 
       <div className="z-10">
