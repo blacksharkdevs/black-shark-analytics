@@ -12,6 +12,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (username: string, password_param: string) => Promise<boolean>;
   logout: () => void;
+  registerUser: (username: string, password_param: string) => Promise<boolean>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(

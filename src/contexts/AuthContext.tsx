@@ -91,6 +91,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     [navigate]
   );
 
+  const registerUser = useCallback(
+    async (usernameInput: string, passwordInput: string): Promise<boolean> => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase.rpc("register_new_admin", {
+          new_username: usernameInput,
+          new_password: passwordInput,
+        });
+
+        if (error) {
+          console.error("RPC register_new_admin error:", error);
+          setIsLoading(false);
+          return false;
+        }
+        const rpcUser = data as User | undefined;
+
+        if (rpcUser && rpcUser.id) {
+          const success = await login(usernameInput, passwordInput);
+          return success;
+        }
+
+        setIsLoading(false);
+        return false;
+      } catch (e) {
+        console.error("Exceção no Registro:", e);
+        setIsLoading(false);
+        return false;
+      }
+    },
+    [login]
+  );
+
   // 3. Função de Logout
   const logout = useCallback(() => {
     setIsLoading(true);
@@ -101,7 +133,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [navigate]);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, isLoading, login, registerUser, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
