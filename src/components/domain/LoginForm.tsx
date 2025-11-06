@@ -35,10 +35,9 @@ const shakeVariants = {
 };
 
 export function LoginForm() {
-  const { login } = useAuth();
+  const { login, isLoading } = useAuth();
   const { toast } = useToast();
 
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isShake, setIsShake] = useState(false);
 
@@ -51,7 +50,6 @@ export function LoginForm() {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
-    setIsLoading(true);
     const success = await login(data.username, data.password);
 
     if (!success) {
@@ -65,7 +63,6 @@ export function LoginForm() {
         variant: "destructive",
       });
     }
-    setIsLoading(false);
   };
 
   return (
