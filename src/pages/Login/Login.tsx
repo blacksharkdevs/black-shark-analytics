@@ -14,7 +14,7 @@ export default function LoginPage() {
     }
   }, [user, isLoading, navigate]);
 
-  if (isLoading || (!isLoading && user)) {
+  if (isLoading) {
     return <LoadingScreen />;
   }
 
