@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { DashboardSkeleton } from "@/components/layout/DashboardSkeleton";
 import { useSidebar } from "@/hooks/useSidebar";
 import { DashboardConfigProvider } from "@/contexts/DashboardConfigContext";
+import { TooltipProvider } from "@/components/common/ui/tooltip";
 
 const SIDEBAR_WIDTH = "280px";
 
@@ -41,10 +42,12 @@ export default function DashboardLayout() {
   }
 
   return (
-    <DashboardConfigProvider>
-      <SidebarProvider>
-        <DashboardLayoutContent />
-      </SidebarProvider>
-    </DashboardConfigProvider>
+    <TooltipProvider delayDuration={300}>
+      <DashboardConfigProvider>
+        <SidebarProvider>
+          <DashboardLayoutContent />
+        </SidebarProvider>
+      </DashboardConfigProvider>
+    </TooltipProvider>
   );
 }

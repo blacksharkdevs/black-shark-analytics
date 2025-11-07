@@ -1,11 +1,18 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "@/pages/Login/Login";
+import DashboardPage from "./pages/Dashboard/DashboardPage"; // 🚨 Conteúdo Principal (Stats/Charts)
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/common/ui/toaster";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import RegisterPage from "./pages/Register/Register";
 import DashboardLayout from "./pages/Dashboard/DashboardLayout";
+
+// 🚨 Placeholders para rotas aninhadas
+const TransactionsPage = () => <div>Transactions View</div>;
+const AffiliatesPage = () => <div>Affiliates View</div>;
+const ReportsPage = () => <div>Reports Index View</div>;
+const ConfigurationsPage = () => <div>Configurations Index View</div>;
 
 function RootProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -20,19 +27,34 @@ export default function App() {
   return (
     <RootProviders>
       <Routes>
+        {/* --- ROTAS PÚBLICAS --- */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
+        {/* 🛡️ ROTA PROTEGIDA (PAI: DashboardLayout) */}
+        {/* 🔑 REMOVEMOS O ASTERISCO E ANINHAMOS AS ROTAS DENTRO */}
         <Route
-          path="/dashboard/*"
+          path="/dashboard"
           element={
             <ProtectedRoute>
               <DashboardLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          {/* 🔑 ROTA INDEX: Carrega o conteúdo principal (Stats/Charts) no path /dashboard */}
+          <Route index element={<DashboardPage />} />
+
+          {/* 🔑 SUB-ROTAS PLANAS (Que o DashboardLayout renderiza no Outlet) */}
+          <Route path="transactions" element={<TransactionsPage />} />
+          <Route path="affiliates" element={<AffiliatesPage />} />
+
+          {/* Rotas de Relatórios (usando o * para sub-sub-rotas futuras) */}
+          <Route path="reports/*" element={<ReportsPage />} />
+
+          {/* Rotas de Configurações */}
+          <Route path="configurations/*" element={<ConfigurationsPage />} />
+        </Route>
 
         <Route path="*" element={<div>404 | Página Não Encontrada</div>} />
       </Routes>

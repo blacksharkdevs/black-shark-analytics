@@ -70,10 +70,8 @@ export function AppSidebar({ width }: { width: string }) {
   const { isSidebarOpen, isMobile, toggleSidebar } = useSidebar();
   const { theme } = useThemeToggle();
 
-  // 🚨 LÓGICA DE ATIVAÇÃO
   const isActive = (href: string) => {
     if (href === "/dashboard") {
-      // Ativa se for o root path exato
       return pathname === "/dashboard" || pathname === "/dashboard/";
     }
     if (
@@ -83,22 +81,21 @@ export function AppSidebar({ width }: { width: string }) {
     )
       return true;
 
-    // Para todos os outros links, usa o startswith
     return pathname.startsWith(href);
   };
 
   return (
-    <motion.div // 🚨 Usamos motion.div para animar a largura da Sidebar
+    <motion.div
       initial={false}
       animate={{
         width: isSidebarOpen && !isMobile ? width : isMobile ? "280px" : "72px",
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className={cn(
-        "fixed top-0 left-0 h-full border-r border-gray-400 bg-card transition-transform duration-300 z-50 flex flex-col", // flex flex-col para o layout interno
+        "fixed top-0 left-0 h-full border-r border-gray-400 bg-card transition-transform duration-300 z-50 flex flex-col",
         {
-          "transform -translate-x-full": !isSidebarOpen && isMobile, // Esconde no mobile
-          "w-[280px]": isSidebarOpen && isMobile, // Garante largura no mobile aberto
+          "transform -translate-x-full": !isSidebarOpen && isMobile,
+          "w-[280px]": isSidebarOpen && isMobile,
         }
       )}
     >
@@ -113,7 +110,6 @@ export function AppSidebar({ width }: { width: string }) {
             color="auto"
             className="text-foreground"
           />
-          {/* Animação do título BlackShark */}
           {isSidebarOpen && (
             <motion.h1
               initial={false}
@@ -124,7 +120,7 @@ export function AppSidebar({ width }: { width: string }) {
               transition={{ duration: 0.2 }}
               className={cn(
                 "text-xl font-black text-foreground whitespace-nowrap overflow-hidden",
-                !isSidebarOpen && "hidden md:flex" // Esconde no modo ícone, exceto se for mobile
+                !isSidebarOpen && "hidden md:flex"
               )}
             >
               BlackShark
@@ -148,8 +144,7 @@ export function AppSidebar({ width }: { width: string }) {
           ))}
         </SidebarMenu>
 
-        {/* BOTÃO DE TOGGLE DA SIDEBAR (para Desktop no rodapé) */}
-        {!isMobile && ( // Renderiza apenas no desktop
+        {!isMobile && (
           <div className="flex justify-center py-4 mt-auto">
             <Button
               variant="ghost"
