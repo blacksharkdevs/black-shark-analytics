@@ -8,11 +8,22 @@ import {
   BadgePercent,
 } from "lucide-react";
 
-import { useDashboardData } from "@/hooks/useDashboardData"; // Dados e Stats
-import { useDashboardConfig } from "@/hooks/useDashboardConfig"; // Loading de Config
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 
-// Mapeamento de Título, Descrição e Fórmula (o mesmo do StatsCard original)
-const STATS_MAP = {
+// Tipagem segura para as chaves (necessário para a lógica do useMemo)
+type StatKey =
+  | "gross_sales"
+  | "total_sales"
+  | "front_sales"
+  | "back_sales"
+  | "average_order_value";
+
+// 🚨 Corrigindo a tipagem do STATS_MAP para Record<string, ...> para tipagem segura
+const STATS_MAP: Record<
+  string,
+  { title: string; description: string; formula?: string }
+> = {
   gross_sales: {
     title: "Gross Sales",
     description: "Revenue after platform fees & taxes",
@@ -38,72 +49,86 @@ const STATS_MAP = {
 };
 
 export function StatsCards() {
-  // 🔑 CONSUMO: Dados, Estatísticas e Utilitários
   const { stats, isLoadingData, formatCurrency } = useDashboardData();
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
   const isLoading = isLoadingData || isDateRangeLoading;
 
-  // --- CÁLCULO DAS PROPS (Toda a lógica de switch/case é resolvida aqui) ---
+  // 🚨 Usamos o objeto stats com um cast seguro para garantir que as propriedades existam
+  const safeStats = stats as Record<string, number>;
+
   const cardProps = useMemo(() => {
-    // Lógica complexa do tooltip de Gross Sales (Resolvendo o bug de valor zero)
+    // 1. CÁLCULO DE TOOLTIPS COMPLEXOS
     const grossSalesExplanation = `Total Revenue: ${formatCurrency(
-      stats.totalRevenue
+      safeStats.totalRevenue
     )}\nPlatform Fee (%): -${formatCurrency(
-      stats.platformFeePercentage
+      safeStats.platformFeePercentage
     )}\nPlatform Fee ($): -${formatCurrency(
-      stats.platformFeeFixed
+      safeStats.platformFeeFixed
     )}\nTaxes: -${formatCurrency(
-      stats.totalTaxes
-    )}\n--------------------\nGross Sales: ${formatCurrency(stats.grossSales)}`;
+      safeStats.totalTaxes
+    )}\n--------------------\nGross Sales: ${formatCurrency(
+      safeStats.grossSales
+    )}`;
 
     const avgOrderValueExplanation = `Avg. gross sales generated per initial transaction.\n\nGross Sales: ${formatCurrency(
-      stats.grossSales
-    )}\nFront Sales: ${stats.frontSalesCount.toLocaleString()}`;
+      safeStats.grossSales
+    )}\nFront Sales: ${safeStats.frontSalesCount.toLocaleString()}`;
 
-    return [
+    // 2. DEFINIÇÃO DAS PROPS
+    const baseCards = [
       {
-        // Gross Sales
-        id: "gross_sales",
+        id: "gross_sales" as StatKey,
         Icon: DollarSign,
-        value: formatCurrency(stats.grossSales), // Valor monetário
+        rawValue: safeStats.grossSales,
         explanation: grossSalesExplanation,
       },
       {
-        // Total Sales
-        id: "total_sales",
+        id: "total_sales" as StatKey,
         Icon: BarChart3,
-        value: (stats.totalSalesTransactions || 0).toLocaleString(), // Valor de contagem
+        rawValue: safeStats.totalSalesTransactions,
       },
       {
-        // Front Sales
-        id: "front_sales",
+        id: "front_sales" as StatKey,
         Icon: Users,
-        value: (stats.frontSalesCount || 0).toLocaleString(),
+        rawValue: safeStats.frontSalesCount,
       },
       {
-        // Back Sales
-        id: "back_sales",
+        id: "back_sales" as StatKey,
         Icon: Package,
-        value: (stats.backSalesCount || 0).toLocaleString(),
+        rawValue: safeStats.backSalesCount,
       },
       {
-        // Average Order Value
-        id: "average_order_value",
+        id: "average_order_value" as StatKey,
         Icon: BadgePercent,
-        value: formatCurrency(stats.averageOrderValue), // Valor monetário
+        rawValue: safeStats.averageOrderValue,
         explanation: avgOrderValueExplanation,
       },
-    ].map((props) => ({
-      ...props,
-      // Puxa title, description, formula do mapa estático e adiciona loading
-      title: STATS_MAP[props.id].title,
-      description: STATS_MAP[props.id].description!,
-      formula: STATS_MAP[props.id].formula,
-      isLoading: isLoading,
-    }));
-  }, [stats, isLoading, formatCurrency]); // Recalcula quando stats mudar
+    ];
 
-  // --- RENDERIZAÇÃO ---
+    // 3. MAPEAR E FORMATAR
+    return baseCards.map((props) => {
+      const config = STATS_MAP[props.id];
+
+      // Determina o 'value' formatado e o 'rawValue' para o CountUp
+      const isMonetary =
+        props.id === "gross_sales" || props.id === "average_order_value";
+
+      const value = isMonetary
+        ? formatCurrency(props.rawValue)
+        : (props.rawValue || 0).toLocaleString();
+
+      return {
+        ...props,
+        title: config.title,
+        value: value,
+        description: config.description,
+        formula: config.formula,
+        isLoading: isLoading,
+        isMonetary,
+      };
+    });
+  }, [stats, isLoading, formatCurrency]);
+
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
       {cardProps.map((props) => (
@@ -111,11 +136,13 @@ export function StatsCards() {
           key={props.id}
           title={props.title}
           value={props.value}
-          icon={props.Icon} // Icone é passado como elemento React
+          rawValue={props.rawValue}
+          icon={props.Icon}
           description={props.description}
           isLoading={props.isLoading}
           explanation={props.explanation}
           formula={props.formula}
+          isMonetary={props.isMonetary}
         />
       ))}
     </div>

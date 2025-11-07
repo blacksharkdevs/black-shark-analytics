@@ -1,6 +1,5 @@
 // Importamos todos os componentes de UI que consomem o contexto
 import { Filters } from "@/components/dashboard/Filters";
-import { StatsCard } from "@/components/dashboard/StatsCard";
 // import { SalesTrendChart } from "@/components/dashboard/SalesTrendChart";
 // import { TopProductsTable } from "@/components/dashboard/TopProductsTable";
 // import { TopAffiliatesTable } from "@/components/dashboard/TopAffiliatesTable";
@@ -11,13 +10,6 @@ import { useDashboardData } from "@/hooks/useDashboardData";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 
 import { ACTION_TYPES } from "@/lib/config";
-import {
-  DollarSign,
-  BarChart3,
-  Users,
-  Package,
-  BadgePercent,
-} from "lucide-react";
 import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 

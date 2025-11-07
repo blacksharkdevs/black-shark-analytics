@@ -1,4 +1,5 @@
 import React from "react";
+import CountUp from "react-countup";
 import {
   Card,
   CardContent,
@@ -14,24 +15,50 @@ import {
 
 interface StatsCardProps {
   title: string;
-  value: string; // Já formatado
-  icon: React.ElementType; // Usamos ElementType para o Lucide icon
+  value: string;
+  rawValue: number;
+  icon: React.ElementType;
   description: string;
   isLoading: boolean;
   explanation?: string;
   formula?: string;
+  isMonetary?: boolean;
 }
 
 export function StatsCard({
   title,
   value,
+  rawValue,
   icon: Icon,
   description,
   isLoading,
   explanation,
   formula,
+  isMonetary = false,
 }: StatsCardProps) {
-  // --- RENDERIZAÇÃO DO SKELETON ---
+  // --- Lógica para o CountUp ---
+  const isCurrency = value.includes("$");
+  const duration = 1.5;
+
+  const countUpProps = isCurrency
+    ? {
+        prefix: "$",
+        decimals: 2,
+        separator: ",",
+        decimal: ".",
+        formattingFn: (val: number) =>
+          val.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+      }
+    : {
+        separator: ",",
+        decimals: 0,
+        formattingFn: (val: number) =>
+          val.toLocaleString("en-US", { maximumFractionDigits: 0 }),
+      };
+
   if (isLoading) {
     return (
       <Card className="transition-shadow duration-300 border rounded-none shadow-lg hover:shadow-xl bg-card/80">
@@ -47,19 +74,26 @@ export function StatsCard({
     );
   }
 
-  // --- CONTEÚDO FINAL DO CARD ---
   const cardContent = (
     <Card className="transition-shadow duration-300 border rounded-none shadow-lg hover:shadow-xl bg-card/80 backdrop-blur-sm">
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
         </CardTitle>
-        <div className="text-accent">
-          <Icon className="w-5 h-5" />
+        <div className="text-blue-600 dark:text-white">
+          <Icon className="w-7 h-7" />
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-foreground">{value}</div>
+        <div className="flex gap-1 text-2xl font-bold text-foreground">
+          {isMonetary && <p>$</p>}
+          <CountUp
+            start={0}
+            end={rawValue}
+            duration={duration}
+            {...countUpProps}
+          />
+        </div>
         {description && (
           <p className="pt-1 text-xs text-muted-foreground">{description}</p>
         )}
@@ -67,21 +101,18 @@ export function StatsCard({
     </Card>
   );
 
-  // --- TOOLTIP ---
   if (formula || explanation) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>{cardContent}</TooltipTrigger>
         <TooltipContent
-          className="max-w-xs p-3 text-sm whitespace-pre-wrap border rounded-none shadow-md bg-card text-foreground border-border"
-          side="top"
+          className="max-w-md p-3 text-lg whitespace-pre-wrap border rounded-none shadow-md bg-card text-foreground border-border"
+          side="bottom"
           align="center"
         >
-          {explanation && (
-            <p className="mb-1 text-base font-semibold">{explanation}</p>
-          )}
+          {explanation && <p className="mb-1 font-semibold">{explanation}</p>}
           {formula && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               <span className="font-medium">Formula:</span> {formula}
             </p>
           )}

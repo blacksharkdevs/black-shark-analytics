@@ -21,7 +21,7 @@ export function ActionTypeFilter({
 }: ActionTypeFilterProps) {
   return (
     <div className="flex items-center gap-2">
-      <ListFilter className="hidden w-5 h-5 text-muted-foreground sm:block" />
+      <ListFilter className="hidden text-blue-600 dark:text-white sm:block" />
       <Select
         value={selectedActionType}
         onValueChange={onActionTypeChange}

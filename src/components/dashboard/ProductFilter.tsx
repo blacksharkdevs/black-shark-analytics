@@ -21,7 +21,7 @@ export function ProductFilter({
 }: ProductFilterProps) {
   return (
     <div className="flex items-center gap-2">
-      <Package className="hidden w-5 h-5 text-muted-foreground sm:block" />
+      <Package className="hidden text-blue-600 dark:text-white sm:block" />
       <Select
         value={selectedProduct}
         onValueChange={onProductChange}
