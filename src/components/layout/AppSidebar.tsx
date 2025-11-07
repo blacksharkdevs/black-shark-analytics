@@ -24,6 +24,7 @@ import { SharkSwim } from "../common/SharkSwin";
 import { useSidebar } from "@/hooks/useSidebar";
 import { Button } from "../common/ui/button";
 import { motion } from "framer-motion";
+import { useThemeToggle } from "@/hooks/useThemeToggle";
 
 const menuItems = [
   {
@@ -67,6 +68,7 @@ export function AppSidebar({ width }: { width: string }) {
   const location = useLocation();
   const pathname = location.pathname;
   const { isSidebarOpen, isMobile, toggleSidebar } = useSidebar();
+  const { theme } = useThemeToggle();
 
   // 🚨 LÓGICA DE ATIVAÇÃO
   const isActive = (href: string) => {
@@ -105,7 +107,12 @@ export function AppSidebar({ width }: { width: string }) {
           to="/dashboard"
           className={cn("flex items-center gap-2 justify-center")}
         >
-          <SharkSwim width={isSidebarOpen ? 80 : 40} />
+          <SharkSwim
+            key={theme}
+            width={isSidebarOpen ? 80 : 40}
+            color="auto"
+            className="text-foreground"
+          />
           {/* Animação do título BlackShark */}
           {isSidebarOpen && (
             <motion.h1
