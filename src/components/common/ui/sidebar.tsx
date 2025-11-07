@@ -65,7 +65,7 @@ const SidebarSeparator = React.forwardRef<
     ref={ref}
     data-sidebar="separator"
     // 🚨 CORES: Usamos bg-accent/50
-    className={cn("my-3 bg-gray-400/40", className)}
+    className={cn("my-3 bg-accent/50", className)}
     {...props}
   />
 ));

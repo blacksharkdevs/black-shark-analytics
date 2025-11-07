@@ -1,24 +1,15 @@
-// Importamos todos os componentes de UI que consomem o contexto
 import { Filters } from "@/components/dashboard/Filters";
-// import { SalesTrendChart } from "@/components/dashboard/SalesTrendChart";
-// import { TopProductsTable } from "@/components/dashboard/TopProductsTable";
-// import { TopAffiliatesTable } from "@/components/dashboard/TopAffiliatesTable";
-// import { TopSellingItemsTable } from "@/components/dashboard/TopSellingItemsTable";
-
-// 🔑 Consumo: Este hook será usado nos componentes filhos, não aqui!
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
-
 import { ACTION_TYPES } from "@/lib/config";
 import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
 import { StatsCards } from "@/components/dashboard/StatsCards";
+import { SalesTrendChart } from "@/components/dashboard/SalesTrendChart";
+import { TopAffiliatesTable } from "@/components/dashboard/TopAffiliatesTable";
+import { TopSellingItemsTable } from "@/components/dashboard/TopSellingItemsTable";
+import { TopProductsTable } from "@/components/dashboard/TopProductsTable";
 
-/**
- * Componente Wrapper: Contém a organização visual da página.
- * Ele consome o estado de carregamento do ConfigContext para mostrar os esqueletos
- */
 function DashboardPageContent() {
-  // 🔑 CONSUMO: Apenas para puxar os filtros e o loading para o Filters component
   const {
     availableProducts,
     selectedProduct,
@@ -28,7 +19,6 @@ function DashboardPageContent() {
     isFetchingProducts,
   } = useDashboardData();
 
-  // 🔑 CONSUMO: Apenas para saber o loading do Data Range
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
 
   const isCombinedLoading = isFetchingProducts || isDateRangeLoading;
@@ -46,14 +36,10 @@ function DashboardPageContent() {
           isLoading={isCombinedLoading}
         />
       </div>
-
-      {/* --- 2. Cartões de Estatísticas (COMPONENTES CONSUMINDO O CONTEXTO) --- */}
       <div className="container p-0 mx-auto space-y-6">
         <StatsCards />
       </div>
-
-      {/* --- 3. Charts e Tabelas --- */}
-      {/* <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <SalesTrendChart />
         </div>
@@ -66,7 +52,7 @@ function DashboardPageContent() {
         <div className="lg:col-span-1">
           <TopProductsTable />
         </div>
-      </div> */}
+      </div>
     </div>
   );
 }

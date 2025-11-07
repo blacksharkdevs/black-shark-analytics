@@ -56,16 +56,15 @@ const shakeAnimation: AnimationDefinition = {
 };
 
 export function RegisterForm() {
-  const { registerUser, isLoading } = useAuth(); // 🚨 Usamos registerUser
+  const { registerUser, isLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const controls = useAnimation();
 
-  // 🚨 O token secreto de validação deve estar no .env do VITE
   const REGISTRATION_SECRET = import.meta.env.VITE_REGISTRATION_SECRET;
 
   const [showPassword, setShowPassword] = useState(false);
-  const [isRegisterSuccess, setIsRegisterSuccess] = useState(false); // 🚨 Estado de sucesso
+  const [isRegisterSuccess, setIsRegisterSuccess] = useState(false);
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -77,28 +76,25 @@ export function RegisterForm() {
   }, [controls]);
 
   const onSubmit = async (data: RegisterFormValues) => {
-    // 1. 🚨 VALIDAÇÃO DO TOKEN NO FRONT-END
     if (data.secretToken !== REGISTRATION_SECRET) {
       controls.start(shakeAnimation);
       toast({
-        title: "Registro Negado",
-        description: "O Token Secreto de Registro está incorreto.",
+        title: "Registration Failure",
+        description: "User already exists or database error.",
         variant: "destructive",
       });
-      return; // Impede a chamada ao Supabase
+      return;
     }
 
-    // 2. CHAMADA RPC PARA REGISTRO
     const success = await registerUser(data.username, data.password);
 
     if (success) {
-      // O registerUser faz login automático e lida com a navegação
       setIsRegisterSuccess(true);
     } else {
       controls.start(shakeAnimation);
       toast({
-        title: "Falha no Registro",
-        description: "Usuário já existe ou erro no banco de dados.",
+        title: "Registration Failure",
+        description: "User already exists or database error.",
         variant: "destructive",
       });
     }
@@ -122,33 +118,32 @@ export function RegisterForm() {
       variants={fadeVariants}
       animate={controls}
       initial="initial"
-      className="w-full max-w-md border rounded-none shadow-2xl bg-blackshark-card border-blackshark-accent"
+      className="w-full max-w-md bg-transparent border rounded-none shadow-2xl border-blackshark-accent"
     >
       <CardHeader className="text-center">
         <div className="flex justify-center mb-4">
           <SharkSwim width={170} />
         </div>
-        <CardTitle className="text-3xl tracking-tight font-headline text-blackshark-primary">
-          Registro de Administrador
+        <CardTitle className="text-3xl tracking-tight text-white font-headline">
+          Administrator Registration
         </CardTitle>
-        <CardDescription className="text-blackshark-accent">
-          Crie seu usuário de acesso. Requer Token Secreto.
+        <CardDescription className="text-white">
+          Create your access user. Requires Secret Token.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* CAMPO USERNAME */}
           <div className="space-y-2">
-            <Label htmlFor="username" className="text-blackshark-primary">
-              Usuário
+            <Label htmlFor="username" className="text-white">
+              Username
             </Label>
             <Input
               id="username"
               type="text"
-              placeholder="novo_admin"
+              placeholder="new username"
               {...form.register("username")}
               disabled={isLoading}
-              className="border rounded-none bg-blackshark-card border-blackshark-accent text-blackshark-primary focus:ring-blackshark-accent"
+              className="border rounded-none border-blackshark-accent text-blackshark-primary focus:ring-blackshark-accent"
               aria-invalid={form.formState.errors.username ? "true" : "false"}
             />
             {form.formState.errors.username && (
@@ -158,10 +153,9 @@ export function RegisterForm() {
             )}
           </div>
 
-          {/* CAMPO SENHA */}
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-blackshark-primary">
-              Senha
+            <Label htmlFor="password" className="text-white">
+              Password
             </Label>
             <div className="relative">
               <Input
@@ -195,18 +189,17 @@ export function RegisterForm() {
             )}
           </div>
 
-          {/* 🚨 NOVO CAMPO: TOKEN SECRETO */}
           <div className="space-y-2">
-            <Label htmlFor="secretToken" className="text-blackshark-primary">
-              Token Secreto
+            <Label htmlFor="secretToken" className="text-white">
+              Token
             </Label>
             <Input
               id="secretToken"
               type="password"
-              placeholder="Chave de Registro"
+              placeholder="myaccesstoken123"
               {...form.register("secretToken")}
               disabled={isLoading}
-              className="border rounded-none bg-blackshark-card border-blackshark-accent text-blackshark-primary focus:ring-blackshark-accent"
+              className="border rounded-none"
               aria-invalid={
                 form.formState.errors.secretToken ? "true" : "false"
               }
@@ -220,26 +213,26 @@ export function RegisterForm() {
 
           <Button
             type="submit"
-            className="w-full rounded-none bg-blackshark-primary hover:bg-blackshark-primary/90 text-blackshark-background"
+            className="w-full rounded-none bg-primary hover:bg-primary/90"
             disabled={isLoading}
           >
             {isLoading ? (
               <DotLoader />
             ) : (
               <>
-                <UserPlus className="w-4 h-4 mr-2 text-blackshark-background" />
-                Registrar
+                <UserPlus className="w-4 h-4 mr-2" />
+                Register
               </>
             )}
           </Button>
 
-          <p className="mt-4 text-sm text-center text-blackshark-accent">
-            Já tem conta?{" "}
+          <p className="mt-4 text-sm text-center text-blue-600/70">
+            Already have an account?{" "}
             <a
               onClick={() => navigate("/login")}
-              className="font-medium cursor-pointer text-blackshark-primary hover:underline"
+              className="font-medium cursor-pointer hover:underline"
             >
-              Fazer Login
+              Log In
             </a>
           </p>
         </form>

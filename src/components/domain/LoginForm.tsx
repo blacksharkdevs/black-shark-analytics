@@ -36,36 +36,23 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const AnimatedCard = motion(Card);
 
 const fadeVariants: Variants = {
-  initial: {
-    y: 150,
-    opacity: 0,
-  },
+  initial: { y: 150, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    transition: {
-      type: "spring",
-      stiffness: 200,
-      damping: 20,
-      delay: 0.1,
-    },
+    transition: { type: "spring", stiffness: 200, damping: 20, delay: 0.1 },
   },
 };
 
 const shakeAnimation: AnimationDefinition = {
   x: [0, -15, 15, -10, 10, -5, 5, 0],
-  transition: {
-    type: "tween",
-    duration: 0.8,
-    ease: "easeInOut",
-  },
+  transition: { type: "tween", duration: 0.8, ease: "easeInOut" },
 };
 
 export function LoginForm() {
   const { login, isLoading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-
   const controls = useAnimation();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -73,10 +60,7 @@ export function LoginForm() {
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-    },
+    defaultValues: { username: "", password: "" },
   });
 
   useEffect(() => {
@@ -118,25 +102,28 @@ export function LoginForm() {
       variants={fadeVariants}
       animate={controls}
       initial="initial"
-      className="w-full max-w-md border rounded-none shadow-2xl bg-blackshark-card border-blackshark-accent"
+      className="w-full max-w-md bg-transparent border rounded-none shadow-2xl border-border"
     >
       <CardHeader className="text-center">
         <div className="flex justify-center mb-4">
-          <SharkSwim width={170} />
+          {/* 🚨 TUBARÃO FIXO BRANCO */}
+          <SharkSwim width={170} color="white" />
         </div>
 
-        <CardTitle className="text-3xl tracking-tight font-headline text-blackshark-primary">
+        {/* 🚨 TEXTO: text-foreground (branco no dark mode) */}
+        <CardTitle className="text-3xl tracking-tight text-white font-headline">
           Black Shark Analytics
         </CardTitle>
-        <CardDescription className="text-blackshark-accent">
-          Insira suas credenciais para acessar o painel.
+        <CardDescription className="text-white">
+          Enter your credentials to access the dashboard.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="username" className="text-blackshark-primary">
-              Usuário
+            {/* 🚨 TEXTO: text-foreground */}
+            <Label htmlFor="username" className="text-white">
+              Username
             </Label>
             <Input
               id="username"
@@ -144,19 +131,19 @@ export function LoginForm() {
               placeholder="blackshark"
               {...form.register("username")}
               disabled={isLoading}
-              className="border rounded-none bg-blackshark-card border-blackshark-accent text-blackshark-primary focus:ring-blackshark-accent"
+              className="border rounded-none border-border text-foreground focus:ring-accent"
               aria-invalid={form.formState.errors.username ? "true" : "false"}
             />
             {form.formState.errors.username && (
-              <p className="text-sm text-blackshark-destructive">
+              <p className="text-sm text-destructive">
                 {form.formState.errors.username.message}
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-blackshark-primary">
-              Senha
+            <Label htmlFor="password" className="text-white">
+              Password
             </Label>
             <div className="relative">
               <Input
@@ -165,14 +152,14 @@ export function LoginForm() {
                 placeholder="••••••••"
                 disabled={isLoading}
                 {...form.register("password")}
-                className="pr-10 border rounded-none bg-blackshark-card border-blackshark-accent text-blackshark-primary focus:ring-blackshark-accent"
+                className="pr-10 border rounded-none border-border text-foreground focus:ring-accent"
                 aria-invalid={form.formState.errors.password ? "true" : "false"}
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="absolute inset-y-0 right-0 h-full px-3 text-blackshark-accent hover:bg-transparent"
+                className="absolute inset-y-0 right-0 h-full px-3 text-muted-foreground hover:bg-transparent"
                 onClick={() => setShowPassword((prev) => !prev)}
                 disabled={isLoading}
               >
@@ -184,7 +171,7 @@ export function LoginForm() {
               </Button>
             </div>
             {form.formState.errors.password && (
-              <p className="text-sm text-blackshark-destructive">
+              <p className="text-sm text-destructive">
                 {form.formState.errors.password.message}
               </p>
             )}
@@ -192,22 +179,21 @@ export function LoginForm() {
 
           <Button
             type="submit"
-            className="w-full rounded-none bg-blackshark-primary hover:bg-blackshark-primary/90 text-blackshark-background"
+            className="w-full rounded-none bg-primary hover:bg-primary/90"
             disabled={isLoading}
           >
             {isLoading ? (
               <DotLoader />
             ) : (
               <>
-                <LogIn className="w-4 h-4 mr-2 text-blackshark-background" />
-                Login
+                <LogIn className="w-4 h-4 mr-2" />
+                Log In
               </>
             )}
           </Button>
         </form>
-        <p className="mt-4 text-sm text-center text-blackshark-accent">
-          Dica: Use o usuário `blackshark` ou as credenciais da sua migração do
-          DB.
+        <p className="mt-4 text-sm text-center text-blue-600/70">
+          Tip: Use the `blackshark` user or your DB migration credentials.
         </p>
       </CardContent>
     </AnimatedCard>

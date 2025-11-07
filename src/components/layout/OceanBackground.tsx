@@ -10,7 +10,7 @@ export function OceanBackground(): JSX.Element {
         duration: Math.random() * 10 + 6,
         delay: Math.random() * 6,
         size: Math.random() * 6 + 3,
-        yStart: Math.random() * 100, // posição vertical inicial
+        yStart: Math.random() * 100,
         opacitySpeed: Math.random() * 6 + 4,
         scale: Math.random() * 0.8 + 0.6,
       })),
@@ -20,13 +20,8 @@ export function OceanBackground(): JSX.Element {
   return (
     <div
       aria-hidden
-      className="absolute inset-0 overflow-hidden bg-blackshark-background pointer-events-none"
-      style={{
-        transform: "translateZ(0)",
-        position: "absolute",
-        inset: 0,
-        overflow: "hidden",
-      }}
+      // 🚨 CORREÇÃO 1: Usamos bg-background dinâmica. As classes de estilo em linha são removidas
+      className="absolute inset-0 overflow-hidden bg-black pointer-events-none"
     >
       {particles.map((p, i) => (
         <motion.span
@@ -38,9 +33,9 @@ export function OceanBackground(): JSX.Element {
             width: `${p.size}px`,
             height: `${p.size}px`,
             borderRadius: "9999px",
-            background: "rgba(59,130,246,0.3)",
-            boxShadow: "0 0 12px rgba(59,130,246,0.1)",
             willChange: "transform, opacity",
+            background: `hsl(var(--accent) / 0.3)`,
+            boxShadow: `0 0 12px hsl(var(--accent) / 0.1)`,
           }}
           initial={{ x: 0, opacity: 0.4, scale: p.scale }}
           animate={{

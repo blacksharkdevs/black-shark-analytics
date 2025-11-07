@@ -38,7 +38,6 @@ export function Header() {
   const { toggleSidebar } = useSidebar();
   const { toggleTheme } = useThemeToggle();
 
-  // Puxamos TUDO do hook consolidado
   const {
     selectedDateConfig,
     setDateConfig,
@@ -82,7 +81,7 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 h-16 bg-background/95 backdrop-blur">
+    <header className="sticky top-0 z-40 h-16 border-b-[1px] bg-background/95 backdrop-blur border-b-gray-500/30">
       <div className="container flex items-center justify-between h-16 px-4 max-w-screen-2xl md:px-8">
         <div className="flex items-center gap-4">
           <Button

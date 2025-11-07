@@ -61,7 +61,7 @@ export function StatsCard({
 
   if (isLoading) {
     return (
-      <Card className="transition-shadow duration-300 border rounded-none shadow-lg hover:shadow-xl bg-card/80">
+      <Card className="transition-shadow duration-300 border rounded-none shadow-lg hover:shadow-xl border-white/30">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <Skeleton className="w-3/4 h-4 rounded-none bg-accent/20" />
           <Skeleton className="w-6 h-6 rounded-none bg-accent/20" />
@@ -75,7 +75,7 @@ export function StatsCard({
   }
 
   const cardContent = (
-    <Card className="transition-shadow duration-300 border rounded-none shadow-lg hover:shadow-xl bg-card/80 backdrop-blur-sm">
+    <Card className="transition-shadow duration-300 border rounded-none shadow-lg hover:shadow-xl border-white/30 backdrop-blur-sm">
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
