@@ -60,26 +60,29 @@ export function Header() {
 
   const availableTimezones = TIMEZONE_OPTIONS;
 
-  // --- LÓGICA DE TÍTULO BASEADA NA ROTA ---
   let headerTitle = "Dashboard";
   const pathname = location.pathname;
-
-  if (pathname === "/dashboard" || pathname.includes("/dashboard/vendas")) {
-    headerTitle = "Vendas";
-  } else if (pathname.includes("/dashboard/reembolsos")) {
-    headerTitle = "Reembolsos";
-  } else if (pathname.includes("/dashboard/transactions")) {
-    headerTitle = "Transações";
-  } else if (pathname.includes("/dashboard/affiliates")) {
-    headerTitle =
-      pathname.split("/").length > 3 ? "Histórico de Afiliado" : "Afiliados";
-  } else if (pathname.includes("/dashboard/customers")) {
-    headerTitle = "Histórico de Clientes";
+  if (pathname.includes("/dashboard/reports")) {
+    headerTitle = "Reports";
+  } else if (pathname.includes("/dashboard/configurations")) {
+    headerTitle = "Configurations";
+  } else if (
+    pathname.includes("/dashboard/affiliates") ||
+    pathname.includes("/dashboard/customers")
+  ) {
+    headerTitle = "Affiliates";
+  } else if (
+    pathname.includes("/dashboard/vendas") ||
+    pathname.includes("/dashboard/reembolsos") ||
+    pathname.includes("/dashboard/transactions")
+  ) {
+    headerTitle = "Sales";
+  } else if (pathname === "/dashboard" || pathname === "/dashboard/") {
+    headerTitle = "Dashboard";
   }
-  // --- FIM LÓGICA DE TÍTULO ---
 
   return (
-    <header className="sticky top-0 z-40 h-16 border-b border-border bg-background/95 backdrop-blur">
+    <header className="sticky top-0 z-40 h-16 bg-background/95 backdrop-blur">
       <div className="container flex items-center justify-between h-16 px-4 max-w-screen-2xl md:px-8">
         <div className="flex items-center gap-4">
           <Button
@@ -155,7 +158,7 @@ export function Header() {
                     <p className="text-sm font-medium leading-none">
                       {user.username}
                     </p>
-                    <p className="text-xs leading-none text-accent">
+                    <p className="text-xs leading-none text-blue-400">
                       Administrator Access
                     </p>
                   </div>

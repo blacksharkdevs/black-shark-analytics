@@ -7,11 +7,9 @@ import {
   AreaChart,
   List,
   BarChartHorizontal,
-  PackageCheck,
   LayoutDashboard,
   ChevronLeft,
   ChevronRight,
-  Settings,
 } from "lucide-react";
 import {
   SidebarHeader,
@@ -21,23 +19,19 @@ import {
 } from "@/components/common/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { SidebarLinkItem } from "./SidebarLinkItem";
-// 🚨 SidebarCollapsibleGroup e SidebarMenuSub não são mais necessários!
-// import { SidebarCollapsibleGroup } from "./SidebarCollapsibleGroup";
+
 import { SharkSwim } from "../common/SharkSwin";
 import { useSidebar } from "@/hooks/useSidebar";
 import { Button } from "../common/ui/button";
 import { motion } from "framer-motion";
 
 const menuItems = [
-  // Dashboard & Transactions
   {
     href: "/dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
     isRoot: true,
   },
-  { href: "/dashboard/vendas", label: "Sales", icon: ListOrdered },
-  { href: "/dashboard/reembolsos", label: "Refunds", icon: PackageCheck },
   { href: "/dashboard/transactions", label: "Transactions", icon: ListOrdered }, // 🚨 ROTA ADICIONADA
   { href: "/dashboard/affiliates", label: "Affiliates", icon: Users },
 ];
@@ -67,11 +61,6 @@ const configMenuItems = [
     label: "Main Products",
     icon: Package,
   },
-  {
-    href: "/dashboard/configurations/settings",
-    label: "Settings",
-    icon: Settings,
-  },
 ];
 
 export function AppSidebar({ width }: { width: string }) {
@@ -96,8 +85,6 @@ export function AppSidebar({ width }: { width: string }) {
     return pathname.startsWith(href);
   };
 
-  const allMenuItems = [...menuItems, ...reportsMenuItems, ...configMenuItems];
-
   return (
     <motion.div // 🚨 Usamos motion.div para animar a largura da Sidebar
       initial={false}
@@ -106,7 +93,7 @@ export function AppSidebar({ width }: { width: string }) {
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className={cn(
-        "fixed top-0 left-0 h-full border-r border-border bg-card transition-transform duration-300 z-50 flex flex-col", // flex flex-col para o layout interno
+        "fixed top-0 left-0 h-full border-r border-gray-400 bg-card transition-transform duration-300 z-50 flex flex-col", // flex flex-col para o layout interno
         {
           "transform -translate-x-full": !isSidebarOpen && isMobile, // Esconde no mobile
           "w-[280px]": isSidebarOpen && isMobile, // Garante largura no mobile aberto
@@ -141,23 +128,29 @@ export function AppSidebar({ width }: { width: string }) {
 
       <SidebarContent className="flex flex-col flex-1 px-3 py-4">
         <SidebarMenu className="flex-1 gap-2">
-          {allMenuItems.map((item) => (
+          {menuItems.map((item) => (
             <SidebarLinkItem key={item.href} item={item} isActive={isActive} />
           ))}
-          <SidebarSeparator className="my-4 bg-accent/50" />{" "}
-          {/* Separador para agrupar visualmente */}
+          <SidebarSeparator />
+          {reportsMenuItems.map((item) => (
+            <SidebarLinkItem key={item.href} item={item} isActive={isActive} />
+          ))}
+          <SidebarSeparator />
+          {configMenuItems.map((item) => (
+            <SidebarLinkItem key={item.href} item={item} isActive={isActive} />
+          ))}
         </SidebarMenu>
 
         {/* BOTÃO DE TOGGLE DA SIDEBAR (para Desktop no rodapé) */}
         {!isMobile && ( // Renderiza apenas no desktop
-          <div className="flex justify-center py-4 mt-auto border-t border-border">
+          <div className="flex justify-center py-4 mt-auto">
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleSidebar}
               className={cn(
                 "h-10 w-10 rounded-full flex items-center justify-center p-0",
-                "text-foreground hover:bg-accent/20 border border-border"
+                "text-foreground hover:bg-blue-500 border border-border"
               )}
               aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
             >

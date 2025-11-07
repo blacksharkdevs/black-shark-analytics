@@ -2,54 +2,81 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ----------------------------------------------------
- * 🔑 DEFINIÇÃO DO TEMA CLARO (Padrão) - Corresponde ao ':root'
- * ---------------------------------------------------- */
-:root {
-  /* Fundo Principal (Branco/Quase Branco) */
-  --background: 0 0% 100%; /* Light: Branco */
-  /* Texto Principal (Preto/Quase Preto) */
-  --foreground: 0 0% 9%; /* Light: Preto */
+@layer base {
+  :root {
+    --background: 0 0% 97%;
+    --foreground: 220 15% 25%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 25%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 25%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 220 15% 90%;
+    --secondary-foreground: 220 15% 25%;
+    --muted: 220 15% 90%;
+    --muted-foreground: 220 10% 45%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 217 91% 60%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
 
-  /* Cards, Sidebar (Cinza Claro) */
-  --card: 0 0% 98%; /* Light: Branco Sujo */
-  --card-foreground: 0 0% 9%; /* Light: Preto */
+    /* Sidebar Specific Vars - Light Theme */
+    --sidebar-background: 0 0% 100%; /* #ffffff */
+    --sidebar-foreground: 0 0% 20%; /* #333333 */
+    --sidebar-muted-foreground: 0 0% 53.3%; /* #888888 */
+    --sidebar-border: 0 0% 90.2%; /* #e6e6e6 */
+    --sidebar-accent: 240 4.8% 95.9%; /* #f4f4f5 (hover bg) */
+    --sidebar-accent-foreground: 224 42.1% 16.7%; /* #111827 (hover text) */
+    --sidebar-active-background: 220 100% 93.9%; /* #e0ecff (active bg, example: light blue tint) */
+    --sidebar-active-foreground: 221 71.4% 49.6%; /* #1d4ed8 (active text) */
+  }
 
-  /* Primary/Botão (Preto - Fundo do botão) */
-  --primary: 0 0% 9%; /* Light: Preto (Para Botões) */
-  --primary-foreground: 0 0% 100%; /* Light: Branco (Texto sobre o botão) */
+  .dark {
+    --background: 227 64% 19%;
+    --foreground: 0 0% 98%;
+    --card: 227 60% 25%;
+    --card-foreground: 0 0% 98%;
+    --popover: 227 60% 25%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 225 100% 58%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 227 50% 30%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 227 50% 30%;
+    --muted-foreground: 227 20% 65%;
+    --accent: 285 100% 50%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 227 40% 35%;
+    --input: 227 40% 35%;
+    --ring: 225 100% 58%;
+    --chart-1: 225 100% 70%;
+    --chart-2: 285 100% 70%;
+    --chart-3: 180 100% 50%;
+    --chart-4: 45 100% 60%;
+    --chart-5: 30 100% 65%;
 
-  /* Accent/Borda/Separador*/
-  --accent: 217 78% 50%; /* Light: Azul Vívido (Para Hover e Foco) */
-  --accent-foreground: 0 0% 100%;
-
-  /* Destructive/Erro (Vermelho) */
-  --destructive: 0 84.2% 60.2%;
-}
-
-/* ----------------------------------------------------
- * 🦈 DEFINIÇÃO DO TEMA ESCURO (BLACK SHARK) - Classe '.dark'
- * ---------------------------------------------------- */
-.dark {
-  /* Fundo Principal (Preto) */
-  --background: 222 47% 4%; /* Dark: Preto Profundo (#010001) */
-  /* Texto Principal (Branco) */
-  --foreground: 0 0% 95%; /* Dark: Branco */
-
-  /* Cards, Sidebar (Quase Preto/Cinza Escuro) */
-  --card: 222 47% 10%; /* Dark: Cinza escuro (Nossa cor #1a1a1a) */
-  --card-foreground: 0 0% 95%; /* Dark: Branco */
-
-  /* Primary/Botão (Branco - Fundo do botão) */
-  --primary: 0 0% 95%; /* Dark: Branco (Para Botões) */
-  --primary-foreground: 222 47% 4%; /* Dark: Preto (Texto sobre o botão) */
-
-  /* Accent/Borda/Separador */
-  --accent: 285 100% 50%;
-  --accent-foreground: 0 0% 98%;
-
-  /* Destructive/Erro (Vermelho) */
-  --destructive: 0 60% 50%;
+    /* Sidebar Specific Vars - Dark Theme (example) */
+    --sidebar-background: 227 60% 15%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-muted-foreground: 0 0% 60%;
+    --sidebar-border: 227 40% 25%;
+    --sidebar-accent: 227 50% 20%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-active-background: 225 80% 30%;
+    --sidebar-active-foreground: 225 100% 85%;
+  }
 }
 
 /* ----------------------------------------------------

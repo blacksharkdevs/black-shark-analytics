@@ -98,7 +98,7 @@ export function DateRangePicker({
         value={selectedGlobalRangeOptionId}
         onValueChange={handlePresetChange}
       >
-        <SelectTrigger className="w-full sm:w-[180px] h-10 bg-card text-foreground border border-input hover:bg-accent transition-colors rounded-none">
+        <SelectTrigger className="w-full sm:w-[180px] h-10 bg-card text-foreground border border-input hover:bg-blue-500 hover:text-white transition-colors rounded-none">
           <SelectValue placeholder="Select date range" />
         </SelectTrigger>
         <SelectContent className="border rounded-none bg-card border-border">
@@ -120,7 +120,7 @@ export function DateRangePicker({
             id="date"
             variant={"outline"}
             className={cn(
-              "w-full justify-start text-left font-normal h-10 bg-card text-foreground hover:bg-accent hover:text-accent-foreground border border-input transition-colors rounded-none",
+              "w-full justify-start text-left font-normal h-10 bg-card text-foreground hover:bg-blue-500 hover:text-white border border-input transition-colors rounded-none",
               !currentGlobalRange.from && "text-muted-foreground",
               "sm:w-[260px]"
             )}
