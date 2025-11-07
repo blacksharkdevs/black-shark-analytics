@@ -1,41 +1,43 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useSidebar } from "@/hooks/useSidebar";
 import { cn } from "@/lib/utils";
-import {
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from "@/components/common/ui/sidebar";
+import { SidebarMenuButton } from "@/components/common/ui/sidebar";
+import { useSidebar } from "@/hooks/useSidebar";
+import { motion } from "framer-motion"; // Importar motion
 
-interface MenuItemProps {
-  item: { href: string; label: string; icon: React.ElementType };
+interface SidebarLinkItemProps {
+  item: {
+    href: string;
+    label: string;
+    icon: React.ElementType;
+  };
   isActive: (href: string) => boolean;
 }
 
-export function SidebarLinkItem({ item, isActive }: MenuItemProps) {
+export function SidebarLinkItem({ item, isActive }: SidebarLinkItemProps) {
   const { isSidebarOpen } = useSidebar();
+  const Icon = item.icon;
 
   return (
-    <SidebarMenuItem>
+    <li className="relative">
       <Link to={item.href}>
-        <SidebarMenuButton
-          isActive={isActive(item.href)}
-          tooltip={{
-            children: item.label,
-            side: "right",
-            className: "bg-blackshark-card text-blackshark-primary",
-          }}
-          className="justify-start h-10 text-sm font-medium"
-          size="default"
-        >
-          <span>
-            <item.icon className="h-[18px] w-[18px] text-current" />
-            <span className={cn("ml-2", !isSidebarOpen && "hidden")}>
+        <SidebarMenuButton isActive={isActive(item.href)} tooltip={item.label}>
+          <Icon className="h-[22px] w-[22px] shrink-0" />
+          {isSidebarOpen && (
+            <motion.span
+              initial={false}
+              animate={{
+                opacity: isSidebarOpen ? 1 : 0,
+                width: isSidebarOpen ? "auto" : 0,
+              }}
+              transition={{ duration: 0.2 }}
+              className={cn("ml-2 whitespace-nowrap overflow-hidden")}
+            >
               {item.label}
-            </span>
-          </span>
+            </motion.span>
+          )}
         </SidebarMenuButton>
       </Link>
-    </SidebarMenuItem>
+    </li>
   );
 }

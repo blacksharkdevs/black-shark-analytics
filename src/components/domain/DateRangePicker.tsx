@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { CalendarIcon } from "lucide-react";
 import { isSameDay, format as dateFnsFormat } from "date-fns";
@@ -44,13 +42,11 @@ export function DateRangePicker({
   >(currentGlobalRange);
 
   React.useEffect(() => {
-    // Sync local state when global state changes from a preset
     if (selectedGlobalRangeOptionId !== "custom") {
       setLocalDateRange(currentGlobalRange);
     }
   }, [currentGlobalRange, selectedGlobalRangeOptionId]);
 
-  // When the popover is opened, ensure its local state is reset to the current global state.
   React.useEffect(() => {
     if (popoverOpen) {
       setLocalDateRange(currentGlobalRange);
@@ -102,12 +98,16 @@ export function DateRangePicker({
         value={selectedGlobalRangeOptionId}
         onValueChange={handlePresetChange}
       >
-        <SelectTrigger className="w-full sm:w-[180px] h-10 bg-card hover:bg-muted transition-colors">
+        <SelectTrigger className="w-full sm:w-[180px] h-10 bg-card text-foreground border border-input hover:bg-accent transition-colors rounded-none">
           <SelectValue placeholder="Select date range" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="border rounded-none bg-card border-border">
           {DATE_RANGE_OPTIONS.map((option) => (
-            <SelectItem key={option.id} value={option.id}>
+            <SelectItem
+              key={option.id}
+              value={option.id}
+              className="rounded-none text-foreground hover:bg-accent/10 focus:bg-accent/10"
+            >
               {option.name}
             </SelectItem>
           ))}
@@ -120,7 +120,7 @@ export function DateRangePicker({
             id="date"
             variant={"outline"}
             className={cn(
-              "w-full justify-start text-left font-normal h-10 bg-card hover:bg-muted transition-colors",
+              "w-full justify-start text-left font-normal h-10 bg-card text-foreground hover:bg-accent hover:text-accent-foreground border border-input transition-colors rounded-none",
               !currentGlobalRange.from && "text-muted-foreground",
               "sm:w-[260px]"
             )}
@@ -130,7 +130,7 @@ export function DateRangePicker({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-auto bg-popover text-popover-foreground"
+          className="w-auto bg-white border rounded-none border-border light"
           align="start"
         >
           <DayPicker
@@ -142,9 +142,14 @@ export function DateRangePicker({
             numberOfMonths={2}
             pagedNavigation
           />
+
           <div className="flex justify-end p-3 border-t border-border">
-            <Button onClick={handleApplyCustomDate} size="sm">
-              Apply
+            <Button
+              onClick={handleApplyCustomDate}
+              size="sm"
+              className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Aplicar
             </Button>
           </div>
         </PopoverContent>

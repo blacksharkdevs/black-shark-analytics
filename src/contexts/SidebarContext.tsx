@@ -1,4 +1,4 @@
-import React, { useState, useCallback, type ReactNode } from "react";
+import { useState, useCallback, type ReactNode } from "react";
 import { SidebarContext } from "./SidebarContextDefinition";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 

@@ -1,4 +1,3 @@
-import React from "react";
 import { Outlet } from "react-router-dom";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Header } from "@/components/layout/Header";
@@ -10,19 +9,25 @@ import { DashboardConfigProvider } from "@/contexts/DashboardConfigContext";
 
 const SIDEBAR_WIDTH = "280px";
 
-function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
+function DashboardLayoutContent() {
   const { isSidebarOpen } = useSidebar();
 
+  const currentSidebarWidth = isSidebarOpen ? SIDEBAR_WIDTH : "72px";
+
   return (
-    <div className="flex min-h-screen">
+    <div className="flex w-full min-h-screen bg-background">
       <AppSidebar width={SIDEBAR_WIDTH} />
       <div
         className="relative flex flex-col flex-1 transition-all duration-300"
-        style={{ marginLeft: isSidebarOpen ? SIDEBAR_WIDTH : "0px" }}
+        style={{
+          marginLeft: currentSidebarWidth,
+          width: `calc(100% - ${currentSidebarWidth})`,
+        }}
       >
         <Header />
-
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 p-4 overflow-y-auto md:p-8">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
@@ -38,9 +43,7 @@ export default function DashboardLayout() {
   return (
     <DashboardConfigProvider>
       <SidebarProvider>
-        <DashboardLayoutContent>
-          <Outlet />
-        </DashboardLayoutContent>
+        <DashboardLayoutContent />
       </SidebarProvider>
     </DashboardConfigProvider>
   );

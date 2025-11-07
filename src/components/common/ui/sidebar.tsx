@@ -27,7 +27,8 @@ const Sidebar = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        "group/sidebar fixed inset-y-0 z-30 flex h-screen flex-col text-blackshark-primary transition-[width] duration-200 ease-in-out",
+        // 🚨 CORES: Usamos text-foreground
+        "group/sidebar fixed inset-y-0 z-30 flex h-screen flex-col text-foreground transition-[width] duration-200 ease-in-out",
         isSidebarOpen ? "w-full" : "w-[72px]",
         className
       )}
@@ -63,7 +64,8 @@ const SidebarSeparator = React.forwardRef<
   <Separator
     ref={ref}
     data-sidebar="separator"
-    className={cn("my-3 bg-blackshark-accent/50", className)}
+    // 🚨 CORES: Usamos bg-accent/50
+    className={cn("my-3 bg-accent/50", className)}
     {...props}
   />
 ));
@@ -114,7 +116,8 @@ SidebarMenuItem.displayName = "SidebarMenuItem";
 // --- Sidebar Menu Button ---
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-none p-2 text-left outline-none ring-blackshark-accent transition-colors ease-in-out focus-visible:ring-2 active:text-blackshark-primary disabled:pointer-events-none disabled:opacity-50 text-blackshark-primary hover:bg-blackshark-accent/20 hover:text-blackshark-primary data-[active=true]:bg-blackshark-accent/40 data-[active=true]:text-blackshark-primary data-[active=true]:font-medium group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center [&>svg]:pointer-events-none [&>svg]:shrink-0 [&_span]:pointer-events-none",
+  // 🚨 CORES/ESTILOS DINÂMICOS
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-none p-2 text-left outline-none ring-accent transition-colors ease-in-out focus-visible:ring-2 active:text-primary disabled:pointer-events-none disabled:opacity-50 text-foreground hover:bg-accent/20 hover:text-foreground data-[active=true]:bg-accent/40 data-[active=true]:text-foreground data-[active=true]:font-medium group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center [&>svg]:pointer-events-none [&>svg]:shrink-0 [&_span]:pointer-events-none",
   {
     variants: {
       variant: { default: "" },
@@ -148,7 +151,7 @@ const SidebarMenuButton = React.forwardRef<
     ref
   ) => {
     const Comp = asChild ? Slot : "button";
-    const { isMobile, isSidebarOpen } = useSidebar();
+    const { isMobile, isSidebarOpen } = useSidebar(); // Usamos o hook real
 
     const tooltipProps =
       typeof tooltip === "string" ? { children: tooltip } : tooltip;
@@ -159,7 +162,11 @@ const SidebarMenuButton = React.forwardRef<
         data-sidebar="menu-button"
         data-size={size}
         data-active={isActive}
-        className={cn(sidebarMenuButtonVariants({ variant, size, className }))}
+        className={cn(
+          sidebarMenuButtonVariants({ variant, size, className }),
+          !isSidebarOpen ? "justify-center" : "justify-start",
+          "flex items-center"
+        )}
         {...props}
       >
         {children}
@@ -177,8 +184,9 @@ const SidebarMenuButton = React.forwardRef<
             align="center"
             hidden={isSidebarOpen || isMobile}
             {...tooltipProps}
+            // 🚨 CORES DINÂMICAS: bg-card, text-foreground, border-border
             className={cn(
-              "bg-blackshark-card text-blackshark-primary border border-blackshark-accent",
+              "bg-card text-foreground border border-border",
               tooltipProps?.className
             )}
           />
@@ -199,7 +207,8 @@ const SidebarMenuSub = React.forwardRef<
     ref={ref}
     data-sidebar="menu-sub"
     className={cn(
-      "ml-[calc(18px+0.5rem)] flex min-w-0 flex-col gap-1 border-l border-blackshark-accent/50 pl-3 py-1",
+      // 🚨 CORES: Usamos border-accent/50
+      "ml-[calc(18px+0.5rem)] flex min-w-0 flex-col gap-1 border-l border-accent/50 pl-3 py-1",
       "group-data-[collapsible=icon]:hidden",
       className
     )}
@@ -228,8 +237,9 @@ const SidebarMenuSubButton = React.forwardRef<
       data-sidebar="menu-sub-button"
       data-active={isActive}
       className={cn(
-        "flex h-auto min-w-0 items-center gap-2 overflow-hidden rounded-none px-2 py-1.5 text-blackshark-accent outline-none ring-blackshark-accent hover:bg-blackshark-accent/20 hover:text-blackshark-primary focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
-        "data-[active=true]:bg-blackshark-accent/40 data-[active=true]:text-blackshark-primary data-[active=true]:font-medium",
+        // 🚨 CORES DINÂMICAS: text-accent, hover:bg-accent/20, text-foreground
+        "flex h-auto min-w-0 items-center gap-2 overflow-hidden rounded-none px-2 py-1.5 text-accent outline-none ring-accent hover:bg-accent/20 hover:text-foreground focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+        "data-[active=true]:bg-accent/40 data-[active=true]:text-foreground data-[active=true]:font-medium",
         "group-data-[collapsible=icon]:hidden",
         className
       )}

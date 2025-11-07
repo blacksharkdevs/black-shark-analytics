@@ -8,22 +8,35 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "blackshark-primary": "#FFFFFF",
-        "blackshark-background": "#010001",
-        "blackshark-card": "#1a1a1a",
-        "blackshark-accent": "#64748b",
-        "blackshark-destructive": "#ef4444",
+        // 🚨 REMOVEMOS AS CORES 'blackshark-' FIXAS E USAMOS APENAS HSL
+        // Essas variáveis serão definidas no global.css
 
-        background: "var(--color-background, #010001)",
-        foreground: "var(--color-foreground, #FFFFFF)",
-        card: "var(--color-card, #1a1a1a)",
-        "card-foreground": "var(--color-card-foreground, #FFFFFF)",
-        primary: "var(--color-primary, #FFFFFF)",
-        "primary-foreground": "var(--color-primary-foreground, #010001)",
-        secondary: "var(--color-secondary, #1a1a1a)",
-        destructive: "var(--color-destructive, #ef4444)",
+        // Fundo e Texto
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+
+        // Cards e Sidebar
+        card: "hsl(var(--card))",
+        "card-foreground": "hsl(var(--card-foreground))",
+
+        // Cores de Ação (Botões/Destaque)
+        primary: "hsl(var(--primary))",
+        "primary-foreground": "hsl(var(--primary-foreground))",
+        secondary: "hsl(var(--secondary))",
+
+        // Borda, Accent, Destructive
+        accent: "hsl(var(--accent))",
+        "accent-foreground": "hsl(var(--accent-foreground))",
+        destructive: "hsl(var(--destructive))",
+        "destructive-foreground": "hsl(var(--destructive-foreground))",
+
+        // Cores mutáveis para inputs/borda (se você tiver)
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
       },
       borderRadius: {
+        // Mantemos 0px para o design reto!
         lg: "0px",
         md: "0px",
         sm: "0px",

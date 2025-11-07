@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/hooks/useSidebar";
 import { ChevronRight } from "lucide-react";
@@ -39,7 +38,7 @@ export function SidebarCollapsibleGroup({
   const { isSidebarOpen } = useSidebar();
   const isBasePathActive = location.pathname.startsWith(basePath);
 
-  // 🔑 Estado local para o Collapsible: Aberto se a rota principal estiver ativa.
+  // Estado local para o Collapsible: Aberto se a rota principal estiver ativa.
   const [isOpen, setIsOpen] = useState(isBasePathActive);
 
   return (
@@ -51,7 +50,8 @@ export function SidebarCollapsibleGroup({
             tooltip={{
               children: title,
               side: "right",
-              className: "bg-blackshark-card text-blackshark-primary",
+              // 🚨 CORREÇÃO: Usamos classes dinâmicas para o Tooltip
+              className: "bg-card text-foreground border border-border",
             }}
             className="justify-start h-10 text-sm font-medium"
             size="default"
@@ -60,7 +60,7 @@ export function SidebarCollapsibleGroup({
             <span
               className={cn(
                 "ml-2 flex-1 text-left",
-                !isSidebarOpen && "hidden"
+                !isSidebarOpen && "hidden" // Esconde o texto quando colapsado
               )}
             >
               {title}
@@ -68,7 +68,7 @@ export function SidebarCollapsibleGroup({
             <ChevronRight
               className={cn(
                 "h-4 w-4 transform transition-transform duration-200 data-[state=open]:rotate-90",
-                !isSidebarOpen && "hidden"
+                !isSidebarOpen && "hidden" // Esconde o ícone de seta quando colapsado
               )}
             />
           </SidebarMenuButton>

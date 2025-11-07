@@ -2,16 +2,18 @@ import { Link, useLocation } from "react-router-dom";
 import {
   ListOrdered,
   Users,
-  Settings,
   Package,
   Link as LinkIcon,
   AreaChart,
   List,
   BarChartHorizontal,
   PackageCheck,
+  LayoutDashboard,
+  ChevronLeft,
+  ChevronRight,
+  Settings,
 } from "lucide-react";
 import {
-  Sidebar,
   SidebarHeader,
   SidebarContent,
   SidebarMenu,
@@ -19,26 +21,37 @@ import {
 } from "@/components/common/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { SidebarLinkItem } from "./SidebarLinkItem";
-import { SidebarCollapsibleGroup } from "./SidebarCollapsibleGroup";
+// 🚨 SidebarCollapsibleGroup e SidebarMenuSub não são mais necessários!
+// import { SidebarCollapsibleGroup } from "./SidebarCollapsibleGroup";
 import { SharkSwim } from "../common/SharkSwin";
 import { useSidebar } from "@/hooks/useSidebar";
+import { Button } from "../common/ui/button";
+import { motion } from "framer-motion";
 
 const menuItems = [
-  { href: "/dashboard/vendas", label: "Vendas", icon: ListOrdered },
-  { href: "/dashboard/reembolsos", label: "Reembolsos", icon: PackageCheck },
-  { href: "/dashboard/affiliates", label: "Afiliados", icon: Users },
+  // Dashboard & Transactions
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    isRoot: true,
+  },
+  { href: "/dashboard/vendas", label: "Sales", icon: ListOrdered },
+  { href: "/dashboard/reembolsos", label: "Refunds", icon: PackageCheck },
+  { href: "/dashboard/transactions", label: "Transactions", icon: ListOrdered }, // 🚨 ROTA ADICIONADA
+  { href: "/dashboard/affiliates", label: "Affiliates", icon: Users },
 ];
 
 const reportsMenuItems = [
-  { href: "/dashboard/reports/items", label: "Relatório de Itens", icon: List },
+  { href: "/dashboard/reports/items", label: "Items Report", icon: List },
   {
     href: "/dashboard/reports/daily-units",
-    label: "Relatório de Unidades Diárias",
+    label: "Daily Units Report",
     icon: BarChartHorizontal,
   },
   {
     href: "/dashboard/reports/main-product-inspector",
-    label: "Inspetor de Produtos",
+    label: "Product Inspector",
     icon: AreaChart,
   },
 ];
@@ -46,97 +59,117 @@ const reportsMenuItems = [
 const configMenuItems = [
   {
     href: "/dashboard/configurations/sku-mapping",
-    label: "Mapeamento SKU",
+    label: "SKU Mapping",
     icon: LinkIcon,
   },
   {
     href: "/dashboard/configurations/main-products",
-    label: "Produtos Principais",
+    label: "Main Products",
     icon: Package,
+  },
+  {
+    href: "/dashboard/configurations/settings",
+    label: "Settings",
+    icon: Settings,
   },
 ];
 
 export function AppSidebar({ width }: { width: string }) {
   const location = useLocation();
   const pathname = location.pathname;
-  const { isSidebarOpen } = useSidebar();
+  const { isSidebarOpen, isMobile, toggleSidebar } = useSidebar();
 
-  // Função de Ativação (Simplificada)
+  // 🚨 LÓGICA DE ATIVAÇÃO
   const isActive = (href: string) => {
-    // Para rota principal, verifica se está na rota ou sub-rota principal.
-    if (href === "/dashboard/vendas")
-      return (
-        pathname === "/dashboard" ||
-        pathname === "/dashboard/" ||
-        pathname === "/dashboard/vendas"
-      );
-    // Lógica para rotas aninhadas e transações/clientes
+    if (href === "/dashboard") {
+      // Ativa se for o root path exato
+      return pathname === "/dashboard" || pathname === "/dashboard/";
+    }
     if (
       href === "/dashboard/affiliates" &&
       (pathname.startsWith("/dashboard/affiliates") ||
-        pathname.startsWith("/dashboard/customers")) // Agrupando customers em affiliates para fins de menu
+        pathname.startsWith("/dashboard/customers"))
     )
       return true;
 
+    // Para todos os outros links, usa o startswith
     return pathname.startsWith(href);
   };
 
+  const allMenuItems = [...menuItems, ...reportsMenuItems, ...configMenuItems];
+
   return (
-    <Sidebar
-      // Note: O componente Sidebar precisa de lógica interna para lidar com o isSidebarOpen
-      collapsible={isSidebarOpen ? "full" : "icon"}
+    <motion.div // 🚨 Usamos motion.div para animar a largura da Sidebar
+      initial={false}
+      animate={{
+        width: isSidebarOpen && !isMobile ? width : isMobile ? "280px" : "72px",
+      }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
       className={cn(
-        "fixed top-0 left-0 h-full border-r border-blackshark-accent bg-blackshark-card transition-transform duration-300 z-50",
-        !isSidebarOpen && "transform -translate-x-full md:translate-x-0"
+        "fixed top-0 left-0 h-full border-r border-border bg-card transition-transform duration-300 z-50 flex flex-col", // flex flex-col para o layout interno
+        {
+          "transform -translate-x-full": !isSidebarOpen && isMobile, // Esconde no mobile
+          "w-[280px]": isSidebarOpen && isMobile, // Garante largura no mobile aberto
+        }
       )}
-      style={{ width: width }}
     >
-      <SidebarHeader className="p-3">
+      <SidebarHeader className="p-3 py-10">
         <Link
-          to="/dashboard/vendas"
-          className={cn(
-            "flex items-center gap-2",
-            isSidebarOpen ? "justify-start" : "justify-center"
-          )}
+          to="/dashboard"
+          className={cn("flex items-center gap-2 justify-center")}
         >
-          <SharkSwim width={isSidebarOpen ? 32 : 24} />
-          <h1
-            className={cn(
-              "text-xl font-black text-blackshark-primary",
-              !isSidebarOpen && "hidden"
-            )}
-          >
-            BlackShark
-          </h1>
+          <SharkSwim width={isSidebarOpen ? 80 : 40} />
+          {/* Animação do título BlackShark */}
+          {isSidebarOpen && (
+            <motion.h1
+              initial={false}
+              animate={{
+                opacity: isSidebarOpen ? 1 : 0,
+                width: isSidebarOpen ? "auto" : 0,
+              }}
+              transition={{ duration: 0.2 }}
+              className={cn(
+                "text-xl font-black text-foreground whitespace-nowrap overflow-hidden",
+                !isSidebarOpen && "hidden md:flex" // Esconde no modo ícone, exceto se for mobile
+              )}
+            >
+              BlackShark
+            </motion.h1>
+          )}
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="px-3 py-4">
-        <SidebarMenu className="gap-2">
-          {/* 1. LINKS PRINCIPAIS (Vendas, Reembolsos, Afiliados) */}
-          {menuItems.map((item) => (
+      <SidebarContent className="flex flex-col flex-1 px-3 py-4">
+        <SidebarMenu className="flex-1 gap-2">
+          {allMenuItems.map((item) => (
             <SidebarLinkItem key={item.href} item={item} isActive={isActive} />
           ))}
-
-          {/* 2. GRUPO RELATÓRIOS (Colapsável) */}
-          <SidebarCollapsibleGroup
-            title="Relatórios"
-            Icon={AreaChart}
-            basePath="/dashboard/reports"
-            items={reportsMenuItems}
-          />
-
-          <SidebarSeparator className="bg-blackshark-accent/50" />
-
-          {/* 3. GRUPO CONFIGURAÇÕES (Colapsável) */}
-          <SidebarCollapsibleGroup
-            title="Configurações"
-            Icon={Settings}
-            basePath="/dashboard/configurations"
-            items={configMenuItems}
-          />
+          <SidebarSeparator className="my-4 bg-accent/50" />{" "}
+          {/* Separador para agrupar visualmente */}
         </SidebarMenu>
+
+        {/* BOTÃO DE TOGGLE DA SIDEBAR (para Desktop no rodapé) */}
+        {!isMobile && ( // Renderiza apenas no desktop
+          <div className="flex justify-center py-4 mt-auto border-t border-border">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className={cn(
+                "h-10 w-10 rounded-full flex items-center justify-center p-0",
+                "text-foreground hover:bg-accent/20 border border-border"
+              )}
+              aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            >
+              {isSidebarOpen ? (
+                <ChevronLeft className="w-5 h-5" />
+              ) : (
+                <ChevronRight className="w-5 h-5" />
+              )}
+            </Button>
+          </div>
+        )}
       </SidebarContent>
-    </Sidebar>
+    </motion.div>
   );
 }

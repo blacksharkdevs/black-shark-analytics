@@ -2,10 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ----------------------------------------------------
+ * 🔑 DEFINIÇÃO DO TEMA CLARO (Padrão) - Corresponde ao ':root'
+ * ---------------------------------------------------- */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Fundo Principal (Branco/Quase Branco) */
+  --background: 0 0% 100%; /* Light: Branco */
+  /* Texto Principal (Preto/Quase Preto) */
+  --foreground: 0 0% 9%; /* Light: Preto */
+
+  /* Cards, Sidebar (Cinza Claro) */
+  --card: 0 0% 98%; /* Light: Branco Sujo */
+  --card-foreground: 0 0% 9%; /* Light: Preto */
+
+  /* Primary/Botão (Preto - Fundo do botão) */
+  --primary: 0 0% 9%; /* Light: Preto (Para Botões) */
+  --primary-foreground: 0 0% 100%; /* Light: Branco (Texto sobre o botão) */
+
+  /* Accent/Borda/Separador*/
+  --accent: 217 78% 50%; /* Light: Azul Vívido (Para Hover e Foco) */
+  --accent-foreground: 0 0% 100%;
+
+  /* Destructive/Erro (Vermelho) */
+  --destructive: 0 84.2% 60.2%;
 }
 
+/* ----------------------------------------------------
+ * 🦈 DEFINIÇÃO DO TEMA ESCURO (BLACK SHARK) - Classe '.dark'
+ * ---------------------------------------------------- */
+.dark {
+  /* Fundo Principal (Preto) */
+  --background: 222 47% 4%; /* Dark: Preto Profundo (#010001) */
+  /* Texto Principal (Branco) */
+  --foreground: 0 0% 95%; /* Dark: Branco */
+
+  /* Cards, Sidebar (Quase Preto/Cinza Escuro) */
+  --card: 222 47% 10%; /* Dark: Cinza escuro (Nossa cor #1a1a1a) */
+  --card-foreground: 0 0% 95%; /* Dark: Branco */
+
+  /* Primary/Botão (Branco - Fundo do botão) */
+  --primary: 0 0% 95%; /* Dark: Branco (Para Botões) */
+  --primary-foreground: 222 47% 4%; /* Dark: Preto (Texto sobre o botão) */
+
+  /* Accent/Borda/Separador */
+  --accent: 285 100% 50%;
+  --accent-foreground: 0 0% 98%;
+
+  /* Destructive/Erro (Vermelho) */
+  --destructive: 0 60% 50%;
+}
+
+/* ----------------------------------------------------
+ * Reset de Altura
+ * ---------------------------------------------------- */
 html,
 body {
   min-height: 100%;
