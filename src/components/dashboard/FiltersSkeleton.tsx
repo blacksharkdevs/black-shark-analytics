@@ -1,4 +1,3 @@
-import React from "react";
 import { Skeleton } from "@/components/common/ui/skeleton";
 import { Package, ListFilter, Network } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,16 +15,16 @@ export function FiltersSkeleton({ hasPlatformFilter }: FiltersSkeletonProps) {
       )}
     >
       <div className="flex items-center gap-2">
-        <Package className="hidden w-5 h-5 text-muted-foreground sm:block" />
+        <Package className="hidden w-6 h-6 text-blue-600 dark:text-white sm:block" />
         <Skeleton className="w-full h-10 rounded-none bg-accent/20" />
       </div>
       <div className="flex items-center gap-2">
-        <ListFilter className="hidden w-5 h-5 text-muted-foreground sm:block" />
+        <ListFilter className="hidden w-6 h-6 text-blue-600 dark:text-white sm:block" />
         <Skeleton className="w-full h-10 rounded-none bg-accent/20" />
       </div>
       {hasPlatformFilter && (
         <div className="flex items-center gap-2">
-          <Network className="hidden w-5 h-5 text-muted-foreground sm:block" />
+          <Network className="hidden w-6 h-6 text-blue-600 dark:text-white sm:block" />
           <Skeleton className="w-full h-10 rounded-none bg-accent/20" />
         </div>
       )}
