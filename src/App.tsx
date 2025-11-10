@@ -7,7 +7,8 @@ import { Toaster } from "@/components/common/ui/toaster";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import RegisterPage from "./pages/Register/Register";
 import DashboardLayout from "./pages/Dashboard/DashboardLayout";
-import TransactionsPage from "./pages/Dashboard/Transactions/transactionsPage";
+import TransactionsPage from "./pages/Dashboard/Transactions/TransactionsPage";
+import TransactionDetailPage from "./pages/Dashboard/Transactions/TransactionDetailPage";
 
 // 🚨 Placeholders para rotas aninhadas
 const AffiliatesPage = () => <div>Affiliates View</div>;
@@ -47,6 +48,8 @@ export default function App() {
 
           {/* 🔑 SUB-ROTAS PLANAS (Que o DashboardLayout renderiza no Outlet) */}
           <Route path="transactions" element={<TransactionsPage />} />
+          <Route path="transactions/:id" element={<TransactionDetailPage />} />
+
           <Route path="affiliates" element={<AffiliatesPage />} />
 
           {/* Rotas de Relatórios (usando o * para sub-sub-rotas futuras) */}
