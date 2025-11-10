@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as dateFns from "date-fns";
 
 export interface SaleRecord {
@@ -26,6 +27,7 @@ export interface SaleRecord {
   platform_transaction_tax?: number | null;
   // Field for COGS
   temp_cogs_per_user?: number | null;
+  net_sales: number;
 }
 
 export const transformSupabaseSaleToRecord = (dbRecord: any): SaleRecord => {

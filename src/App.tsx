@@ -7,9 +7,9 @@ import { Toaster } from "@/components/common/ui/toaster";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import RegisterPage from "./pages/Register/Register";
 import DashboardLayout from "./pages/Dashboard/DashboardLayout";
+import TransactionsPage from "./pages/Dashboard/Transactions/transactionsPage";
 
 // 🚨 Placeholders para rotas aninhadas
-const TransactionsPage = () => <div>Transactions View</div>;
 const AffiliatesPage = () => <div>Affiliates View</div>;
 const ReportsPage = () => <div>Reports Index View</div>;
 const ConfigurationsPage = () => <div>Configurations Index View</div>;
