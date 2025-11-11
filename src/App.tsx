@@ -56,7 +56,7 @@ export default function App() {
           <Route path="reports/*" element={<ReportsPage />} />
 
           {/* Rotas de Configurações */}
-          <Route path="configurations/*" element={<ConfigurationsPage />} />
+          {/* <Route path="configurations/*" element={<ConfigurationsPage />} /> */}
         </Route>
 
         <Route path="*" element={<div>404 | Página Não Encontrada</div>} />
