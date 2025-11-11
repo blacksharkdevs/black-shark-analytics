@@ -13,7 +13,7 @@ import TransactionDetailPage from "./pages/Dashboard/Transactions/TransactionDet
 // 🚨 Placeholders para rotas aninhadas
 const AffiliatesPage = () => <div>Affiliates View</div>;
 const ReportsPage = () => <div>Reports Index View</div>;
-const ConfigurationsPage = () => <div>Configurations Index View</div>;
+// const ConfigurationsPage = () => <div>Configurations Index View</div>;
 
 function RootProviders({ children }: { children: React.ReactNode }) {
   return (
