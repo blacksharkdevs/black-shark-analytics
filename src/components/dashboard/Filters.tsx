@@ -59,7 +59,7 @@ export function Filters({
   // 🚨 Plataforma Filter (Renderizado inline para simplicidade)
   const PlatformFilter = hasPlatformFilter && platforms && (
     <div className="flex items-center gap-2">
-      <Network className="hidden w-5 h-5 text-muted-foreground sm:block" />
+      <Network className="hidden w-5 h-5 text-blue-600 dark:text-white sm:block" />
       <Select
         value={selectedPlatform!}
         onValueChange={onPlatformChange!}

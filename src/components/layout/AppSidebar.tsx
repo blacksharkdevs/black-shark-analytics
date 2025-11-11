@@ -92,7 +92,7 @@ export function AppSidebar({ width }: { width: string }) {
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className={cn(
-        "fixed top-0 left-0 h-full border-r border-gray-400 bg-blue-950 transition-transform duration-300 z-50 flex flex-col",
+        "fixed top-0 left-0 h-full border-r border-gray-400 dark:bg-blue-950  transition-transform duration-300 z-50 flex flex-col",
         {
           "transform -translate-x-full": !isSidebarOpen && isMobile,
           "w-[280px]": isSidebarOpen && isMobile,

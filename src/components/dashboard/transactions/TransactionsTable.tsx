@@ -203,9 +203,9 @@ export function TransactionsTable() {
     if (sortColumn !== column)
       return <ArrowUpDown className="w-4 h-4 ml-2 opacity-30" />;
     return sortDirection === "asc" ? (
-      <ArrowUpDown className="w-4 h-4 ml-2 transform rotate-180 text-accent" /> // Usamos text-accent
+      <ArrowUpDown className="w-4 h-4 ml-2 text-white transform rotate-180 dark:text-yellow-500" /> // Usamos text-accent
     ) : (
-      <ArrowUpDown className="w-4 h-4 ml-2 text-accent" />
+      <ArrowUpDown className="w-4 h-4 ml-2 text-white dark:text-yellow-500" />
     );
   };
 
@@ -349,7 +349,7 @@ export function TransactionsTable() {
                             header.className,
                             header.sortable &&
                               (sortColumn === header.key
-                                ? "text-accent font-semibold"
+                                ? "text-accent dark:text-yellow-500 font-semibold"
                                 : "")
                           )}
                           onClick={() =>
