@@ -1,4 +1,4 @@
-import React, { useMemo, type JSX } from "react";
+import { useMemo, type JSX } from "react";
 import { motion } from "framer-motion";
 
 const PARTICLE_COUNT = 40;

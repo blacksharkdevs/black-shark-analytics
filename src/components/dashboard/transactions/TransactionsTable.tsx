@@ -1,4 +1,3 @@
-import React from "react";
 import { ArrowUpDown, Search } from "lucide-react";
 import {
   Table,

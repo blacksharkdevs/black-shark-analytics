@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as dateFns from "date-fns";
 
@@ -30,7 +31,9 @@ export interface SaleRecord {
   net_sales: number;
 }
 
-export const transformSupabaseSaleToRecord = (dbRecord: any): SaleRecord => {
+export const transformSupabaseSaleToRecord = (
+  dbRecord: any
+): SaleRecord | any => {
   let derivedActionType = dbRecord.action_type;
 
   if (dbRecord.action_type === "neworder") {

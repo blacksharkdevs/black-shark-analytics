@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Sun, Moon, Globe, CalendarCog, LogOut } from "lucide-react";
 

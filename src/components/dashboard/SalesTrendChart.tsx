@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { parseISO, format as dateFnsFormat, isSameDay } from "date-fns";
 import {
   LineChart,
