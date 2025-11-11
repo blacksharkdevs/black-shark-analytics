@@ -5,7 +5,7 @@ import { type Product as ProductConfig } from "@/lib/config";
 import { debounce } from "@/lib/utils";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 import { TransactionsContext } from "./TransactionsContextDefinition";
-import * as dateFns from "date-fns";
+import { calculateRefund } from "@/utils/index";
 
 // --- Tipagens ---
 
@@ -47,64 +47,10 @@ export function TransactionsProvider({
   const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
   const [isFetchingPlatforms, setIsFetchingPlatforms] = useState(true);
 
-  const formatTransactionDate = useCallback((dateString: string) => {
-    if (!dateString) return "N/A";
-    try {
-      const dateObject = dateFns.parseISO(dateString);
-      return dateFns.format(dateObject, "dd/MM/yy HH:mm");
-    } catch (error) {
-      console.error("Error formatting date:", error);
-      return dateString;
-    }
-  }, []);
-
   // Sincroniza a coluna de ordenação padrão com a configuração de data
   useEffect(() => {
     setSortColumn(getCurrentDateDbColumn());
   }, [getCurrentDateDbColumn]);
-
-  // --- UTILS ---
-
-  const calculateRefund = useCallback((item: SaleRecord): number => {
-    const isRefundAction = [
-      "refund",
-      "chargeback",
-      "chargebackrefundtime",
-    ].includes(item.action_type);
-    if (!isRefundAction) return 0;
-    if (
-      item.refund_amount !== null &&
-      item.taxes !== null &&
-      item.refund_amount === item.taxes
-    ) {
-      return 0;
-    }
-    let cost = 0;
-    if (item.platform === "buygoods") {
-      const baseRevenue = Math.abs(item.revenue);
-      const affCommission = item.aff_commission || 0;
-      const taxes = item.taxes || 0;
-      const platformFeePercentageAmount =
-        baseRevenue * (item.platform_tax || 0);
-      const platformFeeTransactionAmount = item.platform_transaction_tax || 0;
-      cost =
-        baseRevenue -
-        affCommission -
-        taxes -
-        platformFeePercentageAmount -
-        platformFeeTransactionAmount;
-    } else {
-      cost = Math.abs(item.merchant_commission || 0);
-    }
-    return cost;
-  }, []);
-
-  const formatCurrency = useCallback((value: number | string) => {
-    const num = Number(value) || 0;
-    return num.toLocaleString("en-US", { style: "currency", currency: "USD" });
-  }, []);
-
-  // --- FETCHING DE PRODUTOS E PLATAFORMAS (Side Effects) ---
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -270,7 +216,6 @@ export function TransactionsProvider({
     selectedActionType,
     sortColumn,
     sortDirection,
-    availableProducts.length,
   ]);
 
   useEffect(() => {
@@ -304,7 +249,7 @@ export function TransactionsProvider({
 
       return { ...t, net_sales: netSales };
     });
-  }, [transactions, calculateRefund]);
+  }, [transactions]);
 
   // 2. Filtro Cliente (se houver termo de busca)
   const filteredTransactions = useMemo(() => {
@@ -375,7 +320,7 @@ export function TransactionsProvider({
   );
   const currentPageRefundCalc = useMemo(
     () => paginatedTransactions.reduce((sum, t) => sum + calculateRefund(t), 0),
-    [paginatedTransactions, calculateRefund]
+    [paginatedTransactions]
   );
   const currentPageNetSales = useMemo(
     () => paginatedTransactions.reduce((sum, t) => sum + t.net_sales, 0),
@@ -465,13 +410,10 @@ export function TransactionsProvider({
       currentPageRevenue,
       currentPageRefundCalc,
       currentPageNetSales,
-      calculateRefund,
     },
 
     // Utilidades
-    formatCurrency,
     ROWS_PER_PAGE_OPTIONS,
-    formatTransactionDate,
   };
 
   return (

@@ -49,13 +49,10 @@ interface TransactionsContextType {
     currentPageRevenue: number;
     currentPageRefundCalc: number;
     currentPageNetSales: number;
-    calculateRefund: (item: SaleRecord) => number;
   };
 
   // Utilidades
   ROWS_PER_PAGE_OPTIONS: number[];
-  formatCurrency: (value: number | string) => string;
-  formatTransactionDate: (dateString: string) => string;
 }
 
 export const TransactionsContext = createContext<

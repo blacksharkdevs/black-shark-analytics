@@ -20,6 +20,7 @@ import { Skeleton } from "@/components/common/ui/skeleton";
 
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
+import { formatCurrency } from "@/utils/index";
 
 interface AffiliateRevenue {
   affiliateName: string;
@@ -27,11 +28,7 @@ interface AffiliateRevenue {
 }
 
 export function TopAffiliatesTable() {
-  const {
-    filteredSalesData: data,
-    isLoadingData,
-    formatCurrency,
-  } = useDashboardData();
+  const { filteredSalesData: data, isLoadingData } = useDashboardData();
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
 
   const isLoading = isLoadingData || isDateRangeLoading;

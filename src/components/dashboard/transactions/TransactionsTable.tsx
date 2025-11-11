@@ -39,15 +39,13 @@ import { useDashboardConfig } from "@/hooks/useDashboardConfig"; // Para getCurr
 import { useTransactions } from "@/hooks/useTransactions";
 import type { SaleRecord } from "@/lib/data";
 import { ACTION_TYPES } from "@/lib/config";
+import {
+  calculateRefund,
+  formatCurrency,
+  formatTransactionDate,
+} from "@/utils/index";
 
-// 🚨 Nota: Esta função deve ser migrada para um utilitário global, mas para fins de migração,
-// a lógica está no useTransactionsContext. Aqui a recriamos para o Tooltip:
-const renderRow = (
-  label: string,
-  value: number,
-  isSubtracted = false,
-  formatCurrency: (value: number) => string
-) => (
+const renderRow = (label: string, value: number, isSubtracted = false) => (
   <div className="grid grid-cols-2 gap-x-2">
     <span>{label}:</span>
     <span className={cn("text-right", isSubtracted && "text-destructive")}>
@@ -68,9 +66,7 @@ export function TransactionsTable() {
     sortState,
     pagination,
     footerCalculations,
-    formatCurrency,
     ROWS_PER_PAGE_OPTIONS,
-    formatTransactionDate,
   } = useTransactions();
 
   const { getCurrentDateDbColumn } = useDashboardConfig();
@@ -96,12 +92,8 @@ export function TransactionsTable() {
     isFetchingPlatforms,
   } = filterState;
 
-  const {
-    currentPageRevenue,
-    currentPageNetSales,
-    currentPageRefundCalc,
-    calculateRefund,
-  } = footerCalculations;
+  const { currentPageRevenue, currentPageNetSales, currentPageRefundCalc } =
+    footerCalculations;
 
   const getRefundTooltipContent = (transaction: SaleRecord) => {
     const refundValue = calculateRefund(transaction);
@@ -149,21 +141,11 @@ export function TransactionsTable() {
           <p className="mb-2 text-xs italic">
             Formula: Revenue - Aff Commission - Taxes - Platform Fees
           </p>
-          {renderRow("Revenue", baseRevenue, false, formatCurrency)}
-          {renderRow("Aff Commission", affCommission, true, formatCurrency)}
-          {renderRow("Taxes", taxes, true, formatCurrency)}
-          {renderRow(
-            "Platform Fee (%)",
-            platformFeePercentageAmount,
-            true,
-            formatCurrency
-          )}
-          {renderRow(
-            "Platform Fee ($)",
-            platformFeeTransactionAmount,
-            true,
-            formatCurrency
-          )}
+          {renderRow("Revenue", baseRevenue, false)}
+          {renderRow("Aff Commission", affCommission, true)}
+          {renderRow("Taxes", taxes, true)}
+          {renderRow("Platform Fee (%)", platformFeePercentageAmount, true)}
+          {renderRow("Platform Fee ($)", platformFeeTransactionAmount, true)}
           <hr className="my-1 border-border/50" />
           <div className="grid grid-cols-2 font-bold gap-x-2">
             <span>Total Cost:</span>
@@ -183,8 +165,7 @@ export function TransactionsTable() {
         {renderRow(
           "Merchant Commission",
           Math.abs(transaction.merchant_commission || 0),
-          false,
-          formatCurrency
+          false
         )}
         <hr className="my-1 border-border/50" />
         <div className="grid grid-cols-2 font-bold gap-x-2">

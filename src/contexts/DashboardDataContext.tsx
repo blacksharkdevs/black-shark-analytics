@@ -189,11 +189,6 @@ export function DashboardDataProvider({
     };
   }, [filteredSalesData]);
 
-  const formatCurrency = useCallback((value: number | string) => {
-    const num = Number(value) || 0;
-    return num.toLocaleString("en-US", { style: "currency", currency: "USD" });
-  }, []);
-
   const contextValue = {
     filteredSalesData,
     availableProducts,
@@ -204,7 +199,6 @@ export function DashboardDataProvider({
     stats,
     isLoadingData,
     isFetchingProducts,
-    formatCurrency,
   };
 
   return (

@@ -21,6 +21,7 @@ import { Badge } from "@/components/common/ui/badge";
 
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
+import { formatCurrency } from "@/utils/index";
 
 interface ItemStats {
   productName: string;
@@ -30,11 +31,7 @@ interface ItemStats {
 }
 
 export function TopSellingItemsTable() {
-  const {
-    filteredSalesData: data,
-    isLoadingData,
-    formatCurrency,
-  } = useDashboardData();
+  const { filteredSalesData: data, isLoadingData } = useDashboardData();
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
 
   const isLoading = isLoadingData || isDateRangeLoading;

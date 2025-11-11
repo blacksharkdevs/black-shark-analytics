@@ -10,6 +10,7 @@ import {
 
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
+import { formatCurrency } from "@/utils/index";
 
 // Tipagem segura para as chaves (necessário para a lógica do useMemo)
 type StatKey =
@@ -49,7 +50,7 @@ const STATS_MAP: Record<
 };
 
 export function StatsCards() {
-  const { stats, isLoadingData, formatCurrency } = useDashboardData();
+  const { stats, isLoadingData } = useDashboardData();
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
   const isLoading = isLoadingData || isDateRangeLoading;
 

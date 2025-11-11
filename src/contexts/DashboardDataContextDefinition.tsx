@@ -14,7 +14,6 @@ interface DashboardDataContextType {
   stats: any;
   isLoadingData: boolean;
   isFetchingProducts: boolean;
-  formatCurrency: (value: number) => string;
 }
 
 export const DashboardDataContext = createContext<

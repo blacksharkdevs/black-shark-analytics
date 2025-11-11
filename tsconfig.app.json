@@ -31,7 +31,8 @@
       "@/contexts/*": ["contexts/*"],
       "@/lib/*": ["lib/*"],
       "@/pages/*": ["pages/*"],
-      "@/assets/*": ["assets/*"]
+      "@/assets/*": ["assets/*"],
+      "@/utils/*": ["utils/*"]
     }
   },
   "include": ["src"]

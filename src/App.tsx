@@ -9,6 +9,7 @@ import RegisterPage from "./pages/Register/Register";
 import DashboardLayout from "./pages/Dashboard/DashboardLayout";
 import TransactionsPage from "./pages/Dashboard/Transactions/TransactionsPage";
 import TransactionDetailPage from "./pages/Dashboard/Transactions/TransactionDetailPage";
+import CustomerHistoryPage from "./components/dashboard/customer/CustomerHistoryPage";
 
 // 🚨 Placeholders para rotas aninhadas
 const AffiliatesPage = () => <div>Affiliates View</div>;
@@ -33,8 +34,6 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* 🛡️ ROTA PROTEGIDA (PAI: DashboardLayout) */}
-        {/* 🔑 REMOVEMOS O ASTERISCO E ANINHAMOS AS ROTAS DENTRO */}
         <Route
           path="/dashboard"
           element={
@@ -43,12 +42,11 @@ export default function App() {
             </ProtectedRoute>
           }
         >
-          {/* 🔑 ROTA INDEX: Carrega o conteúdo principal (Stats/Charts) no path /dashboard */}
           <Route index element={<DashboardPage />} />
-
-          {/* 🔑 SUB-ROTAS PLANAS (Que o DashboardLayout renderiza no Outlet) */}
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="transactions/:id" element={<TransactionDetailPage />} />
+
+          <Route path="customers/:email" element={<CustomerHistoryPage />} />
 
           <Route path="affiliates" element={<AffiliatesPage />} />
 
