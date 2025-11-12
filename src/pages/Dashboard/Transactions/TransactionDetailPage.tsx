@@ -18,43 +18,6 @@ type TransactionDetails = {
   [key: string]: any;
 };
 
-const formatLabel = (key: string) => {
-  return key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
-};
-
-const formatValue = (key: string, value: any) => {
-  if (value === null || value === undefined)
-    return <span className="text-muted-foreground">N/A</span>;
-  if (typeof value === "boolean") return value ? "Yes" : "No";
-
-  if (
-    ["transaction_date", "calc_charged_day", "created_at"].includes(key) &&
-    typeof value === "string"
-  ) {
-    const date = new Date(value);
-    if (isValid(date)) {
-      return dateFnsFormat(date, "MMM dd, yyyy h:mm:ss a") + " (UTC)";
-    }
-    return value;
-  }
-
-  if (
-    key.includes("amount") ||
-    key.includes("commission") ||
-    key.includes("taxes") ||
-    key.includes("fee") ||
-    key.includes("revenue")
-  ) {
-    if (typeof value === "number") {
-      return `$${value.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`;
-    }
-  }
-  return value.toString();
-};
-
 export default function TransactionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -68,6 +31,43 @@ export default function TransactionDetailPage() {
   const handleBack = useCallback(() => {
     navigate("/dashboard/transactions");
   }, [navigate]);
+
+  const formatLabel = (key: string) => {
+    return key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  };
+
+  const formatValue = (key: string, value: any) => {
+    if (value === null || value === undefined)
+      return <span className="text-muted-foreground">N/A</span>;
+    if (typeof value === "boolean") return value ? "Yes" : "No";
+
+    if (
+      ["transaction_date", "calc_charged_day", "created_at"].includes(key) &&
+      typeof value === "string"
+    ) {
+      const date = new Date(value);
+      if (isValid(date)) {
+        return dateFnsFormat(date, "MMM dd, yyyy h:mm:ss a") + " (UTC)";
+      }
+      return value;
+    }
+
+    if (
+      key.includes("amount") ||
+      key.includes("commission") ||
+      key.includes("taxes") ||
+      key.includes("fee") ||
+      key.includes("revenue")
+    ) {
+      if (typeof value === "number") {
+        return `$${value.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}`;
+      }
+    }
+    return value.toString();
+  };
 
   useEffect(() => {
     if (!id) return;

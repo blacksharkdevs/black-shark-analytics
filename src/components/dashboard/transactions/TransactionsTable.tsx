@@ -1,4 +1,4 @@
-import { ArrowUpDown, Search } from "lucide-react";
+import { ArrowDown, ArrowUp, Search } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -7,35 +7,35 @@ import {
   TableHeader,
   TableRow,
   TableFooter,
-} from "@/components/common/ui/table"; // Migrado
+} from "@/components/common/ui/table";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/common/ui/card"; // Migrado
-import { Input } from "@/components/common/ui/input"; // Migrado
-import { Button } from "@/components/common/ui/button"; // Migrado
-import { Skeleton } from "@/components/common/ui/skeleton"; // Migrado
+} from "@/components/common/ui/card";
+import { Input } from "@/components/common/ui/input";
+import { Button } from "@/components/common/ui/button";
+import { Skeleton } from "@/components/common/ui/skeleton";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/common/ui/select"; // Migrado
+} from "@/components/common/ui/select";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/common/ui/tooltip"; // Migrado
-import { Link } from "react-router-dom"; // Migrado para React Router
+} from "@/components/common/ui/tooltip";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Filters as FilterControls } from "../Filters"; // Assumindo que este está na mesma pasta
+import { Filters as FilterControls } from "../Filters";
 
-import { useDashboardConfig } from "@/hooks/useDashboardConfig"; // Para getCurrentDateDbColumn
+import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 import { useTransactions } from "@/hooks/useTransactions";
 import type { SaleRecord } from "@/lib/data";
 import { ACTION_TYPES } from "@/lib/config";
@@ -56,7 +56,6 @@ const renderRow = (label: string, value: number, isSubtracted = false) => (
 );
 
 export function TransactionsTable() {
-  // 🔑 CONSUMO DE DADOS E ESTADOS
   const {
     transactions: paginatedTransactions,
     isLoading: isLoadingTotal,
@@ -120,7 +119,6 @@ export function TransactionsTable() {
     }
 
     if (transaction.platform === "buygoods") {
-      // Lógica BuyGoods (reproduzida do useTransactions)
       const baseRevenue = Math.abs(transaction.revenue);
       const affCommission = transaction.aff_commission || 0;
       const taxes = transaction.taxes || 0;
@@ -155,7 +153,6 @@ export function TransactionsTable() {
       );
     }
 
-    // Default logic for others
     return (
       <div className="p-1 space-y-1 text-sm text-foreground">
         <p className="font-bold">
@@ -182,11 +179,11 @@ export function TransactionsTable() {
     column: keyof SaleRecord | "calc_charged_day" | "net_sales"
   ) => {
     if (sortColumn !== column)
-      return <ArrowUpDown className="w-4 h-4 ml-2 opacity-30" />;
+      return <ArrowDown className="w-4 h-4 ml-2 opacity-30" />;
     return sortDirection === "asc" ? (
-      <ArrowUpDown className="w-4 h-4 ml-2 text-white transform rotate-180 dark:text-yellow-500" /> // Usamos text-accent
+      <ArrowUp className="w-4 h-4 ml-2 text-white transform rotate-180 dark:text-yellow-500" />
     ) : (
-      <ArrowUpDown className="w-4 h-4 ml-2 text-white dark:text-yellow-500" />
+      <ArrowUp className="w-4 h-4 ml-2 text-white dark:text-yellow-500" />
     );
   };
 
