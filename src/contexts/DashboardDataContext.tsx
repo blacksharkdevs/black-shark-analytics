@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { supabase } from "@/lib/supabaseClient";
-import { transformSupabaseSaleToRecord } from "@/lib/data";
+// Removemos supabase e transformSupabaseSaleToRecord
 import { type Product as ProductConfig } from "@/lib/config";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 import { DashboardDataContext } from "./DashboardDataContextDefinition";
 import type { SaleRecord } from "@/types/index";
 
-const MAX_RECORDS_FOR_DASHBOARD_STATS = 50000;
+// Serviços e Lógica Reutilizada
+import { fetchProductsForFilter } from "@/services/configService"; // Reutiliza
+import { fetchSalesDataForDashboard } from "@/services/dashboardService"; // Novo serviço de fetch
+import { calculateDashboardStats } from "@/lib/dashboardCalculations"; // Nova lógica de cálculo
+
+// Não é mais necessário, pois está no Service
+// const MAX_RECORDS_FOR_DASHBOARD_STATS = 50000;
 
 export function DashboardDataProvider({
   children,
@@ -26,40 +31,23 @@ export function DashboardDataProvider({
   const [selectedProduct, setSelectedProduct] = useState<string>("all");
   const [selectedActionType, setSelectedActionType] = useState<string>("all");
   const [isLoadingData, setIsLoadingData] = useState(true);
-  const [isFetchingProducts, setIsFetchingProducts] = useState(true);
-
-  const fetchProducts = useCallback(async () => {
-    setIsFetchingProducts(true);
-    const { data, error } = await supabase
-      .from("config_products")
-      .select("merchant_id, product_name")
-      .order("product_name");
-
-    if (error) {
-      console.error("Error fetching products:", error);
-    } else if (data) {
-      const productsForFilter = data.map((p) => ({
-        id: p.merchant_id,
-        name: p.product_name,
-      }));
-      setAvailableProducts([
-        { id: "all", name: "All Products" },
-        ...productsForFilter,
-      ]);
-    }
-    setIsFetchingProducts(false);
-  }, []);
+  const [isFetchingProducts, setIsFetchingProducts] = useState(true); // ➡️ REFACTOR 1.1: Usando o serviço de config (reutilizado do Transactions)
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    const loadProducts = async () => {
+      setIsFetchingProducts(true);
+      const products = await fetchProductsForFilter();
+      setAvailableProducts(products);
+      setIsFetchingProducts(false);
+    };
+    loadProducts();
+  }, []); // ➡️ REFACTOR 2.1: Função de fetch limpa, apenas chama o serviço
 
   const fetchAndFilterData = useCallback(async () => {
+    // 1. GUARDS: Verifica dependências de carregamento e dados de filtro
     if (
       isDateRangeLoading ||
-      (isFetchingProducts &&
-        selectedProduct !== "all" &&
-        availableProducts.length <= 1) ||
+      isFetchingProducts ||
       !currentDateRange ||
       !currentDateRange.from ||
       !currentDateRange.to
@@ -71,123 +59,39 @@ export function DashboardDataProvider({
 
     setIsLoadingData(true);
 
-    const queryFromUTC = currentDateRange.from.toISOString();
-    const queryToUTC = currentDateRange.to.toISOString();
-    const dateDbColumn = getCurrentDateDbColumn();
+    try {
+      // 2. Chamada do Service
+      const salesData = await fetchSalesDataForDashboard({
+        currentDateRange,
+        getCurrentDateDbColumn,
+        selectedProduct,
+        selectedActionType,
+      });
 
-    let query = supabase
-      .from("sales_data")
-      .select(
-        "*,config_products!inner(merchant_id,product_name,platform_tax,platform_transaction_tax)"
-      )
-      .gte(dateDbColumn, queryFromUTC)
-      .lte(dateDbColumn, queryToUTC);
-
-    if (selectedProduct !== "all") {
-      query = query.eq("merchant_id", selectedProduct);
-    }
-
-    if (selectedActionType !== "all") {
-      switch (selectedActionType) {
-        case "all_incomes":
-          query = query.eq("action_type", "neworder");
-          break;
-        case "front_sale":
-          query = query.eq("action_type", "neworder").eq("upsell", false);
-          break;
-        case "back_sale":
-          query = query.eq("action_type", "neworder").eq("upsell", true);
-          break;
-        case "rebill":
-          query = query.eq("action_type", "rebill");
-          break;
-        case "all_refunds":
-          query = query.in("action_type", [
-            "chargebackrefundtime",
-            "refund",
-            "chargeback",
-          ]);
-          break;
-      }
-    }
-
-    query = query.limit(MAX_RECORDS_FOR_DASHBOARD_STATS);
-    query = query.order(dateDbColumn, { ascending: true });
-
-    const { data: rawSalesData, error } = await query;
-
-    if (error) {
-      console.error("Error fetching sales data:", error);
+      // 3. Atualiza estado
+      setFilteredSalesData(salesData);
+    } catch (error) {
+      console.error("Erro ao buscar dados do Dashboard no Service:", error);
       setFilteredSalesData([]);
-    } else if (rawSalesData) {
-      if (rawSalesData.length === MAX_RECORDS_FOR_DASHBOARD_STATS) {
-        console.warn(
-          `Warning: Dashboard query reached the maximum limit of ${MAX_RECORDS_FOR_DASHBOARD_STATS} records.`
-        );
-      }
-      const transformedData = rawSalesData.map(transformSupabaseSaleToRecord);
-      setFilteredSalesData(transformedData);
-    } else {
-      setFilteredSalesData([]);
+    } finally {
+      setIsLoadingData(false);
     }
-    setIsLoadingData(false);
   }, [
     currentDateRange,
     selectedProduct,
     selectedActionType,
     isFetchingProducts,
-    availableProducts,
     isDateRangeLoading,
     getCurrentDateDbColumn,
   ]);
 
   useEffect(() => {
     fetchAndFilterData();
-  }, [fetchAndFilterData]);
+  }, [fetchAndFilterData]); // ➡️ REFACTOR 3.1: Cálculos de métricas isolados (Usando função pura)
 
   const stats = useMemo(() => {
-    const totalRevenue = filteredSalesData.reduce(
-      (sum, record) => sum + record.revenue,
-      0
-    );
-    const totalTaxes = filteredSalesData.reduce(
-      (sum, record) => sum + (record.taxes || 0),
-      0
-    );
-    const platformFeePercentage = filteredSalesData.reduce(
-      (sum, record) => sum + record.revenue * (record.platform_tax || 0),
-      0
-    );
-    const platformFeeFixed = filteredSalesData.reduce(
-      (sum, record) => sum + (record.platform_transaction_tax || 0),
-      0
-    );
-    const totalPlatformFees = platformFeePercentage + platformFeeFixed;
-    const grossSales = totalRevenue - totalPlatformFees - totalTaxes;
-
-    const totalSalesTransactions = filteredSalesData.length;
-    const frontSalesCount = filteredSalesData.filter(
-      (record) => record.action_type === "front_sale"
-    ).length;
-    const backSalesCount = filteredSalesData.filter(
-      (record) => record.action_type === "back_sale"
-    ).length;
-
-    const averageOrderValue =
-      frontSalesCount > 0 ? grossSales / frontSalesCount : 0;
-
-    return {
-      totalRevenue,
-      grossSales,
-      totalTaxes,
-      platformFeePercentage,
-      platformFeeFixed,
-      totalPlatformFees,
-      totalSalesTransactions,
-      frontSalesCount,
-      backSalesCount,
-      averageOrderValue,
-    };
+    // Apenas passa o dado filtrado para a função de cálculo
+    return calculateDashboardStats(filteredSalesData);
   }, [filteredSalesData]);
 
   const contextValue = {

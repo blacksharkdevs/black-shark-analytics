@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { supabase } from "@/lib/supabaseClient";
-import { transformSupabaseSaleToRecord } from "@/lib/data";
+// Importações limpas: removemos supabase e transformSupabaseSaleToRecord
 import { type Product as ProductConfig } from "@/lib/config";
 import { debounce } from "@/lib/utils";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
@@ -10,16 +9,15 @@ import {
   fetchDistinctSalesPlatforms,
   fetchProductsForFilter,
 } from "@/services/configService";
+import { fetchTransactions } from "@/services/transactionsService"; // ✨ Importa a função de serviço
 import type { SaleRecord } from "@/types/index";
-import { applyActionTypeFilter } from "@/lib/transactionFilters";
-import { applyServerSort } from "@/lib/transactionSort";
+// Os imports de lib de filtro e sort não são mais necessários aqui no Provider
 import {
   calculateNetSales,
   type SaleRecordWithNetSales,
 } from "@/lib/dataCalculations";
 
 // --- Tipagens ---
-
 type SortColumn = keyof SaleRecord | "calc_charged_day" | "net_sales";
 const ROWS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 
@@ -58,7 +56,7 @@ export function TransactionsProvider({
 
   useEffect(() => {
     setSortColumn(getCurrentDateDbColumn());
-  }, [getCurrentDateDbColumn]); // ➡️ REFACTOR: Efeito para buscar PRODUTOS (usando service)
+  }, [getCurrentDateDbColumn]); // Efeitos para buscar Configurações (limpos, usando configService)
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -78,13 +76,10 @@ export function TransactionsProvider({
       setIsFetchingPlatforms(false);
     };
     loadPlatforms();
-  }, []); // --- FETCH TRANSACTIONS (Lógica Principal, agora mais limpa) ---
+  }, []); // --- FETCH TRANSACTIONS (Refatorado para usar o Service) ---
 
-  const fetchTransactions = useCallback(async () => {
-    const dateDbColumnToFilter = getCurrentDateDbColumn();
-    const limit = itemsPerPage;
-    const page = currentPage;
-
+  const fetchTransactionsData = useCallback(async () => {
+    // 1. GUARDA: Evita fetch se houver dependências de carregamento
     if (
       isDateRangeLoading ||
       isFetchingPlatforms ||
@@ -100,52 +95,29 @@ export function TransactionsProvider({
     }
 
     setIsLoadingData(true);
-    const fromRange = (page - 1) * limit;
-    const toRange = fromRange + limit - 1;
 
-    const queryFromUTC = currentDateRange.from.toISOString();
-    const queryToUTC = currentDateRange.to.toISOString();
-
-    let query = supabase
-      .from("sales_data")
-      .select(
-        "*,customer_firstname,customer_lastname,config_products!inner(*)",
-        { count: "exact" }
-      )
-      .gte(dateDbColumnToFilter, queryFromUTC)
-      .lte(dateDbColumnToFilter, queryToUTC); // Aplicação dos filtros básicos
-
-    if (selectedProduct !== "all") {
-      query = query.eq("merchant_id", selectedProduct);
-    }
-    if (selectedPlatform !== "all") {
-      query = query.eq("platform", selectedPlatform);
-    }
-
-    // ➡️ REFACTOR: Aplica os filtros de Ação (logica movida para lib)
-    query = applyActionTypeFilter(query, selectedActionType); // ➡️ REFACTOR: Ordenação dinâmica (Server Sort) (logica movida para lib)
-
-    if (sortColumn && sortColumn !== "net_sales") {
-      query = applyServerSort(query, sortColumn, sortDirection);
-    } else {
-      // Se a ordenação for por Net Sales (cliente) ou padrão, ordena pela data.
-      query = query.order(dateDbColumnToFilter, { ascending: false });
-    }
-
-    query = query.range(fromRange, toRange);
-
-    const { data, error, count } = await query;
-
-    if (error) {
-      console.error("Error fetching transactions:", error);
+    try {
+      // 2. Chama a função de serviço com todos os parâmetros de estado
+      const { data, count } = await fetchTransactions({
+        currentDateRange,
+        getCurrentDateDbColumn,
+        itemsPerPage,
+        currentPage,
+        selectedProduct,
+        selectedPlatform,
+        selectedActionType,
+        sortColumn,
+        sortDirection,
+      }); // 3. Atualiza o estado
+      setTransactions(data);
+      setTotalTransactions(count);
+    } catch (error) {
+      console.error("Erro ao buscar transações no Service:", error);
       setTransactions([]);
       setTotalTransactions(0);
-    } else if (data) {
-      const transformedData = data.map(transformSupabaseSaleToRecord);
-      setTransactions(transformedData);
-      setTotalTransactions(count || 0);
+    } finally {
+      setIsLoadingData(false);
     }
-    setIsLoadingData(false);
   }, [
     isDateRangeLoading,
     isFetchingPlatforms,
@@ -162,13 +134,12 @@ export function TransactionsProvider({
   ]);
 
   useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]); // --- CÁLCULOS E MEMOIZAÇÃO (Filtro Cliente e Cálculos de Página) --- // 1. Cálculos de Net Sales (useMemo) (logica movida para lib)
+    fetchTransactionsData();
+  }, [fetchTransactionsData]); // --- CÁLCULOS E MEMOIZAÇÃO (Filtro Cliente e Cálculos de Página) --- // 1. Cálculos de Net Sales (limpo, usando dataCalculations)
 
   const transactionsWithNetSales = useMemo(() => {
-    // ➡️ REFACTOR: Usando a função pura externa para calcular Net Sales
     return transactions.map(calculateNetSales) as SaleRecordWithNetSales[];
-  }, [transactions]); // 2. Filtro Cliente (se houver termo de busca) (mantido - ok, é lógica de estado/apresentação)
+  }, [transactions]); // 2. Filtro Cliente (mantido)
 
   const filteredTransactions = useMemo(() => {
     if (!searchTerm) {
@@ -189,13 +160,11 @@ export function TransactionsProvider({
       );
     });
 
-    // 💡 Ajuste: Se o totalTransactions foi alterado pela busca no cliente, atualiza.
-    // É uma lógica um pouco estranha se você estiver fazendo paginação no cliente, mas mantém o original.
     if (totalTransactions !== filtered.length && searchTerm) {
       setTotalTransactions(filtered.length);
     }
     return filtered;
-  }, [searchTerm, transactionsWithNetSales, totalTransactions]); // 3. Ordenação no Cliente (Net Sales e/ou busca no cliente) (mantido - ok, é lógica de estado/apresentação)
+  }, [searchTerm, transactionsWithNetSales, totalTransactions]); // 3. Ordenação no Cliente (mantido)
 
   const sortedTransactions = useMemo(() => {
     const dataToSort = searchTerm
@@ -242,7 +211,7 @@ export function TransactionsProvider({
   const currentPageNetSales = useMemo(
     () => paginatedTransactions.reduce((sum, t) => sum + t.net_sales, 0),
     [paginatedTransactions]
-  ); // --- HANDLERS (Funções de Estado) --- // ... HANDLERS (mantidos, não há alteração de lógica)
+  ); // --- HANDLERS (Funções de Estado) ---
 
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
