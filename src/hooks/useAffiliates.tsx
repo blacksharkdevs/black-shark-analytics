@@ -1,10 +1,18 @@
-// import { AffiliatesContext } from "@/contexts/AffiliatesContextDefinition";
-// import { useContext } from "react";
+import { AffiliatesContext } from "@/contexts/AffiliatesContextDefinition";
+import { useContext } from "react";
 
-// export function useAffiliates() {
-//   const context = useContext(AffiliatesContext);
-//   if (!context) {
-//     throw new Error("useAffiliates must be used within an AffiliatesProvider");
-//   }
-//   return context;
-// }
+/**
+ * Hook customizado para acessar o estado e os handlers do Contexto de Afiliados.
+ * Deve ser usado dentro do AffiliatesProvider.
+ */
+export function useAffiliates() {
+  const context = useContext(AffiliatesContext);
+
+  if (context === undefined) {
+    throw new Error(
+      "useAffiliates deve ser usado dentro de um AffiliatesProvider"
+    );
+  }
+
+  return context;
+}

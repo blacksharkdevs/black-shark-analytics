@@ -1,350 +1,292 @@
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// import { useState, useEffect, useCallback, useMemo } from "react";
-// import { supabase } from "@/lib/supabaseClient";
-// import { useDashboardConfig } from "@/hooks/useDashboardConfig";
-// import { debounce } from "@/lib/utils";
-// import {
-//   AffiliatesContext,
-//   type AffiliatePerformanceData,
-//   type SortableAffiliateKeys,
-// } from "./AffiliatesContextDefinition";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  type ReactNode,
+} from "react";
+import { useDashboardConfig } from "@/hooks/useDashboardConfig";
+import {
+  AffiliatesContext,
+  type AffiliatesContextValue,
+} from "./AffiliatesContextDefinition";
+import {
+  type AffiliatePerformanceData,
+  type SortableAffiliateKeys,
+} from "@/types/affiliates";
+import { fetchAffiliatePerformance } from "@/services/affiliateService";
+import { fetchDistinctSalesPlatforms } from "@/services/configService"; // Reutilizando a lógica de plataformas
+import { debounce } from "@/lib/utils";
+import { AFFILIATE_ACTION_TYPES } from "@/lib/config"; // Assumindo que este array existe
 
-// const ROWS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
+const ROWS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
+const DEFAULT_SORT_COLUMN: SortableAffiliateKeys = "total_revenue";
+const DEFAULT_ACTION_TYPE =
+  AFFILIATE_ACTION_TYPES.find((a) => a.id === "all_incomes")?.id ||
+  "all_incomes";
 
-// export function AffiliatesProvider({
-//   children,
-// }: {
-//   children: React.ReactNode;
-// }) {
-//   const {
-//     currentDateRange,
-//     getCurrentDateDbColumn,
-//     isLoading: isDateRangeLoading,
-//   } = useDashboardConfig();
+export const AffiliatesProvider = ({ children }: { children: ReactNode }) => {
+  // --- CONSUMO DE CONTEXTOS EXTERNOS ---
+  const {
+    currentDateRange,
+    getCurrentDateDbColumn,
+    isLoading: isDateRangeLoading,
+  } = useDashboardConfig();
 
-//   // ESTADOS
-//   const [affiliateData, setAffiliateData] = useState<
-//     AffiliatePerformanceData[]
-//   >([]);
-//   const [isLoadingData, setIsLoadingData] = useState(true);
-//   const [sortColumn, setSortColumn] =
-//     useState<SortableAffiliateKeys>("total_revenue");
-//   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [itemsPerPage, setItemsPerPage] = useState(ROWS_PER_PAGE_OPTIONS[1]);
-//   const [availablePlatforms, setAvailablePlatforms] = useState<string[]>([]);
-//   const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
-//   const [searchTermAffiliate, setSearchTermAffiliate] = useState<string>("");
-//   const [isFetchingPlatforms, setIsFetchingPlatforms] = useState(true);
-//   const [selectedActionType, setSelectedActionType] =
-//     useState<string>("all_incomes");
+  console.log("🏗️ AffiliatesProvider montado/atualizado", {
+    currentDateRange,
+    isDateRangeLoading,
+  });
 
-//   // --- UTILS ---
+  // --- ESTADOS PRINCIPAIS ---
+  const [rawAffiliateData, setRawAffiliateData] = useState<
+    AffiliatePerformanceData[]
+  >([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
-//   const formatCurrency = useCallback((value: number | string) => {
-//     const num = Number(value) || 0;
-//     return num.toLocaleString("en-US", {
-//       style: "currency",
-//       currency: "USD",
-//       minimumFractionDigits: 2,
-//       maximumFractionDigits: 2,
-//     });
-//   }, []);
+  // --- ESTADOS DE FILTRO/BUSCA ---
+  const [availablePlatforms, setAvailablePlatforms] = useState<string[]>([]);
+  const [isFetchingPlatforms, setIsFetchingPlatforms] = useState(true);
+  const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
+  const [selectedActionType, setSelectedActionType] =
+    useState<string>(DEFAULT_ACTION_TYPE);
+  const [searchTermAffiliate, setSearchTermAffiliate] = useState<string>("");
 
-//   // --- FETCHING DE PLATAFORMAS (Side Effect) ---
-//   useEffect(() => {
-//     const fetchPlatforms = async () => {
-//       setIsFetchingPlatforms(true);
-//       const { data, error } = await supabase.rpc(
-//         "get_distinct_sales_platforms"
-//       );
-//       if (error) {
-//         console.error("Error fetching distinct platforms:", error);
-//         setAvailablePlatforms([]);
-//       } else if (data) {
-//         const distinctPlatforms = (data as Array<{ platform: string }>)
-//           .map((item) => item.platform)
-//           .sort();
-//         setAvailablePlatforms(distinctPlatforms);
-//       }
-//       setIsFetchingPlatforms(false);
-//     };
-//     fetchPlatforms();
-//   }, []);
+  // --- ESTADOS DE TABELA ---
+  const [sortColumn, setSortColumn] =
+    useState<SortableAffiliateKeys>(DEFAULT_SORT_COLUMN);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(ROWS_PER_PAGE_OPTIONS[1]);
 
-//   // --- FETCH DATA (Lógica Principal RPC) ---
-//   const fetchAffiliateData = useCallback(async () => {
-//     if (
-//       isDateRangeLoading ||
-//       !currentDateRange ||
-//       !currentDateRange.from ||
-//       !currentDateRange.to
-//     ) {
-//       setAffiliateData([]);
-//       setIsLoadingData(false);
-//       return;
-//     }
+  // --- LÓGICA DE FETCH DE CONFIGURAÇÃO (PLATAFORMAS) ---
+  useEffect(() => {
+    const loadPlatforms = async () => {
+      setIsFetchingPlatforms(true);
+      // Reutilizando o serviço de configuração que já criamos
+      const platforms = await fetchDistinctSalesPlatforms();
+      setAvailablePlatforms(platforms);
+      setIsFetchingPlatforms(false);
+    };
+    loadPlatforms();
+  }, []);
 
-//     setIsLoadingData(true);
+  // --- LÓGICA PRINCIPAL DE FETCH DE DADOS (USANDO SERVICE) ---
+  const loadAffiliatesData = useCallback(async () => {
+    // GUARD: Impede fetches desnecessários antes que as dependências estejam prontas
+    // IMPORTANTE: NÃO bloqueamos se isFetchingPlatforms, pois as plataformas carregam em paralelo
+    if (
+      isDateRangeLoading ||
+      !currentDateRange ||
+      !currentDateRange.from ||
+      !currentDateRange.to
+    ) {
+      console.log("⏸️ AffiliatesContext: Aguardando date range...", {
+        isDateRangeLoading,
+        currentDateRange,
+      });
+      setRawAffiliateData([]);
+      setIsLoadingData(false);
+      return;
+    }
 
-//     const dateDbColumn = getCurrentDateDbColumn();
-//     const queryFromUTC = currentDateRange.from.toISOString();
-//     const queryToUTC = currentDateRange.to.toISOString();
+    console.log("🚀 AffiliatesContext: Iniciando fetch de afiliados", {
+      dateRange: currentDateRange,
+      platform: selectedPlatform,
+      actionType: selectedActionType,
+      searchTerm: searchTermAffiliate,
+    });
 
-//     // RPC Parameters
-//     const rpcParams = {
-//       start_date_param: queryFromUTC,
-//       end_date_param: queryToUTC,
-//       date_column_name_param: dateDbColumn,
-//       platform_param: selectedPlatform === "all" ? null : selectedPlatform,
-//       aff_name_search_param:
-//         searchTermAffiliate.trim() === "" ? null : searchTermAffiliate.trim(),
-//       action_type_param:
-//         selectedActionType === "all" ? null : selectedActionType,
-//     };
+    setIsLoadingData(true);
 
-//     const { data, error } = await supabase.rpc(
-//       "get_affiliate_performance",
-//       rpcParams
-//     );
+    try {
+      // Chamada ao Service
+      const data = await fetchAffiliatePerformance({
+        currentDateRange: currentDateRange,
+        dateDbColumn: getCurrentDateDbColumn(),
+        platformFilter: selectedPlatform,
+        affNameSearch: searchTermAffiliate,
+        actionTypeFilter: selectedActionType,
+      });
 
-//     if (error) {
-//       console.error("Error fetching affiliate performance data:", error);
-//       setAffiliateData([]);
-//     } else if (data) {
-//       // Transformação e Cálculo no cliente (Gross Sales, Profit, etc.)
-//       const typedData = (data as any[]).map((item) => {
-//         const totalRevenue = parseFloat(item.total_revenue) || 0;
-//         const totalTaxes = parseFloat(item.taxes) || 0;
-//         const platformFeePercentage =
-//           parseFloat(item.platform_fee_percentage_amount) || 0;
-//         const platformFeeTransaction =
-//           parseFloat(item.platform_fee_transaction_amount) || 0;
+      console.log("✅ AffiliatesContext: Dados recebidos", {
+        count: data.length,
+        sample: data[0],
+      });
 
-//         const grossSales =
-//           totalRevenue -
-//           platformFeePercentage -
-//           platformFeeTransaction -
-//           totalTaxes;
-//         const frontSales = Number(item.front_sales) || 0;
-//         const netSales = parseFloat(item.net_sales) || 0;
-//         const refundsAndChargebacks = -Math.abs(
-//           parseFloat(item.refunds_and_chargebacks) || 0
-//         );
-//         const netFinal = netSales + refundsAndChargebacks;
-//         const totalCogs = parseFloat(item.total_cogs) || 0;
-//         const profit = netFinal - totalCogs;
-//         const allowance = grossSales * 0.1;
-//         const cashFlow = profit - allowance;
+      setRawAffiliateData(data);
+      setCurrentPage(1); // Sempre volta para a página 1 ao recarregar dados
+    } catch (error) {
+      console.error("❌ Erro ao carregar dados de afiliados:", error);
+      setRawAffiliateData([]);
+    } finally {
+      setIsLoadingData(false);
+    }
+  }, [
+    isDateRangeLoading,
+    currentDateRange,
+    getCurrentDateDbColumn,
+    selectedPlatform,
+    searchTermAffiliate,
+    selectedActionType,
+  ]);
 
-//         return {
-//           aff_name: item.aff_name || "N/A",
-//           platform: item.platform || "N/A",
-//           customers: Number(item.customers) || 0,
-//           total_sales: Number(item.total_sales) || 0,
-//           front_sales: frontSales,
-//           back_sales: Number(item.back_sales) || 0,
-//           total_revenue: totalRevenue,
-//           gross_sales: grossSales,
-//           refunds_and_chargebacks: refundsAndChargebacks,
-//           commission_paid: parseFloat(item.commission_paid) || 0,
-//           taxes: totalTaxes,
-//           platform_fee_percentage_amount: platformFeePercentage,
-//           platform_fee_transaction_amount: platformFeeTransaction,
-//           aov: frontSales > 0 ? grossSales / frontSales : 0,
-//           net_sales: netSales,
-//           net_final: netFinal,
-//           total_cogs: totalCogs,
-//           profit: profit,
-//           cash_flow: cashFlow,
-//           // Dados para o Tooltip (do RPC)
-//           total_refund_amount: parseFloat(item.total_refund_amount) || 0,
-//           total_refund_commission:
-//             parseFloat(item.total_refund_commission) || 0,
-//           total_refund_taxes: parseFloat(item.total_refund_taxes) || 0,
-//           total_refund_platform_fees:
-//             parseFloat(item.total_refund_platform_fees) || 0,
-//         };
-//       });
-//       setAffiliateData(typedData as AffiliatePerformanceData[]);
-//     }
-//     setIsLoadingData(false);
-//   }, [
-//     isDateRangeLoading,
-//     currentDateRange,
-//     getCurrentDateDbColumn,
-//     selectedPlatform,
-//     searchTermAffiliate,
-//     selectedActionType,
-//   ]);
+  // Dispara o fetch sempre que um filtro relevante muda
+  useEffect(() => {
+    loadAffiliatesData();
+  }, [loadAffiliatesData]);
 
-//   // Roda o fetch quando os filtros ou data range mudam
-//   useEffect(() => {
-//     if (currentDateRange) {
-//       fetchAffiliateData();
-//     }
-//   }, [fetchAffiliateData, currentDateRange]);
+  // --- LÓGICA CLIENT-SIDE (Ordenação, Paginação) ---
 
-//   // --- LÓGICA DE ORDENAÇÃO E PAGINAÇÃO (Client Side) ---
+  // 1. Ordenação
+  const sortedAffiliateData = useMemo(() => {
+    if (!rawAffiliateData) return [];
 
-//   const sortedAffiliateData = useMemo(() => {
-//     if (!affiliateData) return [];
-//     return [...affiliateData].sort((a, b) => {
-//       const aValue = a[sortColumn];
-//       const bValue = b[sortColumn];
+    const sorted = [...rawAffiliateData].sort((a, b) => {
+      const aValue = a[sortColumn];
+      const bValue = b[sortColumn];
 
-//       if (typeof aValue === "string" && typeof bValue === "string") {
-//         return sortDirection === "asc"
-//           ? aValue.localeCompare(bValue)
-//           : bValue.localeCompare(aValue);
-//       }
-//       if (typeof aValue === "number" && typeof bValue === "number") {
-//         return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
-//       }
-//       return 0;
-//     });
-//   }, [affiliateData, sortColumn, sortDirection]);
+      // Ordenação de Strings
+      if (typeof aValue === "string" && typeof bValue === "string") {
+        return sortDirection === "asc"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      // Ordenação de Números
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+      }
+      return 0;
+    });
 
-//   const paginatedData = useMemo(() => {
-//     const startIndex = (currentPage - 1) * itemsPerPage;
-//     return sortedAffiliateData.slice(startIndex, startIndex + itemsPerPage);
-//   }, [sortedAffiliateData, currentPage, itemsPerPage]);
+    return sorted;
+  }, [rawAffiliateData, sortColumn, sortDirection]);
 
-//   const totalPages = Math.ceil(sortedAffiliateData.length / itemsPerPage);
+  // 2. Paginação
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return sortedAffiliateData.slice(startIndex, startIndex + itemsPerPage);
+  }, [sortedAffiliateData, currentPage, itemsPerPage]);
 
-//   // Identificação dos Top 3 Afiliados (por Revenue) - Usado para destacar linhas
-//   const topAffiliatesIndices = useMemo(() => {
-//     if (affiliateData.length === 0) return new Set<number>();
-//     const sortedByRevenue = [...affiliateData].sort(
-//       (a, b) => b.total_revenue - a.total_revenue
-//     );
-//     // Retorna um Set com os índices dos top 3 no array original antes de ser paginado/filtrado
-//     const top3Affiliates = sortedByRevenue
-//       .slice(0, 3)
-//       .map((item) => ({ aff_name: item.aff_name, platform: item.platform }));
+  const totalAffiliatesCount = sortedAffiliateData.length;
+  const totalPages = Math.ceil(totalAffiliatesCount / itemsPerPage);
 
-//     return new Set(
-//       top3Affiliates.map((topAff) =>
-//         affiliateData.findIndex(
-//           (item) =>
-//             item.aff_name === topAff.aff_name &&
-//             item.platform === topAff.platform
-//         )
-//       )
-//     );
-//   }, [affiliateData]);
+  // --- HANDLERS ---
 
-//   // --- HANDLERS ---
+  const handleSort = useCallback(
+    (column: SortableAffiliateKeys) => {
+      // Se a coluna for a mesma, inverte a direção, caso contrário, seta para 'asc'
+      setSortDirection((prev) =>
+        sortColumn === column && prev === "asc" ? "desc" : "asc"
+      );
+      setSortColumn(column);
+      setCurrentPage(1);
+    },
+    [sortColumn]
+  );
 
-//   const handleSort = (column: SortableAffiliateKeys) => {
-//     if (sortColumn === column) {
-//       setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
-//     } else {
-//       setSortColumn(column);
-//       setSortDirection("asc");
-//     }
-//     setCurrentPage(1);
-//   };
+  // Usamos um debounce para a busca, evitando múltiplas chamadas API enquanto o usuário digita
+  const debouncedSearch = useMemo(
+    () => debounce((term: string) => setSearchTermAffiliate(term), 300),
+    []
+  );
 
-//   const handleSearch = useCallback(
-//     debounce((term: string) => {
-//       setSearchTermAffiliate(term);
-//       setCurrentPage(1);
-//     }, 300),
-//     []
-//   );
+  const handleSearch = useCallback(
+    (term: string) => {
+      // A busca real é feita no loadAffiliatesData (disparado pelo useEffect), então apenas setamos o termo
+      debouncedSearch(term);
+    },
+    [debouncedSearch]
+  );
 
-//   const handleItemsPerPageChange = (value: string) => {
-//     setItemsPerPage(parseInt(value, 10));
-//     setCurrentPage(1);
-//   };
+  const handlePlatformChange = useCallback((platform: string) => {
+    setSelectedPlatform(platform);
+    // O useEffect do loadAffiliatesData fará o fetch.
+  }, []);
 
-//   const handlePageChange = (page: number) => setCurrentPage(page);
+  const handleActionTypeChange = useCallback((actionType: string) => {
+    setSelectedActionType(actionType);
+    // O useEffect do loadAffiliatesData fará o fetch.
+  }, []);
 
-//   const handlePlatformChange = (platform: string) => {
-//     setSelectedPlatform(platform);
-//     setCurrentPage(1);
-//   };
-//   const handleActionTypeChange = (actionType: string) => {
-//     setSelectedActionType(actionType);
-//     setCurrentPage(1);
-//   };
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+  }, []);
 
-//   // --- CONDICIONAIS DE RENDERIZAÇÃO ---
-//   const showContentSkeleton =
-//     (isLoadingData || isFetchingPlatforms) && affiliateData.length === 0;
-//   const showNoDataMessage =
-//     !isLoadingData && !isFetchingPlatforms && affiliateData.length === 0;
+  const handleItemsPerPageChange = useCallback((value: string) => {
+    setItemsPerPage(parseInt(value, 10));
+    setCurrentPage(1);
+  }, []);
 
-//   // --- TOOLTIP DE REEMBOLSO (Lógica) ---
-//   const getRefundTooltipContent = (item: AffiliatePerformanceData) => {
-//     // ... (Lógica de renderização do Tooltip BuyGoods/Default - Usa item.total_refund_amount, etc.) ...
-//     // Simplificado para este contexto, mas a lógica completa estará no componente UI,
-//     // pois ela precisa de renderRow e cn.
-//     // Aqui, retornamos um objeto com os dados para o Tooltip renderizar.
+  // --- Context Value (Dados que a UI Consome) ---
+  const contextValue: AffiliatesContextValue = useMemo(
+    () => ({
+      // Dados
+      affiliateData: paginatedData,
 
-//     if (item.platform === "buygoods") {
-//       return {
-//         title: "BuyGoods R+CB Cost",
-//         isBuyGoods: true,
-//         refundAmount: item.total_refund_amount,
-//         commission: item.total_refund_commission,
-//         taxes: item.total_refund_taxes,
-//         platformFees: item.total_refund_platform_fees,
-//         finalCost: item.refunds_and_chargebacks,
-//       };
-//     }
+      // Loading States
+      isLoadingData: isLoadingData,
+      isFetchingPlatforms: isFetchingPlatforms,
+      isDateRangeLoading: isDateRangeLoading, // Consumido do hook externo
 
-//     return {
-//       title: `${item.platform} R+CB Cost`,
-//       isBuyGoods: false,
-//       finalCost: item.refunds_and_chargebacks,
-//     };
-//   };
+      // Filtros e Handlers
+      filterState: {
+        availablePlatforms: availablePlatforms,
+        selectedPlatform: selectedPlatform,
+        selectedActionType: selectedActionType,
+        searchTermAffiliate: searchTermAffiliate,
+      },
+      handleFilterChange: {
+        platform: handlePlatformChange,
+        actionType: handleActionTypeChange,
+        search: handleSearch,
+      },
 
-//   // --- Retorno Final do Contexto ---
-//   const contextValue = {
-//     affiliateData: paginatedData, // Dados da página atual
-//     isLoading: isLoadingData || isDateRangeLoading || isFetchingPlatforms,
+      // Ordenação
+      sortState: {
+        sortColumn: sortColumn,
+        sortDirection: sortDirection,
+        handleSort: handleSort,
+      },
 
-//     // Filtros
-//     filterState: {
-//       availablePlatforms,
-//       selectedPlatform,
-//       selectedActionType,
-//       isFetchingPlatforms,
-//     },
-//     handleFilterChange: {
-//       platform: handlePlatformChange,
-//       actionType: handleActionTypeChange,
-//     },
-//     handleSearch,
+      // Paginação
+      pagination: {
+        currentPage: currentPage,
+        totalPages: totalPages,
+        itemsPerPage: itemsPerPage,
+        totalAffiliatesCount: totalAffiliatesCount,
+        handlePageChange: handlePageChange,
+        handleItemsPerPageChange: handleItemsPerPageChange,
+        ROWS_PER_PAGE_OPTIONS: ROWS_PER_PAGE_OPTIONS,
+      },
+    }),
+    [
+      paginatedData,
+      isLoadingData,
+      isFetchingPlatforms,
+      isDateRangeLoading,
+      availablePlatforms,
+      selectedPlatform,
+      selectedActionType,
+      searchTermAffiliate,
+      sortColumn,
+      sortDirection,
+      handleSort,
+      handlePlatformChange,
+      handleActionTypeChange,
+      handleSearch,
+      currentPage,
+      totalPages,
+      itemsPerPage,
+      totalAffiliatesCount,
+      handlePageChange,
+      handleItemsPerPageChange,
+    ]
+  );
 
-//     // Ordenação
-//     sortState: { sortColumn, sortDirection, handleSort },
-
-//     // Paginação
-//     pagination: {
-//       currentPage,
-//       totalPages,
-//       itemsPerPage: itemsPerPage,
-//       handleItemsPerPageChange,
-//       handlePageChange,
-//       totalRecords: sortedAffiliateData.length,
-//       ROWS_PER_PAGE_OPTIONS,
-//     },
-
-//     // Utilidades e Status
-//     formatCurrency,
-//     showContentSkeleton,
-//     showNoDataMessage,
-//     topAffiliatesIndices,
-//     getRefundTooltipContent,
-//   };
-
-//   return (
-//     <AffiliatesContext.Provider value={contextValue}>
-//       {children}
-//     </AffiliatesContext.Provider>
-//   );
-// }
+  return (
+    <AffiliatesContext.Provider value={contextValue}>
+      {children}
+    </AffiliatesContext.Provider>
+  );
+};
