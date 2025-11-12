@@ -1,10 +1,12 @@
 # 🦈 Black Shark Analytics
 
-Bem-vindo(a) ao **Black Shark Analytics**! Este é o painel de métricas da nossa empresa de marketing, o coração de onde analisamos as vendas, reembolsos e performance dos nossos afiliados.
+Bem-vindo(a) ao **Black Shark Analytics**!  
+Este é o painel de métricas da nossa empresa de marketing — o coração de onde analisamos as vendas, reembolsos e performance dos nossos afiliados.
 
-Este projeto foi totalmente refatorado do Next.js para uma **stack moderna, leve e performática**: **React + Vite + SWC + TypeScript**.
+Este projeto foi totalmente refatorado do **Next.js** para uma stack moderna, leve e performática:  
+**React + Vite + SWC + TypeScript**.
 
-Seja você um dev experiente ou alguém que acabou de chegar, este README é o seu **guia essencial** para entender, rodar e desenvolver no projeto.
+Seja você um dev experiente ou alguém que acabou de chegar, este README é o seu guia essencial para entender, rodar e desenvolver no projeto.
 
 ---
 
@@ -13,10 +15,10 @@ Seja você um dev experiente ou alguém que acabou de chegar, este README é o s
 Aqui é onde a mágica acontece. A performance do Black Shark é garantida por essa combinação de ferramentas:
 
 | Categoria         | Tecnologia       | Por que usamos?                                         |
-| :---------------- | :--------------- | :------------------------------------------------------ |
+| ----------------- | ---------------- | ------------------------------------------------------- |
 | **Frontend**      | React            | Biblioteca de UI padrão do mercado.                     |
 | **Build Tool**    | Vite             | Compilação super-rápida (dev e produção).               |
-| **Transpiler**    | SWC              | Substituindo o Babel para builds _instantâneos_.        |
+| **Transpiler**    | SWC              | Substituindo o Babel para builds instantâneos.          |
 | **Linguagem**     | TypeScript       | Segurança de tipos para evitar bugs bobos.              |
 | **Estilização**   | Tailwind CSS     | Utility-First para desenvolver a UI em tempo recorde.   |
 | **Banco/Backend** | Supabase         | Database e autenticação simples e robusta (PostgreSQL). |
@@ -28,89 +30,123 @@ Aqui é onde a mágica acontece. A performance do Black Shark é garantida por e
 
 A estrutura do projeto segue o princípio de **separação de preocupações (SoC)**, facilitando a localização de arquivos e a manutenção.
 
-### 🌲 Visão em Árvore
-
-Para uma visão rápida, aqui está como o projeto está organizado. Note a separação clara entre **UI, Lógica, Páginas e Utilitários**.
+### 🌲 Visão em Árvore Detalhada
 
 ```
-├── .vscode/ # ⚙️ Configurações (settings, extensions)
-├── node_modules/ # 📦 Dependências (gerado automaticamente)
-├── public/ # 🖼️ Arquivos estáticos (favicon, logos, etc.)
+├── .vscode/                 # ⚙️ Configurações (settings, extensions)
+├── node_modules/            # 📦 Dependências (gerado automaticamente)
+├── public/                  # 🖼️ Arquivos estáticos (favicon, logos, etc.)
 │
-├── src/ # 🦈 Coração da Aplicação (Tudo que será compilado)
-│ ├── assets/ # 🎨 Mídia, ícones, fontes, estilos globais
-│ │ ├── images/
-│ │ └── styles/
-│ │ ├── global.css
-│ │ └── variables.css
-│ │
-│ ├── components/ # 🧱 Componentes Reutilizáveis
-│ │ ├── common/ # 🧩 Componentes "burros" (UI) - Botões, Inputs, Cards genéricos
-│ │ ├── layout/ # 📐 Componentes de Layout - Header, Sidebar, Footer (Ex: AppSidebar.tsx)
-│ │ └── domain/ # 📊 Componentes que carregam lógica específica (Ex: SalesTrendChart.tsx)
-│ │
-│ ├── hooks/ # 🎣 Lógica de estado/ciclo de vida (useAuth, useToast, useDateRange)
-│ │
-│ ├── contexts/ # 🌟 Gerenciamento de estado global (AuthContext, DateRangeContext)
-│ │
-│ ├── lib/ # 📚 Utilitários e Wrappers
-│ │ ├── api/ # 🔗 Funções de interação com API ou Supabase
-│ │ └── utils.ts # Funções helpers genéricas
-│ │
-│ ├── pages/ # 🧭 Telas da Aplicação (Organizadas por Rota)
-│ │ ├── Login/ # /login
-│ │ │ └── Login.tsx
-│ │ │
-│ │ ├── Dashboard/ # /dashboard/\*
-│ │ │ ├── components/ # Componentes exclusivos desta página/domínio
-│ │ │ ├── Vendas/ # /dashboard/vendas
-│ │ │ │ └── VendasPage.tsx
-│ │ │ └── Reembolsos/# /dashboard/reembolsos
-│ │ │ └── ReembolsosPage.tsx
-│ │ └── App.tsx # Ponto de entrada com o Roteador Principal
-│ │
-│ └── main.tsx # 🚀 Ponto de entrada do Vite (Monta o React no DOM)
+├── src/                     # 🦈 Coração da Aplicação
+│   ├── assets/              # 🎨 Mídia, ícones, fontes, estilos globais
+│   │   ├── images/
+│   │   └── styles/
+│   │
+│   ├── components/          # 🧱 Componentes Reutilizáveis
+│   │   ├── common/          # 🧩 Componentes de UI - Botões, Inputs, Cards
+│   │   ├── layout/          # 📐 Header, Sidebar, Footer
+│   │   └── dashboard/       # 📊 Gráficos e componentes do Dashboard
+│   │
+│   ├── hooks/               # 🎣 Lógica de estado/ciclo de vida
+│   ├── contexts/            # 🌟 Gerenciamento de estado global
+│   │   ├── DashboardConfigProvider.tsx
+│   │   ├── DashboardDataProvider.tsx
+│   │   └── TransactionsProvider.tsx
+│   │
+│   ├── lib/                 # 📚 Lógica Pura (sem React/API)
+│   │   ├── dataCalculations.ts
+│   │   ├── dateConfig.ts
+│   │   └── transactionFilters.ts
+│   │
+│   ├── services/            # 🔗 Acesso a Dados e Persistência
+│   │   ├── configStorage.ts
+│   │   ├── dashboardService.ts
+│   │   └── transactionsService.ts
+│   │
+│   └── pages/               # 🧭 Telas da Aplicação (por rota)
+│       ├── Login/
+│       │   └── Login.tsx
+│       ├── Dashboard/
+│       │   ├── Affiliates/
+│       │   ├── Customers/
+│       │   ├── Transactions/
+│       │   ├── DashboardLayout.tsx
+│       │   └── DashboardPage.tsx
+│       └── App.tsx
 │
-├── .gitignore # 🚫 O que o Git deve ignorar
-├── README.md # 📄 Documentação
-├── package.json # Dependências e scripts
-├── vite.config.ts # ⚡ Configuração do bundler (Vite + SWC)
-├── tsconfig.json # Configuração do TypeScript
-└── tailwind.config.js # Configuração do Tailwind CSS
+├── .gitignore               # 🚫 O que o Git deve ignorar
+├── README.md                # 📄 Documentação
+├── package.json             # 📦 Dependências e scripts
+├── vite.config.ts           # ⚡ Configuração do bundler (Vite + SWC)
+└── tsconfig.json            # ⚙️ Configuração do TypeScript
 ```
 
 ---
 
-### 🗺️ Guia Rápido por Responsabilidade
+## 🗺️ Guia Rápido por Responsabilidade
 
-| Pasta            | Conteúdo                                                               | Para que serve?                                                                                                 |
-| :--------------- | :--------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
-| `src/assets`     | Imagens, fontes e estilos globais (`global.css`).                      | 🖼️ Onde ficam os recursos estáticos que não são código.                                                         |
-| `src/components` | **Componentes Reutilizáveis** (UI e Lógica).                           | 🧱 Nossa biblioteca de blocos de montar. Divididos em `common` (botões/inputs) e `layout` (Sidebar/Header).     |
-| `src/contexts`   | Providers e gerenciamento de estado global.                            | 🌟 Onde definimos quem tem acesso a dados globais (Autenticação, Configuração de Data).                         |
-| `src/hooks`      | Lógica de reuso e custom hooks (e.g., `useAuth`, `useToast`).          | 🎣 Encapsula a lógica de estado/ciclo de vida do componente.                                                    |
-| `src/lib`        | Funções utilitárias, wrappers de terceiros e clientes de API/Supabase. | 📚 O "canivete suíço" do projeto. Funções que fazem coisas fora do React.                                       |
-| `src/pages`      | **Telas** da aplicação. Uma pasta por rota principal.                  | 🗺️ O mapa do site. Se o URL é `/dashboard/vendas`, você encontra a tela dentro de `src/pages/Dashboard/Vendas`. |
-| `public`         | `index.html`, `favicon.ico` e arquivos que vão direto para a raiz.     | 🌐 Arquivos estáticos servidos diretamente.                                                                     |
+| Pasta            | Conteúdo                                  | Para que serve                             |
+| ---------------- | ----------------------------------------- | ------------------------------------------ |
+| `src/contexts`   | Providers (`*Provider.tsx`)               | 🌟 Orquestrador de estado global e filtros |
+| `src/services`   | Funções que acessam Supabase/localStorage | 🔗 Acesso a dados e queries SQL            |
+| `src/lib`        | Funções puras (`calculate*`, `apply*`)    | 📚 Lógica de negócio desacoplada           |
+| `src/components` | UI e Componentes JSX                      | 🧱 Interface visual e consumo de hooks     |
 
 ---
 
-## 🚀 Como Colocar para Rodar
+## 🧠 Arquitetura: Fluxo de Dados Desacoplado
 
-Siga estes passos para ter o Black Shark Analytics rodando na sua máquina:
+O fluxo de dados segue sempre esta ordem:
+
+1. **Componente** (`*Table.tsx`): Pede dados.
+2. **Hook** (`useTransactions`): Consome o Context.
+3. **Context** (`TransactionsProvider`): Gerencia estado e chama o Service.
+4. **Service** (`transactionsService.ts`): Monta query SQL e chama Supabase.
+5. **Lib** (`transactionFilters.ts`): Aplica regras de negócio.
+
+### Exemplo: Atualização da Tabela de Transações
+
+| Camada       | Responsabilidade               | Arquivo                                 |
+| ------------ | ------------------------------ | --------------------------------------- |
+| Lógica Pura  | Cálculo de `net_sales`         | `src/lib/dataCalculations.ts`           |
+| Query Logic  | Construção da Query            | `src/services/transactionsService.ts`   |
+| State        | Armazenar resultados e filtros | `src/contexts/TransactionsProvider.tsx` |
+| Persistência | Salvar configs no LocalStorage | `src/services/configStorage.ts`         |
+
+💡 Esse desacoplamento garante que, se o Supabase for substituído por uma API Node.js, **apenas os arquivos dentro de `src/services/` precisam ser alterados.**
+
+---
+
+## 🚀 Como Rodar o Projeto
 
 ### 1. Pré-requisitos
 
-Certifique-se de ter instalado:
-
-- **Node.js** (versão LTS recomendada)
-- **npm** ou **yarn** ou **pnpm** (use o que preferir, mas `npm` é o padrão)
+- Node.js (versão LTS)
+- npm, yarn ou pnpm (preferencialmente **npm**)
 
 ### 2. Variáveis de Ambiente
 
-O projeto precisa de credenciais do Supabase. Crie um arquivo `.env` na raiz e preencha com o seguinte (peça a um colega as chaves):
+Crie um arquivo `.env` na raiz e adicione:
 
-```dotenv
-VITE_SUPABASE_URL=secreto-url-aqui
-VITE_SUPABASE_ANON_KEY=secreto-key-aqui
 ```
+VITE_SUPABASE_URL=SUA-URL-AQUI
+VITE_SUPABASE_ANON_KEY=SUA-CHAVE-AQUI
+VITE_SUPABASE_SERVICE_ROLE_KEY=SUA-CHAVE-AQUI
+VITE_REGISTRATION_SECRET=SUA-CHAVE-AQUI
+```
+
+### 3. Instalação e Execução
+
+```bash
+# 1. Instalar dependências
+npm install
+
+# 2. Rodar ambiente de desenvolvimento
+npm run dev
+```
+
+Acesse **http://localhost:5173** (ou porta semelhante).
+
+---
+
+🦈 **Black Shark Analytics** — Performance, clareza e dados sob controle.
