@@ -16,7 +16,7 @@ export default function LoginPage() {
   }, [user, isLoading, navigate]);
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen p-4 bg-blackshark-background">
+    <div className="relative flex items-center justify-center min-h-screen p-4 bg-black">
       <OceanSoundPlayer />
       <OceanBackground />
 

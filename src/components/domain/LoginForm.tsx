@@ -25,6 +25,7 @@ import { DotLoader } from "../common/ui/DotLoader";
 import { SharkSwim } from "../common/SharkSwin";
 import { useNavigate } from "react-router-dom";
 import { LoadingScreen } from "../common/LoadingScreen";
+import { useThemeToggle } from "@/hooks/useThemeToggle";
 
 const loginSchema = z.object({
   username: z.string().min(1, { message: "O nome de usuário é obrigatório" }),
@@ -54,6 +55,7 @@ export function LoginForm() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const controls = useAnimation();
+  const { theme } = useThemeToggle();
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoginSuccess, setIsLoginSuccess] = useState(false);
@@ -107,7 +109,7 @@ export function LoginForm() {
       <CardHeader className="text-center">
         <div className="flex justify-center mb-4">
           {/* 🚨 TUBARÃO FIXO BRANCO */}
-          <SharkSwim width={170} color="white" />
+          <SharkSwim key={theme} width={170} className="text-foreground" />
         </div>
 
         {/* 🚨 TEXTO: text-foreground (branco no dark mode) */}

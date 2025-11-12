@@ -28,7 +28,7 @@ export function OceanBackground({
       aria-hidden
       // 🚨 CORREÇÃO 1: Usamos bg-background dinâmica. As classes de estilo em linha são removidas
       className={`absolute inset-0 overflow-hidden pointer-events-none ${
-        backgroundTransparent ? "" : "bg-background"
+        backgroundTransparent ? "bg-transparent" : "bg-black"
       }`}
     >
       {particles.map((p, i) => (
