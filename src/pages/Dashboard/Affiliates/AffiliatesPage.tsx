@@ -11,15 +11,16 @@ import { Users } from "lucide-react";
 import { useAffiliates } from "@/hooks/useAffiliates";
 import { AffiliatesProvider } from "@/contexts/AffiliatesContext";
 import { type AffiliatePerformanceData } from "@/types/affiliates";
+import { AFFILIATE_ACTION_TYPES } from "@/lib/config";
 import {
   AffiliatesTableHeader,
   AffiliatesTableRow,
   AffiliatesTableFooter,
-  AffiliatesFilters,
   AffiliatesPagination,
   AffiliatesLoadingSkeleton,
   AffiliatesNoData,
 } from "@/components/dashboard/affiliates";
+import { Filters } from "@/components/dashboard/Filters";
 
 function AffiliatesPageContent() {
   const {
@@ -32,14 +33,6 @@ function AffiliatesPageContent() {
     sortState,
     pagination,
   } = useAffiliates();
-
-  console.log("📊 AffiliatesPageContent render", {
-    affiliateDataLength: affiliateData.length,
-    isLoadingData,
-    isDateRangeLoading,
-    isFetchingPlatforms,
-    filterState,
-  });
 
   const { availablePlatforms, selectedPlatform, selectedActionType } =
     filterState;
@@ -93,7 +86,7 @@ function AffiliatesPageContent() {
 
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
-      <Card className="shadow-lg">
+      <Card className="shadow-lg border-[1px] border-gray-300/20">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Users className="w-6 h-6 text-primary" />
@@ -105,14 +98,19 @@ function AffiliatesPageContent() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AffiliatesFilters
-            selectedPlatform={selectedPlatform}
+          <Filters
+            products={[{ id: "all", name: "All Products" }]}
+            selectedProduct="all"
+            onProductChange={() => {}}
+            actionTypes={AFFILIATE_ACTION_TYPES}
             selectedActionType={selectedActionType}
-            availablePlatforms={availablePlatforms}
-            isFetchingPlatforms={isFetchingPlatforms}
-            onSearchChange={handleFilterChange.search}
-            onPlatformChange={handleFilterChange.platform}
             onActionTypeChange={handleFilterChange.actionType}
+            platforms={availablePlatforms}
+            selectedPlatform={selectedPlatform}
+            onPlatformChange={handleFilterChange.platform}
+            isPlatformLoading={isFetchingPlatforms}
+            searchPlaceholder="Search by Affiliate Name..."
+            onSearchChange={handleFilterChange.search}
           />
 
           {showContentSkeleton ? (
@@ -121,7 +119,7 @@ function AffiliatesPageContent() {
             <AffiliatesNoData />
           ) : (
             <>
-              <div className="overflow-x-auto border rounded-md">
+              <div className="overflow-x-auto border-b-[1px] rounded-md border-b-gray-300/30">
                 <Table>
                   <AffiliatesTableHeader
                     sortColumn={sortColumn}

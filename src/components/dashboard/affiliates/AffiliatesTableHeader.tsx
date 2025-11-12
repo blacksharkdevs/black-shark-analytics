@@ -176,7 +176,7 @@ export function AffiliatesTableHeader({
                         {header.label}
                       </span>
                     </TooltipTrigger>
-                    <TooltipContent>
+                    <TooltipContent className="bg-blue-950">
                       <p>{header.tooltip}</p>
                     </TooltipContent>
                   </Tooltip>

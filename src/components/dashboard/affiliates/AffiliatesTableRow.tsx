@@ -122,7 +122,9 @@ export function AffiliatesTableRow({
                 {formatCurrency(item.refunds_and_chargebacks)}
               </span>
             </TooltipTrigger>
-            <TooltipContent>{getRefundTooltipContent(item)}</TooltipContent>
+            <TooltipContent className="bg-blue-950">
+              {getRefundTooltipContent(item)}
+            </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </TableCell>

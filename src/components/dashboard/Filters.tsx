@@ -15,6 +15,7 @@ import {
 // 🚨 Componentes recém-criados
 import { ProductFilter } from "./ProductFilter";
 import { ActionTypeFilter } from "./ActionTypeFilter";
+import { SearchFilter } from "./SearchFilter";
 import { FiltersSkeleton } from "./FiltersSkeleton";
 
 interface FiltersProps {
@@ -31,6 +32,11 @@ interface FiltersProps {
   selectedPlatform?: string;
   onPlatformChange?: (platform: string) => void;
   isPlatformLoading?: boolean;
+
+  // Filtro de Busca Opcional
+  searchPlaceholder?: string;
+  onSearchChange?: (value: string) => void;
+  searchDefaultValue?: string;
 }
 
 export function Filters({
@@ -45,15 +51,26 @@ export function Filters({
   selectedPlatform,
   onPlatformChange,
   isPlatformLoading = false,
+  searchPlaceholder,
+  onSearchChange,
+  searchDefaultValue,
 }: FiltersProps) {
   const hasPlatformFilter =
     platforms !== undefined &&
     onPlatformChange !== undefined &&
     selectedPlatform !== undefined;
+
+  const hasSearchFilter = onSearchChange !== undefined;
+
   const isTotalLoading = isLoading || isPlatformLoading;
 
   if (isTotalLoading) {
-    return <FiltersSkeleton hasPlatformFilter={hasPlatformFilter} />;
+    return (
+      <FiltersSkeleton
+        hasPlatformFilter={hasPlatformFilter}
+        hasSearchFilter={hasSearchFilter}
+      />
+    );
   }
 
   // 🚨 Plataforma Filter (Renderizado inline para simplicidade)
@@ -89,10 +106,23 @@ export function Filters({
   return (
     <div
       className={cn(
-        "grid grid-cols-1 md:grid-cols-2 gap-4",
-        hasPlatformFilter && "lg:grid-cols-3"
+        "grid grid-cols-1 gap-4 mb-6",
+        !hasSearchFilter && !hasPlatformFilter && "md:grid-cols-2",
+        (hasSearchFilter || hasPlatformFilter) &&
+          !(hasSearchFilter && hasPlatformFilter) &&
+          "md:grid-cols-2 lg:grid-cols-3",
+        hasSearchFilter && hasPlatformFilter && "md:grid-cols-2 lg:grid-cols-4"
       )}
     >
+      {/* Filtro 0: Busca (Condicional) */}
+      {hasSearchFilter && (
+        <SearchFilter
+          placeholder={searchPlaceholder}
+          onSearchChange={onSearchChange!}
+          defaultValue={searchDefaultValue}
+        />
+      )}
+
       {/* Filtro 1: Produtos */}
       <ProductFilter
         products={products}

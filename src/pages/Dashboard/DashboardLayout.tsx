@@ -7,11 +7,15 @@ import { DashboardSkeleton } from "@/components/layout/DashboardSkeleton";
 import { useSidebar } from "@/hooks/useSidebar";
 import { DashboardConfigProvider } from "@/contexts/DashboardConfigContext";
 import { TooltipProvider } from "@/components/common/ui/tooltip";
+import { LoadingScreen } from "@/components/common/LoadingScreen";
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
 
 const SIDEBAR_WIDTH = "280px";
 
 function DashboardLayoutContent() {
   const { isSidebarOpen } = useSidebar();
+  const { isLoadingData } = useDashboardData();
 
   const currentSidebarWidth = isSidebarOpen ? SIDEBAR_WIDTH : "72px";
 
@@ -27,7 +31,11 @@ function DashboardLayoutContent() {
       >
         <Header />
         <main className="flex-1 p-4 overflow-y-auto md:p-8">
-          <Outlet />
+          {isLoadingData ? (
+            <LoadingScreen backgroundTransparent={true} />
+          ) : (
+            <Outlet />
+          )}
         </main>
       </div>
     </div>
@@ -44,9 +52,11 @@ export default function DashboardLayout() {
   return (
     <TooltipProvider delayDuration={300}>
       <DashboardConfigProvider>
-        <SidebarProvider>
-          <DashboardLayoutContent />
-        </SidebarProvider>
+        <DashboardDataProvider>
+          <SidebarProvider>
+            <DashboardLayoutContent />
+          </SidebarProvider>
+        </DashboardDataProvider>
       </DashboardConfigProvider>
     </TooltipProvider>
   );

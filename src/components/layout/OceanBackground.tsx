@@ -3,7 +3,13 @@ import { motion } from "framer-motion";
 
 const PARTICLE_COUNT = 40;
 
-export function OceanBackground(): JSX.Element {
+interface OceanBackgroundProps {
+  backgroundTransparent?: boolean;
+}
+
+export function OceanBackground({
+  backgroundTransparent = false,
+}: OceanBackgroundProps): JSX.Element {
   const particles = useMemo(
     () =>
       Array.from({ length: PARTICLE_COUNT }, () => ({
@@ -21,7 +27,9 @@ export function OceanBackground(): JSX.Element {
     <div
       aria-hidden
       // 🚨 CORREÇÃO 1: Usamos bg-background dinâmica. As classes de estilo em linha são removidas
-      className="absolute inset-0 overflow-hidden bg-black pointer-events-none"
+      className={`absolute inset-0 overflow-hidden pointer-events-none ${
+        backgroundTransparent ? "" : "bg-background"
+      }`}
     >
       {particles.map((p, i) => (
         <motion.span
