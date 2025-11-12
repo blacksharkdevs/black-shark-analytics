@@ -1,6 +1,6 @@
 import { createContext } from "react";
-import type { SaleRecord } from "@/lib/data"; // Importar tipos necessários
 import type { Product as ProductConfig } from "@/lib/config";
+import type { SaleRecord } from "@/types/index";
 
 interface TransactionsContextType {
   // Dados e Status

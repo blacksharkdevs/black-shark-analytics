@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
 import CountUp from "react-countup";
 import {
@@ -49,7 +50,7 @@ export function TopProductsTable() {
     }, {} as Record<string, ProductRevenue>);
 
     return Object.values(productRevenueMap)
-      .sort((a, b) => b.totalRevenue - a.totalRevenue)
+      .sort((a: any, b: any) => b.totalRevenue - a.totalRevenue)
       .slice(0, 5);
   }, [data]);
 
@@ -122,7 +123,7 @@ export function TopProductsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {topProducts.map((product) => (
+            {topProducts.map((product: any) => (
               <TableRow
                 key={product.productName}
                 className="transition-colors hover:bg-accent/10 border-border/50"
@@ -130,7 +131,6 @@ export function TopProductsTable() {
                 <TableCell className="text-foreground">
                   {product.productName}
                 </TableCell>
-                {/* 🚨 COLUNA DE RECEITA COM COUNTUP */}
                 <TableCell className="font-semibold text-right text-primary tabular-nums">
                   <CountUp
                     start={0}

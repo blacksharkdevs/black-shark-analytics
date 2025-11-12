@@ -13,12 +13,13 @@ import { Button } from "@/components/common/ui/button";
 import { Skeleton } from "@/components/common/ui/skeleton";
 import { ArrowLeft, FileText } from "lucide-react";
 import { format as dateFnsFormat, isValid } from "date-fns";
+import { TransactionsProvider } from "@/contexts/TransactionsContext";
 
 type TransactionDetails = {
   [key: string]: any;
 };
 
-export default function TransactionDetailPage() {
+function TransactionDetailPageContent() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -170,5 +171,13 @@ export default function TransactionDetailPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function TransactionDetailPage() {
+  return (
+    <TransactionsProvider>
+      <TransactionDetailPageContent />
+    </TransactionsProvider>
   );
 }

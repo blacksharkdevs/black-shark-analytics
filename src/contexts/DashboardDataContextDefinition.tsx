@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { type SaleRecord } from "@/lib/data";
+import type { SaleRecord } from "@/types/index";
 import { type Product as ProductConfig } from "@/lib/config";
 import { createContext } from "react";
 

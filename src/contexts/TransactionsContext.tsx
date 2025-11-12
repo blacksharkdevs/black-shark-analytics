@@ -1,11 +1,22 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { type SaleRecord, transformSupabaseSaleToRecord } from "@/lib/data";
+import { transformSupabaseSaleToRecord } from "@/lib/data";
 import { type Product as ProductConfig } from "@/lib/config";
 import { debounce } from "@/lib/utils";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 import { TransactionsContext } from "./TransactionsContextDefinition";
 import { calculateRefund } from "@/utils/index";
+import {
+  fetchDistinctSalesPlatforms,
+  fetchProductsForFilter,
+} from "@/services/configService";
+import type { SaleRecord } from "@/types/index";
+import { applyActionTypeFilter } from "@/lib/transactionFilters";
+import { applyServerSort } from "@/lib/transactionSort";
+import {
+  calculateNetSales,
+  type SaleRecordWithNetSales,
+} from "@/lib/dataCalculations";
 
 // --- Tipagens ---
 
@@ -22,9 +33,8 @@ export function TransactionsProvider({
     currentDateRange,
     getCurrentDateDbColumn,
     isLoading: isDateRangeLoading,
-  } = useDashboardConfig();
+  } = useDashboardConfig(); // ESTADOS PRINCIPAIS
 
-  // ESTADOS PRINCIPAIS
   const [transactions, setTransactions] = useState<SaleRecord[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,9 +44,8 @@ export function TransactionsProvider({
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalTransactions, setTotalTransactions] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(ROWS_PER_PAGE_OPTIONS[1]);
+  const [itemsPerPage, setItemsPerPage] = useState(ROWS_PER_PAGE_OPTIONS[1]); // ESTADOS DE FILTRO
 
-  // ESTADOS DE FILTRO
   const [availableProducts, setAvailableProducts] = useState<ProductConfig[]>([
     { id: "all", name: "All Products" },
   ]);
@@ -47,64 +56,35 @@ export function TransactionsProvider({
   const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
   const [isFetchingPlatforms, setIsFetchingPlatforms] = useState(true);
 
-  // Sincroniza a coluna de ordenação padrão com a configuração de data
   useEffect(() => {
     setSortColumn(getCurrentDateDbColumn());
-  }, [getCurrentDateDbColumn]);
+  }, [getCurrentDateDbColumn]); // ➡️ REFACTOR: Efeito para buscar PRODUTOS (usando service)
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const loadProducts = async () => {
       setIsFetchingProducts(true);
-      const { data, error } = await supabase
-        .from("config_products")
-        .select("merchant_id, product_name")
-        .order("product_name");
-      if (error) {
-        console.error("Error fetching products:", error);
-        setAvailableProducts([{ id: "all", name: "All Products" }]);
-      } else if (data) {
-        const productsForFilter = data.map((p) => ({
-          id: p.merchant_id,
-          name: p.product_name,
-        }));
-        setAvailableProducts([
-          { id: "all", name: "All Products" },
-          ...productsForFilter,
-        ]);
-      }
+      const products = await fetchProductsForFilter();
+      setAvailableProducts(products);
       setIsFetchingProducts(false);
     };
-    fetchProducts();
+    loadProducts();
   }, []);
 
   useEffect(() => {
-    const fetchPlatforms = async () => {
+    const loadPlatforms = async () => {
       setIsFetchingPlatforms(true);
-      const { data, error } = await supabase.rpc(
-        "get_distinct_sales_platforms"
-      );
-      if (error) {
-        console.error("Error fetching distinct platforms:", error);
-        setAvailablePlatforms([]);
-      } else if (data) {
-        const distinctPlatforms = (data as Array<{ platform: string }>)
-          .map((item) => item.platform)
-          .sort();
-        setAvailablePlatforms(distinctPlatforms);
-      }
+      const platforms = await fetchDistinctSalesPlatforms();
+      setAvailablePlatforms(platforms);
       setIsFetchingPlatforms(false);
     };
-    fetchPlatforms();
-  }, []);
-
-  // --- FETCH TRANSACTIONS (Lógica Principal) ---
+    loadPlatforms();
+  }, []); // --- FETCH TRANSACTIONS (Lógica Principal, agora mais limpa) ---
 
   const fetchTransactions = useCallback(async () => {
     const dateDbColumnToFilter = getCurrentDateDbColumn();
     const limit = itemsPerPage;
     const page = currentPage;
 
-    // GUARD: Evita queries desnecessárias
     if (
       isDateRangeLoading ||
       isFetchingPlatforms ||
@@ -133,59 +113,22 @@ export function TransactionsProvider({
         { count: "exact" }
       )
       .gte(dateDbColumnToFilter, queryFromUTC)
-      .lte(dateDbColumnToFilter, queryToUTC);
+      .lte(dateDbColumnToFilter, queryToUTC); // Aplicação dos filtros básicos
 
-    // Aplicação dos filtros
     if (selectedProduct !== "all") {
       query = query.eq("merchant_id", selectedProduct);
     }
     if (selectedPlatform !== "all") {
       query = query.eq("platform", selectedPlatform);
     }
-    if (selectedActionType !== "all") {
-      switch (selectedActionType) {
-        case "all_incomes":
-          query = query.eq("action_type", "neworder");
-          break;
-        case "front_sale":
-          query = query.eq("action_type", "neworder").eq("upsell", false);
-          break;
-        case "back_sale":
-          query = query.eq("action_type", "neworder").eq("upsell", true);
-          break;
-        case "rebill":
-          query = query.eq("action_type", "rebill");
-          break;
-        case "all_refunds":
-          query = query.in("action_type", [
-            "chargebackrefundtime",
-            "refund",
-            "chargeback",
-          ]);
-          break;
-      }
-    }
 
-    // Ordenação dinâmica (Server Sort)
+    // ➡️ REFACTOR: Aplica os filtros de Ação (logica movida para lib)
+    query = applyActionTypeFilter(query, selectedActionType); // ➡️ REFACTOR: Ordenação dinâmica (Server Sort) (logica movida para lib)
+
     if (sortColumn && sortColumn !== "net_sales") {
-      let actualSortColumn: string = sortColumn;
-      const sortOptions: {
-        ascending: boolean;
-        referencedTable?: string;
-        foreignTable?: string;
-      } = { ascending: sortDirection === "asc" };
-      if (sortColumn === "product_name") {
-        actualSortColumn = "product_name";
-        sortOptions.referencedTable = "config_products";
-      } else if (sortColumn === "revenue") {
-        actualSortColumn = "total_amount_charged";
-      } else if (sortColumn === "id") {
-        actualSortColumn = "sale_id";
-      } else if (sortColumn === "customer_name") {
-        actualSortColumn = "customer_firstname";
-      }
-      query = query.order(actualSortColumn, sortOptions);
+      query = applyServerSort(query, sortColumn, sortDirection);
     } else {
+      // Se a ordenação for por Net Sales (cliente) ou padrão, ordena pela data.
       query = query.order(dateDbColumnToFilter, { ascending: false });
     }
 
@@ -220,38 +163,13 @@ export function TransactionsProvider({
 
   useEffect(() => {
     fetchTransactions();
-  }, [fetchTransactions]);
+  }, [fetchTransactions]); // --- CÁLCULOS E MEMOIZAÇÃO (Filtro Cliente e Cálculos de Página) --- // 1. Cálculos de Net Sales (useMemo) (logica movida para lib)
 
-  // --- CÁLCULOS E MEMOIZAÇÃO (Filtro Cliente e Cálculos de Página) ---
-
-  // 1. Cálculos de Net Sales (useMemo)
   const transactionsWithNetSales = useMemo(() => {
-    return transactions.map((t) => {
-      const isRefundAction = [
-        "refund",
-        "chargeback",
-        "chargebackrefundtime",
-      ].includes(t.action_type);
-      let netSales = 0;
+    // ➡️ REFACTOR: Usando a função pura externa para calcular Net Sales
+    return transactions.map(calculateNetSales) as SaleRecordWithNetSales[];
+  }, [transactions]); // 2. Filtro Cliente (se houver termo de busca) (mantido - ok, é lógica de estado/apresentação)
 
-      if (isRefundAction) {
-        netSales = -calculateRefund(t);
-      } else {
-        const platformFeePercentageAmount = t.revenue * (t.platform_tax || 0);
-        const platformFeeTransactionAmount = t.platform_transaction_tax || 0;
-        netSales =
-          t.revenue -
-          (t.aff_commission || 0) -
-          (t.taxes || 0) -
-          platformFeePercentageAmount -
-          platformFeeTransactionAmount;
-      }
-
-      return { ...t, net_sales: netSales };
-    });
-  }, [transactions]);
-
-  // 2. Filtro Cliente (se houver termo de busca)
   const filteredTransactions = useMemo(() => {
     if (!searchTerm) {
       return transactionsWithNetSales;
@@ -271,13 +189,14 @@ export function TransactionsProvider({
       );
     });
 
-    if (totalTransactions !== filtered.length) {
+    // 💡 Ajuste: Se o totalTransactions foi alterado pela busca no cliente, atualiza.
+    // É uma lógica um pouco estranha se você estiver fazendo paginação no cliente, mas mantém o original.
+    if (totalTransactions !== filtered.length && searchTerm) {
       setTotalTransactions(filtered.length);
     }
     return filtered;
-  }, [searchTerm, transactionsWithNetSales, totalTransactions]);
+  }, [searchTerm, transactionsWithNetSales, totalTransactions]); // 3. Ordenação no Cliente (Net Sales e/ou busca no cliente) (mantido - ok, é lógica de estado/apresentação)
 
-  // 3. Ordenação no Cliente (Net Sales e/ou busca no cliente)
   const sortedTransactions = useMemo(() => {
     const dataToSort = searchTerm
       ? filteredTransactions
@@ -302,18 +221,16 @@ export function TransactionsProvider({
     sortDirection,
     searchTerm,
     filteredTransactions,
-  ]);
+  ]); // 4. Paginação no Cliente (mantido)
 
-  // 4. Paginação no Cliente
   const paginatedTransactions = useMemo(() => {
     if (searchTerm) {
       const startIndex = (currentPage - 1) * itemsPerPage;
       return sortedTransactions.slice(startIndex, startIndex + itemsPerPage);
     }
     return sortedTransactions;
-  }, [sortedTransactions, currentPage, itemsPerPage, searchTerm]);
+  }, [sortedTransactions, currentPage, itemsPerPage, searchTerm]); // 5. Cálculos do Rodapé da Página (mantido)
 
-  // 5. Cálculos do Rodapé da Página
   const currentPageRevenue = useMemo(
     () => paginatedTransactions.reduce((sum, t) => sum + t.revenue, 0),
     [paginatedTransactions]
@@ -325,9 +242,7 @@ export function TransactionsProvider({
   const currentPageNetSales = useMemo(
     () => paginatedTransactions.reduce((sum, t) => sum + t.net_sales, 0),
     [paginatedTransactions]
-  );
-
-  // --- HANDLERS (Funções de Estado) ---
+  ); // --- HANDLERS (Funções de Estado) --- // ... HANDLERS (mantidos, não há alteração de lógica)
 
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
@@ -367,18 +282,16 @@ export function TransactionsProvider({
       setSelectedPlatform(newPlatform);
       setCurrentPage(1);
     },
-  };
+  }; // --- Retorno Final do Hook ---
 
-  // --- Retorno Final do Hook ---
   const contextValue = {
     transactions: paginatedTransactions,
     isLoading:
       isLoadingData ||
       isDateRangeLoading ||
       isFetchingProducts ||
-      isFetchingPlatforms,
+      isFetchingPlatforms, // Filtros e Handlers
 
-    // Filtros e Handlers
     filterState: {
       availableProducts,
       selectedProduct,
@@ -389,12 +302,10 @@ export function TransactionsProvider({
       isFetchingPlatforms,
     },
     handleFilterChange,
-    handleSearch,
+    handleSearch, // Ordenação
 
-    // Ordenação
-    sortState: { sortColumn, sortDirection, handleSort },
+    sortState: { sortColumn, sortDirection, handleSort }, // Paginação
 
-    // Paginação
     pagination: {
       currentPage,
       totalTransactions,
@@ -403,16 +314,14 @@ export function TransactionsProvider({
       handlePageChange,
       totalPages: Math.ceil(totalTransactions / itemsPerPage),
       ROWS_PER_PAGE_OPTIONS,
-    },
+    }, // Cálculos do Rodapé
 
-    // Cálculos do Rodapé
     footerCalculations: {
       currentPageRevenue,
       currentPageRefundCalc,
       currentPageNetSales,
-    },
+    }, // Utilidades
 
-    // Utilidades
     ROWS_PER_PAGE_OPTIONS,
   };
 

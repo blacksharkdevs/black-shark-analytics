@@ -13,7 +13,7 @@ import { ArrowLeft, User } from "lucide-react";
 import { useCustomerHistory } from "@/hooks/useCustomerHistory";
 import { CustomerTransactionsTable } from "@/components/dashboard/customer/CustomerTransactionsTable";
 
-export default function CustomerHistoryPage() {
+function CustomersDetailPageContent() {
   const params = useParams();
   const navigate = useNavigate();
   const email = decodeURIComponent(params.email as string);
@@ -43,7 +43,7 @@ export default function CustomerHistoryPage() {
       <Card className="border rounded-none shadow-lg bg-card border-border">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <User className="w-6 h-6 text-accent" />
+            <User className="w-6 h-6 text-blue-600" />
             <div className="flex-1">
               <CardTitle className="text-foreground">
                 Transaction History
@@ -82,4 +82,8 @@ export default function CustomerHistoryPage() {
       </Card>
     </div>
   );
+}
+
+export default function CustomersDetailPage() {
+  return <CustomersDetailPageContent />;
 }

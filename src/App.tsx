@@ -9,12 +9,8 @@ import RegisterPage from "./pages/Register/Register";
 import DashboardLayout from "./pages/Dashboard/DashboardLayout";
 import TransactionsPage from "./pages/Dashboard/Transactions/TransactionsPage";
 import TransactionDetailPage from "./pages/Dashboard/Transactions/TransactionDetailPage";
-import CustomerHistoryPage from "./components/dashboard/customer/CustomerHistoryPage";
-
-// 🚨 Placeholders para rotas aninhadas
-const AffiliatesPage = () => <div>Affiliates View</div>;
-const ReportsPage = () => <div>Reports Index View</div>;
-// const ConfigurationsPage = () => <div>Configurations Index View</div>;
+import CustomersDetailPage from "./pages/Dashboard/Customers/CustomersDetailPage";
+import AffiliatesPage from "./pages/Dashboard/Affiliates/AffiliatesPage";
 
 function RootProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -34,6 +30,7 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
+        {/* --- ROTAS PRIVADAS --- */}
         <Route
           path="/dashboard"
           element={
@@ -46,15 +43,12 @@ export default function App() {
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="transactions/:id" element={<TransactionDetailPage />} />
 
-          <Route path="customers/:email" element={<CustomerHistoryPage />} />
+          <Route path="customers" element={<TransactionsPage />} />
+          <Route path="customers/:email" element={<CustomersDetailPage />} />
 
+          {/* vamos continuar daqui agora */}
           <Route path="affiliates" element={<AffiliatesPage />} />
-
-          {/* Rotas de Relatórios (usando o * para sub-sub-rotas futuras) */}
-          <Route path="reports/*" element={<ReportsPage />} />
-
-          {/* Rotas de Configurações */}
-          {/* <Route path="configurations/*" element={<ConfigurationsPage />} /> */}
+          {/* <Route path="reports/*" element={<ReportsPage />} /> */}
         </Route>
 
         <Route path="*" element={<div>404 | Página Não Encontrada</div>} />

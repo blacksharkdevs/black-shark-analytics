@@ -17,7 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/common/ui/tooltip";
 import { cn } from "@/lib/utils";
-import type { SaleRecord } from "@/lib/data";
+import type { SaleRecord } from "@/types/index";
 import {
   calculateRefund,
   formatCurrency,
@@ -122,11 +122,7 @@ export function CustomerTransactionsTable({
 }: {
   transactions: SaleRecord[];
 }) {
-  // NOTA: O useMemo foi trazido para este componente, pois ele é burro e precisa calcular os totais
-
   const transactionsWithNetSales = useMemo(() => {
-    // 🚨 A propriedade net_sales DEVE ser adicionada na interface SaleRecord em lib/data.ts.
-    // Assumimos que o array 'transactions' já vem com a propriedade net_sales calculada pelo useCustomerHistory.
     return transactions;
   }, [transactions]);
 
@@ -134,7 +130,6 @@ export function CustomerTransactionsTable({
     return transactionsWithNetSales.reduce(
       (acc, t) => {
         acc.revenue += t.revenue;
-        // 🚨 Assumimos que net_sales existe no objeto SaleRecord com a correção da interface.
         acc.net_sales += t.net_sales;
         acc.refund_calc += calculateRefund(t);
         return acc;
@@ -173,7 +168,6 @@ export function CustomerTransactionsTable({
                 className="hover:bg-accent/10 border-border/50"
               >
                 <TableCell>
-                  {/* Link para o detalhe da transação */}
                   <Link
                     to={`/dashboard/transactions/${transaction.id}`}
                     className="text-primary hover:underline"

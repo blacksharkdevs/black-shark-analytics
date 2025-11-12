@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { type SaleRecord, transformSupabaseSaleToRecord } from "@/lib/data";
+import { transformSupabaseSaleToRecord } from "@/lib/data";
 import { type Product as ProductConfig } from "@/lib/config";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 import { DashboardDataContext } from "./DashboardDataContextDefinition";
+import type { SaleRecord } from "@/types/index";
 
 const MAX_RECORDS_FOR_DASHBOARD_STATS = 50000;
 

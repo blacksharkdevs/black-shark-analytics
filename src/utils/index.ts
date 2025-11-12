@@ -1,4 +1,4 @@
-import type { SaleRecord } from "@/lib/data";
+import type { SaleRecord } from "@/types/index";
 import * as dateFns from "date-fns";
 
 export const formatCurrency = (value: number) =>

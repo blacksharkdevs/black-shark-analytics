@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
 import CountUp from "react-countup";
 import {
@@ -50,7 +51,7 @@ export function TopAffiliatesTable() {
     }, {} as Record<string, AffiliateRevenue>);
 
     return Object.values(affiliateRevenueMap)
-      .sort((a, b) => b.totalRevenue - a.totalRevenue)
+      .sort((a: any, b: any) => b.totalRevenue - a.totalRevenue)
       .slice(0, 5);
   }, [data]);
 
@@ -124,7 +125,7 @@ export function TopAffiliatesTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {topAffiliates.map((affiliate, index) => (
+            {topAffiliates.map((affiliate: any, index) => (
               <TableRow
                 key={affiliate.affiliateName}
                 className="transition-colors hover:bg-accent/10 border-border/50"
@@ -140,7 +141,6 @@ export function TopAffiliatesTable() {
                   {affiliate.affiliateName}
                 </TableCell>
                 <TableCell className="font-semibold text-right text-primary tabular-nums">
-                  {/* 🚨 COUNTUP APLICADO AQUI */}
                   <CountUp
                     start={0}
                     end={affiliate.totalRevenue}

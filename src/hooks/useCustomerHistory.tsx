@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { type SaleRecord, transformSupabaseSaleToRecord } from "@/lib/data";
+import { transformSupabaseSaleToRecord } from "@/lib/data";
 import { calculateRefund } from "@/utils/index";
+import type { SaleRecord } from "@/types/index";
 
 export function useCustomerHistory(customerEmail: string) {
   const [transactions, setTransactions] = useState<SaleRecord[]>([]);

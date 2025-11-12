@@ -37,7 +37,7 @@ import { Filters as FilterControls } from "../Filters";
 
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 import { useTransactions } from "@/hooks/useTransactions";
-import type { SaleRecord } from "@/lib/data";
+import type { SaleRecord } from "@/types/index";
 import { ACTION_TYPES } from "@/lib/config";
 import {
   calculateRefund,
