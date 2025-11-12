@@ -43,10 +43,7 @@ export default function App() {
           <Route index element={<DashboardPage />} />
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="transactions/:id" element={<TransactionDetailPage />} />
-
-          <Route path="customers" element={<TransactionsPage />} />
           <Route path="customers/:email" element={<CustomersDetailPage />} />
-
           <Route path="affiliates" element={<AffiliatesPage />} />
           <Route path="affiliates/:name" element={<AffiliateDetailPage />} />
         </Route>

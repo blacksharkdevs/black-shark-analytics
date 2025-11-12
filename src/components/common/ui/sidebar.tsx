@@ -117,7 +117,7 @@ SidebarMenuItem.displayName = "SidebarMenuItem";
 
 const sidebarMenuButtonVariants = cva(
   // 🚨 CORES/ESTILOS DINÂMICOS
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-none p-2 text-left outline-none ring-accent transition-colors ease-in-out focus-visible:ring-2 active:text-primary disabled:pointer-events-none disabled:opacity-50 text-foreground hover:bg-accent/20 hover:text-foreground data-[active=true]:bg-blue-700/40 data-[active=true]:dark:bg-blue-100/40 data-[active=true]:text-foreground data-[active=true]:font-medium group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center [&>svg]:pointer-events-none [&>svg]:shrink-0 [&_span]:pointer-events-none",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-none p-2 text-left outline-none ring-accent transition-colors ease-in-out focus-visible:ring-2 active:text-primary disabled:pointer-events-none disabled:opacity-50 text-foreground hover:bg-blue-700/20 hover:dark:bg-blue-100/20 hover:text-foreground data-[active=true]:bg-blue-700/40 data-[active=true]:dark:bg-blue-100/40 data-[active=true]:text-foreground data-[active=true]:font-medium group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center [&>svg]:pointer-events-none [&>svg]:shrink-0 [&_span]:pointer-events-none",
   {
     variants: {
       variant: { default: "" },
