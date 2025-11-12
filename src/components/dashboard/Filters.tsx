@@ -69,17 +69,14 @@ export function Filters({
           <SelectValue placeholder="Filter by Platform" />
         </SelectTrigger>
         <SelectContent className="border rounded-none bg-card border-border">
-          <SelectItem
-            value="all"
-            className="rounded-none text-foreground hover:bg-accent/10 focus:bg-accent/10"
-          >
+          <SelectItem value="all" className="rounded-none text-foreground">
             All Platforms
           </SelectItem>
           {platforms.map((platform) => (
             <SelectItem
               key={platform}
               value={platform}
-              className="rounded-none text-foreground hover:bg-accent/10 focus:bg-accent/10"
+              className="rounded-none text-foreground"
             >
               {platform}
             </SelectItem>

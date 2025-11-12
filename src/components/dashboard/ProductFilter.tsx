@@ -35,7 +35,7 @@ export function ProductFilter({
             <SelectItem
               key={product.id}
               value={product.id}
-              className="rounded-none text-foreground hover:bg-accent/10 focus:bg-accent/10"
+              className="rounded-none text-foreground"
             >
               {product.name}
             </SelectItem>

@@ -1,14 +1,27 @@
-import { useState, useEffect, useCallback, type ReactNode } from "react";
-import { DATE_CONFIG_OPTIONS } from "@/lib/config"; // Assumindo que você moverá/criará isso
-import { getCalculatedDateRange } from "@/lib/data"; // Assumindo que você moverá/criará isso
+import {
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+  useMemo,
+} from "react";
+// O getCalculatedDateRange e a lógica da data range assumo que estão em /lib/data
+import { getCalculatedDateRange } from "@/lib/data";
 import { DashboardConfigContext } from "./DashboardConfigContextDefiniton";
+
+// Novos imports para persistência e lógica de DB
+import {
+  loadConfigFromStorage,
+  saveConfigToStorage,
+} from "@/services/configStorage";
+import { DATE_CONFIG_OPTIONS, getDateDbColumn } from "@/lib/dateConfig";
 
 interface DateRange {
   from: Date;
   to: Date;
 }
 
-const CONFIG_LOCAL_STORAGE_KEY = "blackshark_dashboard_config";
+// Constantes de Configuração
 const DEFAULT_DATE_COLUMN_ID = "transaction_date";
 const DEFAULT_DATE_RANGE_ID = "last_7_days";
 
@@ -21,134 +34,84 @@ export const DashboardConfigProvider = ({
 }) => {
   const [isLoading, setIsLoading] = useState(true);
 
-  // 1. ESTADO: COLUNA DE DATA (DB Column)
-  const [selectedDateConfig, setSelectedDateConfig] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem(CONFIG_LOCAL_STORAGE_KEY);
-      const config = stored ? JSON.parse(stored) : {};
-      return config.dateColumnId || DEFAULT_DATE_COLUMN_ID;
-    }
-    return DEFAULT_DATE_COLUMN_ID;
-  });
+  // Carrega a configuração inicial UMA VEZ
+  const initialConfig = useMemo(() => loadConfigFromStorage(), []); // 1. ESTADO: COLUNA DE DATA (DB Column)
 
-  // 2. ESTADO: OPÇÃO DE PERÍODO (Preset: last_7_days, custom, etc.)
+  const [selectedDateConfig, setSelectedDateConfig] = useState<string>(
+    initialConfig.dateColumnId || DEFAULT_DATE_COLUMN_ID
+  ); // 2. ESTADO: OPÇÃO DE PERÍODO (Preset: last_7_days, custom, etc.)
+
   const [selectedDateRangeOptionId, setSelectedDateRangeOptionId] =
-    useState<string>(() => {
-      if (typeof window !== "undefined") {
-        const stored = localStorage.getItem(CONFIG_LOCAL_STORAGE_KEY);
-        const config = stored ? JSON.parse(stored) : {};
-        return config.dateRangeId || DEFAULT_DATE_RANGE_ID;
-      }
-      return DEFAULT_DATE_RANGE_ID;
-    });
+    useState<string>(initialConfig.dateRangeId || DEFAULT_DATE_RANGE_ID); // 3. ESTADO: PERÍODO (Datas de/para)
 
-  // 3. ESTADO: PERÍODO (Datas de/para)
   const [currentDateRange, setCurrentDateRange] = useState<DateRange>(() =>
-    getCalculatedDateRange(DEFAULT_DATE_RANGE_ID, new Date())
-  );
+    getCalculatedDateRange(
+      initialConfig.dateRangeId || DEFAULT_DATE_RANGE_ID,
+      new Date()
+    )
+  ); // --- Funções de Persistência (Simplificada) --- // Essa função agora só delega a lógica de mesclagem e armazenamento para o Service
 
-  // --- Funções de Persistência ---
-  const saveConfigToLocalStorage = useCallback(
+  const saveConfig = useCallback(
     (newConfig: { dateRangeId?: string; dateColumnId?: string }) => {
-      const currentStored =
-        typeof window !== "undefined"
-          ? JSON.parse(localStorage.getItem(CONFIG_LOCAL_STORAGE_KEY) || "{}")
-          : {};
-
-      const updatedConfig = {
-        ...currentStored,
-        dateRangeId:
-          newConfig.dateRangeId ||
-          currentStored.dateRangeId ||
-          selectedDateRangeOptionId,
-        dateColumnId:
-          newConfig.dateColumnId ||
-          currentStored.dateColumnId ||
-          selectedDateConfig,
-      };
-
-      if (typeof window !== "undefined") {
-        localStorage.setItem(
-          CONFIG_LOCAL_STORAGE_KEY,
-          JSON.stringify(updatedConfig)
-        );
-      }
+      saveConfigToStorage(newConfig);
     },
-    [selectedDateRangeOptionId, selectedDateConfig]
+    [] // Sem dependências, pois o serviço gerencia a mesclagem.
   );
 
-  // --- Lógica de Inicialização (useEffect) ---
+  // A Lógica de Inicialização no useEffect é simplificada, pois os useStates já pegaram a config.
+  // Usamos o useEffect apenas para garantir que o dateRange seja calculado na montagem.
   useEffect(() => {
-    setIsLoading(true);
-    const stored =
-      typeof window !== "undefined"
-        ? JSON.parse(localStorage.getItem(CONFIG_LOCAL_STORAGE_KEY) || "{}")
-        : {};
-
-    const initialDateRangeId = stored.dateRangeId || DEFAULT_DATE_RANGE_ID;
-
-    // Atualiza o range na inicialização
-    setCurrentDateRange(getCalculatedDateRange(initialDateRangeId, new Date()));
-
-    // Atualiza os estados (o selectedDateConfig já foi setado no useState, mas garantimos)
-    if (stored.dateRangeId) setSelectedDateRangeOptionId(stored.dateRangeId);
-    if (stored.dateColumnId) setSelectedDateConfig(stored.dateColumnId);
-
+    // Recalcula o dateRange usando os IDs carregados para garantir a precisão
+    setCurrentDateRange(
+      getCalculatedDateRange(selectedDateRangeOptionId, new Date())
+    );
     setIsLoading(false);
-  }, []);
+  }, [selectedDateRangeOptionId]); // Depende apenas do ID do range // --- 1. Lógica do DateConfig ---
 
-  // --- 1. Lógica do DateConfig ---
   const setDateConfig = useCallback(
     (optionId: string) => {
       const newConfig = DATE_CONFIG_OPTIONS.find((opt) => opt.id === optionId);
       if (newConfig) {
         setSelectedDateConfig(newConfig.id);
-        saveConfigToLocalStorage({ dateColumnId: newConfig.id });
+        saveConfig({ dateColumnId: newConfig.id });
       }
     },
-    [saveConfigToLocalStorage]
+    [saveConfig]
   );
 
-  const getCurrentDateDbColumn = useCallback(():
-    | "transaction_date"
-    | "calc_charged_day" => {
-    const currentConfig = DATE_CONFIG_OPTIONS.find(
-      (opt) => opt.id === selectedDateConfig
-    );
-    return (
-      (currentConfig?.db_column as "transaction_date" | "calc_charged_day") ||
-      "transaction_date"
-    );
-  }, [selectedDateConfig]);
+  // ➡️ REFACTOR: Usando a função pura da Lib
+  const getCurrentDateDbColumn = useCallback(
+    () => getDateDbColumn(selectedDateConfig),
+    [selectedDateConfig]
+  ); // --- 2. Lógica do DateRange ---
 
-  // --- 2. Lógica do DateRange ---
   const updateDateRangeOption = useCallback(
     (optionId: string) => {
       setIsLoading(true);
       setSelectedDateRangeOptionId(optionId);
-      saveConfigToLocalStorage({ dateRangeId: optionId });
+      saveConfig({ dateRangeId: optionId });
       if (optionId !== "custom") {
+        // Recálculo da data: Se o ID mudar, o useEffect acima já vai recalcular o currentDateRange.
         setCurrentDateRange(getCalculatedDateRange(optionId, new Date()));
       }
       setIsLoading(false);
     },
-    [saveConfigToLocalStorage]
+    [saveConfig]
   );
 
   const updateCustomDateRange = useCallback(
     (newRange: DateRange) => {
       setIsLoading(true);
       setSelectedDateRangeOptionId("custom");
-      saveConfigToLocalStorage({ dateRangeId: "custom" });
+      saveConfig({ dateRangeId: "custom" }); // O Custom range precisa ser atualizado imediatamente, pois não depende do ID para recálculo
       setCurrentDateRange(
         getCalculatedDateRange("custom", new Date(), newRange)
       );
       setIsLoading(false);
     },
-    [saveConfigToLocalStorage]
-  );
+    [saveConfig]
+  ); // --- Renderização ---
 
-  // --- Renderização ---
   return (
     <DashboardConfigContext.Provider
       value={{

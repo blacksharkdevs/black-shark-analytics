@@ -36,7 +36,7 @@ export function ActionTypeFilter({
             <SelectItem
               key={action.id}
               value={action.id}
-              className="rounded-none text-foreground hover:bg-accent/10 focus:bg-accent/10"
+              className="rounded-none text-foreground"
             >
               {action.name}
             </SelectItem>
