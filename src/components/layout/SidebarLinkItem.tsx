@@ -22,7 +22,7 @@ export function SidebarLinkItem({ item, isActive }: SidebarLinkItemProps) {
     <li className="relative">
       <Link to={item.href}>
         <SidebarMenuButton isActive={isActive(item.href)} tooltip={item.label}>
-          <Icon className="h-[22px] w-[22px] shrink-0" />
+          <Icon className="h-[22px] w-[22px] shrink-0 data-[active=true]:text-white text-foreground" />
           {isSidebarOpen && (
             <motion.span
               initial={false}

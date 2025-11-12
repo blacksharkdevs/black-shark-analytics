@@ -65,7 +65,7 @@ const SidebarSeparator = React.forwardRef<
     ref={ref}
     data-sidebar="separator"
     // 🚨 CORES: Usamos bg-accent/50
-    className={cn("my-3 bg-accent/50", className)}
+    className={cn("my-3 dark:bg-gray-300/50 bg-black/70", className)}
     {...props}
   />
 ));
@@ -117,7 +117,7 @@ SidebarMenuItem.displayName = "SidebarMenuItem";
 
 const sidebarMenuButtonVariants = cva(
   // 🚨 CORES/ESTILOS DINÂMICOS
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-none p-2 text-left outline-none ring-accent transition-colors ease-in-out focus-visible:ring-2 active:text-primary disabled:pointer-events-none disabled:opacity-50 text-foreground hover:bg-accent/20 hover:text-foreground data-[active=true]:bg-accent/40 data-[active=true]:text-foreground data-[active=true]:font-medium group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center [&>svg]:pointer-events-none [&>svg]:shrink-0 [&_span]:pointer-events-none",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-none p-2 text-left outline-none ring-accent transition-colors ease-in-out focus-visible:ring-2 active:text-primary disabled:pointer-events-none disabled:opacity-50 text-foreground hover:bg-accent/20 hover:text-foreground data-[active=true]:bg-blue-700/40 data-[active=true]:dark:bg-blue-100/40 data-[active=true]:text-foreground data-[active=true]:font-medium group-data-[collapsible=icon]:!p-2 group-data-[collapsible=icon]:justify-center [&>svg]:pointer-events-none [&>svg]:shrink-0 [&_span]:pointer-events-none",
   {
     variants: {
       variant: { default: "" },
@@ -151,7 +151,7 @@ const SidebarMenuButton = React.forwardRef<
     ref
   ) => {
     const Comp = asChild ? Slot : "button";
-    const { isMobile, isSidebarOpen } = useSidebar(); // Usamos o hook real
+    const { isMobile, isSidebarOpen } = useSidebar();
 
     const tooltipProps =
       typeof tooltip === "string" ? { children: tooltip } : tooltip;

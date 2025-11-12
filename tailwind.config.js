@@ -8,9 +8,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // 🚨 REMOVEMOS AS CORES 'blackshark-' FIXAS E USAMOS APENAS HSL
-        // Essas variáveis serão definidas no global.css
-
         // Fundo e Texto
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

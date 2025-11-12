@@ -73,14 +73,22 @@ export function AffiliatesTableFooter({ data }: AffiliatesTableFooterProps) {
       </TableRow>
       <TableRow>
         <TableCell
-          colSpan={7}
+          colSpan={1}
           className="pt-2 font-semibold text-muted-foreground"
         >
           Page Total Gross & Revenue
         </TableCell>
-        <TableCell className="pt-2 font-bold text-left text-primary">
+        <TableCell
+          colSpan={1}
+          className="pt-2 font-bold text-left text-primary"
+        >
           Gross: {formatCurrency(totals.gross_sales)}
-          <br />
+        </TableCell>
+
+        <TableCell
+          colSpan={1}
+          className="pt-2 font-bold text-left text-primary"
+        >
           Revenue: {formatCurrency(totals.total_revenue)}
         </TableCell>
       </TableRow>
