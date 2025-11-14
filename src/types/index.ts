@@ -33,3 +33,25 @@ export interface SaleRecord {
 }
 
 export type SortColumn = keyof SaleRecord | "calc_charged_day" | "net_sales";
+
+// SKU Mapping types
+export interface SkuConfig {
+  merchant_id: string;
+  original_name: string;
+  display_name?: string | null;
+  main_product_id?: number | null;
+  unit_count?: number | null;
+  item_type?: string | null;
+  upsell?: boolean;
+}
+
+export interface MainProduct {
+  id: number;
+  name: string;
+}
+
+export interface UnconfiguredSkuFromRpc {
+  merchant_id: string;
+  original_product_name: string;
+  upsell: boolean;
+}

@@ -34,7 +34,8 @@
       "@/assets/*": ["assets/*"],
       "@/utils/*": ["utils/*"],
       "@/services/*": ["services/*"],
-      "@/types/*": ["types/*"]
+      "@/types/*": ["types/*"],
+      "@/locales/*": ["locales/*"]
     }
   },
   "include": ["src"]

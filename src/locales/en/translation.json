@@ -38,7 +38,8 @@
     "details": "Details",
     "focus": "Focus",
     "backToAffiliates": "Back to Affiliates",
-    "backToTransactions": "Back to Transactions"
+    "backToTransactions": "Back to Transactions",
+    "backToConfigurations": "Back to Configurations"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -369,6 +370,53 @@
     },
     "accessConfiguration": "Access Configuration",
     "tipText": "Configure <strong>SKU Mapping</strong> first to ensure your products are correctly recognized, then organize your catalog in <strong>Main Products</strong>."
+  },
+  "skuMapping": {
+    "title": "SKU Configuration Mapping",
+    "description": "Map each unique Merchant ID and its original name to a main product and define its properties.",
+    "manageMainProducts": "Manage Main Products",
+    "cardTitle": "SKU Mapping",
+    "cardDescription": "Find a unique SKU and map it. Unconfigured SKUs are highlighted. Changes are saved per row.",
+    "searchPlaceholder": "Search by Merchant ID, Original Name, or Display Name...",
+    "noSearchResults": "No SKUs match your search.",
+    "noUnconfigured": "No unconfigured SKUs found. All products are mapped!",
+    "table": {
+      "merchantId": "Merchant ID",
+      "originalName": "Original Name",
+      "displayName": "Display Name",
+      "mainProduct": "Main Product",
+      "units": "Units",
+      "itemType": "Item Type",
+      "action": "Action",
+      "standardNamePlaceholder": "Standard Name",
+      "selectPlaceholder": "Select..."
+    }
+  },
+  "mainProducts": {
+    "title": "Main Products",
+    "description": "Manage the list of main products for SKU mapping.",
+    "backToSkuMapping": "Back to SKU Mapping",
+    "SkuMapping": "SKU Mapping",
+    "cardTitle": "Main Products",
+    "cardDescription": "Create, edit, or delete main products that will be used in SKU mapping.",
+    "addNew": "Add New",
+    "new": "New",
+    "namePlaceholder": "Main Product Name",
+    "nameRequired": "Product name is required.",
+    "noProducts": "No main products found. Add a new one!",
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "actions": "Actions"
+    },
+    "createSuccess": "Main product created successfully!",
+    "createError": "Error creating main product.",
+    "updateSuccess": "Main product updated successfully!",
+    "updateError": "Error updating main product.",
+    "deleteSuccess": "Main product deleted successfully!",
+    "deleteError": "Error deleting main product.",
+    "deleteConfirm": "Are you sure you want to delete the product '{{name}}'? This action cannot be undone.",
+    "fetchError": "Error loading main products."
   },
   "language": {
     "selector": "Language",

@@ -15,6 +15,9 @@ import AffiliateDetailPage from "./pages/Dashboard/Affiliates/AffiliateDetailPag
 import ReportsPage from "./pages/Dashboard/Reports/ReportsPage";
 import ItemsPage from "./pages/Dashboard/Reports/Items";
 import ConfigurationsPage from "./pages/Dashboard/Configurations/ConfigurationsPage";
+import SkuMappingPage from "./pages/Dashboard/SkuMapping/SkuMappingPage";
+import MainProductsPage from "./pages/Dashboard/MainProducts/MainProductsPage";
+import { SkuMappingProvider } from "@/contexts/SkuMappingContext";
 
 function RootProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -55,6 +58,18 @@ export default function App() {
           <Route path="reports/items" element={<ItemsPage />} />
 
           <Route path="configurations" element={<ConfigurationsPage />} />
+          <Route
+            path="configurations/sku-mapping"
+            element={
+              <SkuMappingProvider>
+                <SkuMappingPage />
+              </SkuMappingProvider>
+            }
+          />
+          <Route
+            path="configurations/main-products"
+            element={<MainProductsPage />}
+          />
         </Route>
 
         <Route path="*" element={<div>404 | Página Não Encontrada</div>} />

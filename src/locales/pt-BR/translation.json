@@ -38,7 +38,8 @@
     "details": "Detalhes",
     "focus": "Foco",
     "backToAffiliates": "Voltar para Afiliados",
-    "backToTransactions": "Voltar para Transações"
+    "backToTransactions": "Voltar para Transações",
+    "backToConfigurations": "Voltar para Configurações"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -369,6 +370,53 @@
     },
     "accessConfiguration": "Acessar Configuração",
     "tipText": "Configure o <strong>Mapeamento de SKU</strong> primeiro para garantir que seus produtos sejam reconhecidos corretamente, depois organize seu catálogo em <strong>Produtos Principais</strong>."
+  },
+  "skuMapping": {
+    "title": "Mapeamento de SKUs",
+    "description": "Mapeie cada ID de comerciante único e seu nome original para um produto principal e defina suas propriedades.",
+    "manageMainProducts": "Gerenciar Produtos Principais",
+    "cardTitle": "Mapeamento de SKU",
+    "cardDescription": "Encontre um SKU único e mapeie-o. SKUs não configurados são destacados. As alterações são salvas por linha.",
+    "searchPlaceholder": "Buscar por ID do Comerciante, Nome Original ou Nome de Exibição...",
+    "noSearchResults": "Nenhum SKU corresponde à sua pesquisa.",
+    "noUnconfigured": "Nenhum SKU não configurado encontrado. Todos os produtos estão mapeados!",
+    "table": {
+      "merchantId": "ID do Comerciante",
+      "originalName": "Nome Original",
+      "displayName": "Nome de Exibição",
+      "mainProduct": "Produto Principal",
+      "units": "Unidades",
+      "itemType": "Tipo de Item",
+      "action": "Ação",
+      "standardNamePlaceholder": "Nome Padrão",
+      "selectPlaceholder": "Selecione..."
+    }
+  },
+  "mainProducts": {
+    "title": "Produtos Principais",
+    "description": "Gerencie a lista de produtos principais para mapeamento de SKU.",
+    "backToSkuMapping": "Voltar para Mapeamento de SKU",
+    "SkuMapping": "Mapeamento de SKU",
+    "cardTitle": "Produtos Principais",
+    "cardDescription": "Crie, edite ou exclua produtos principais que serão usados no mapeamento de SKU.",
+    "addNew": "Adicionar Novo",
+    "new": "Novo",
+    "namePlaceholder": "Nome do Produto Principal",
+    "nameRequired": "O nome do produto é obrigatório.",
+    "noProducts": "Nenhum produto principal encontrado. Adicione um novo!",
+    "table": {
+      "id": "ID",
+      "name": "Nome",
+      "actions": "Ações"
+    },
+    "createSuccess": "Produto principal criado com sucesso!",
+    "createError": "Erro ao criar produto principal.",
+    "updateSuccess": "Produto principal atualizado com sucesso!",
+    "updateError": "Erro ao atualizar produto principal.",
+    "deleteSuccess": "Produto principal excluído com sucesso!",
+    "deleteError": "Erro ao excluir produto principal.",
+    "deleteConfirm": "Tem certeza de que deseja excluir o produto '{{name}}'? Esta ação não pode ser desfeita.",
+    "fetchError": "Erro ao carregar produtos principais."
   },
   "language": {
     "selector": "Idioma",
