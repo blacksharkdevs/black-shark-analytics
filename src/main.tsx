@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import "@/assets/styles/global.css";
+import "@/lib/i18n";
 
 const rootElement = document.getElementById("root");
 

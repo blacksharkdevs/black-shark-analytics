@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Table,
   TableBody,
@@ -18,6 +19,7 @@ import { useAffiliateDetail } from "@/hooks/useAffiliateDetail";
 import { formatCurrency } from "@/utils/index";
 
 export function AffiliateProductPerformanceTable() {
+  const { t } = useTranslation();
   const { productPerformance, isLoading } = useAffiliateDetail();
 
   const showContentSkeleton = isLoading && productPerformance.length === 0;
@@ -50,7 +52,7 @@ export function AffiliateProductPerformanceTable() {
     <Card className="border-[1px] border-white/30 rounded-none shadow-lg">
       <CardHeader>
         <CardTitle className="text-foreground">
-          Product Performance Breakdown
+          {t("affiliates.productPerformance")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -65,21 +67,35 @@ export function AffiliateProductPerformanceTable() {
           </div>
         ) : showNoDataMessage ? (
           <div className="py-10 text-center text-muted-foreground">
-            No product data available for this affiliate.
+            {t("affiliates.noProductData")}
           </div>
         ) : (
           <div className="border rounded-md border-border">
             <Table>
               <TableHeader className="text-muted-foreground">
                 <TableRow className="hover:bg-transparent border-border/50">
-                  <TableHead>Product Name</TableHead>
-                  <TableHead className="text-right">Sales</TableHead>
-                  <TableHead className="text-right">Gross Sales</TableHead>
-                  <TableHead className="text-right">AOV</TableHead>
-                  <TableHead className="text-right">Refunds (Cost)</TableHead>
-                  <TableHead className="text-right">Net</TableHead>
-                  <TableHead className="text-right">COGS</TableHead>
-                  <TableHead className="text-right">Profit</TableHead>
+                  <TableHead>{t("affiliates.table.productName")}</TableHead>
+                  <TableHead className="text-right">
+                    {t("affiliates.table.sales")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("affiliates.table.grossSales")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("affiliates.table.aov")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("affiliates.table.refundsCost")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("affiliates.table.net")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("affiliates.table.cogs")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("affiliates.table.profit")}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="text-foreground">
@@ -119,7 +135,7 @@ export function AffiliateProductPerformanceTable() {
                 <TableFooter className="border-t bg-accent/10 border-border">
                   <TableRow className="hover:bg-transparent">
                     <TableCell className="font-semibold text-foreground">
-                      Total
+                      {t("common.total")}
                     </TableCell>
                     <TableCell className="font-bold text-right text-primary">
                       {totals.sales_count}

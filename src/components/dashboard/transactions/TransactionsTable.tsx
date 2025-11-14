@@ -1,4 +1,5 @@
 import { ArrowDown, ArrowUp, CircleDollarSign, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Table,
   TableBody,
@@ -56,6 +57,7 @@ const renderRow = (label: string, value: number, isSubtracted = false) => (
 );
 
 export function TransactionsTable() {
+  const { t } = useTranslation();
   const {
     transactions: paginatedTransactions,
     isLoading: isLoadingTotal,
@@ -101,7 +103,7 @@ export function TransactionsTable() {
       "chargeback",
       "chargebackrefundtime",
     ].includes(transaction.action_type);
-    if (!isRefundAction) return "Not a refund transaction.";
+    if (!isRefundAction) return t("transactions.tooltips.notRefund");
 
     if (
       transaction.refund_amount !== null &&
@@ -110,10 +112,8 @@ export function TransactionsTable() {
     ) {
       return (
         <div className="p-1 space-y-1 text-sm text-foreground">
-          <p className="font-bold">Refund Cost Exempt</p>
-          <p>
-            Refund Amount is equal to Taxes, so this cost is not counted here.
-          </p>
+          <p className="font-bold">{t("transactions.tooltips.refundExempt")}</p>
+          <p>{t("transactions.tooltips.refundExemptDesc")}</p>
         </div>
       );
     }
@@ -135,18 +135,32 @@ export function TransactionsTable() {
 
       return (
         <div className="p-1 space-y-1 text-sm text-foreground">
-          <p className="font-bold">BuyGoods Refund Cost</p>
-          <p className="mb-2 text-xs italic">
-            Formula: Revenue - Aff Commission - Taxes - Platform Fees
+          <p className="font-bold">
+            {t("transactions.tooltips.buyGoodsRefund")}
           </p>
-          {renderRow("Revenue", baseRevenue, false)}
-          {renderRow("Aff Commission", affCommission, true)}
-          {renderRow("Taxes", taxes, true)}
-          {renderRow("Platform Fee (%)", platformFeePercentageAmount, true)}
-          {renderRow("Platform Fee ($)", platformFeeTransactionAmount, true)}
+          <p className="mb-2 text-xs italic">
+            {t("transactions.tooltips.buyGoodsFormula")}
+          </p>
+          {renderRow(t("transactions.tooltips.revenue"), baseRevenue, false)}
+          {renderRow(
+            t("transactions.tooltips.affCommission"),
+            affCommission,
+            true
+          )}
+          {renderRow(t("transactions.tooltips.taxes"), taxes, true)}
+          {renderRow(
+            t("transactions.tooltips.platformFeePercent"),
+            platformFeePercentageAmount,
+            true
+          )}
+          {renderRow(
+            t("transactions.tooltips.platformFeeDollar"),
+            platformFeeTransactionAmount,
+            true
+          )}
           <hr className="my-1 border-border/50" />
           <div className="grid grid-cols-2 font-bold gap-x-2">
-            <span>Total Cost:</span>
+            <span>{t("transactions.tooltips.totalCost")}:</span>
             <span className="text-right">{formatCurrency(finalCost)}</span>
           </div>
         </div>
@@ -156,17 +170,22 @@ export function TransactionsTable() {
     return (
       <div className="p-1 space-y-1 text-sm text-foreground">
         <p className="font-bold">
-          Refund Cost ({transaction.platform || "N/A"}):
+          {t("transactions.tooltips.refundCost", {
+            platform: transaction.platform || "N/A",
+          })}
+          :
         </p>
-        <p className="mb-2 text-xs italic">Formula: ABS(merchant_commission)</p>
+        <p className="mb-2 text-xs italic">
+          {t("transactions.tooltips.merchantFormula")}
+        </p>
         {renderRow(
-          "Merchant Commission",
+          t("transactions.tooltips.merchantCommission"),
           Math.abs(transaction.merchant_commission || 0),
           false
         )}
         <hr className="my-1 border-border/50" />
         <div className="grid grid-cols-2 font-bold gap-x-2">
-          <span>Total Cost:</span>
+          <span>{t("transactions.tooltips.totalCost")}:</span>
           <span className="text-right">{formatCurrency(refundValue)}</span>
         </div>
       </div>
@@ -193,39 +212,64 @@ export function TransactionsTable() {
     sortable?: boolean;
     className?: string;
   }[] = [
-    { key: "id", label: "Sale ID", sortable: true, className: "w-[150px]" },
+    {
+      key: "id",
+      label: t("transactions.table.saleId"),
+      sortable: true,
+      className: "w-[150px]",
+    },
     {
       key: getCurrentDateDbColumn(),
-      label: "Date (UTC)",
+      label: t("transactions.table.dateUtc"),
       sortable: true,
       className: "w-[180px]",
     },
-    { key: "product_name", label: "Product", sortable: true },
-    { key: "customer_name", label: "Customer", sortable: true },
-    { key: "aff_name", label: "Affiliate", sortable: true },
-    { key: "platform", label: "Platform", sortable: true },
+    {
+      key: "product_name",
+      label: t("transactions.table.product"),
+      sortable: true,
+    },
+    {
+      key: "customer_name",
+      label: t("transactions.table.customer"),
+      sortable: true,
+    },
+    {
+      key: "aff_name",
+      label: t("transactions.table.affiliate"),
+      sortable: true,
+    },
+    {
+      key: "platform",
+      label: t("transactions.table.platform"),
+      sortable: true,
+    },
     {
       key: "revenue",
-      label: "Revenue",
+      label: t("transactions.table.revenue"),
       sortable: true,
       className: "text-right w-[120px]",
     },
     {
       key: "net_sales",
-      label: "Net Sales",
+      label: t("transactions.table.netSales"),
       sortable: true,
       className: "text-right w-[120px]",
     },
     {
       key: "refund_calc",
-      label: "Refund Calc",
+      label: t("transactions.table.refundCalc"),
       sortable: false,
       className: "text-right w-[120px]",
     },
-    { key: "customer_email", label: "Customer Email", sortable: true },
+    {
+      key: "customer_email",
+      label: t("transactions.table.customerEmail"),
+      sortable: true,
+    },
     {
       key: "action_type",
-      label: "Action Type",
+      label: t("transactions.table.actionType"),
       sortable: true,
       className: "w-[150px]",
     },
@@ -261,24 +305,24 @@ export function TransactionsTable() {
         <CardHeader>
           <div className="flex items-center space-x-2">
             <CircleDollarSign className="w-6 h-6 text-primary" />
-            <CardTitle className="text-foreground">All Transactions</CardTitle>
+            <CardTitle className="text-foreground">
+              {t("transactions.pageTitle")}
+            </CardTitle>
           </div>
-          <CardDescription>
-            Browse, search, and filter through all sales records (Dates in UTC).
-          </CardDescription>
+          <CardDescription>{t("transactions.pageDescription")}</CardDescription>
           <div className="flex flex-col items-center justify-between gap-4 pt-4 mt-4 border-t sm:flex-row border-border/50">
             <div className="relative w-full sm:max-w-sm">
               <Search className="absolute w-5 h-5 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search anything on this page..."
+                placeholder={t("transactions.searchPlaceholder")}
                 className="w-full pl-10 border rounded-none bg-card border-input"
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </div>
             <div className="flex items-center w-full gap-2 sm:w-auto">
               <span className="text-sm text-muted-foreground whitespace-nowrap">
-                Rows per page:
+                {t("transactions.rowsPerPage")}:
               </span>
               <Select
                 value={itemsPerPage.toString()}
@@ -314,7 +358,7 @@ export function TransactionsTable() {
             </div>
           ) : showNoTransactionsMessage ? (
             <div className="py-10 text-center text-muted-foreground">
-              No transactions found for the selected filters.
+              {t("transactions.noData")}
             </div>
           ) : (
             <>
@@ -433,26 +477,43 @@ export function TransactionsTable() {
                                   {/* Tooltip de Net Sales (adaptado do seu código antigo) */}
                                   <div className="p-1 space-y-1 text-sm">
                                     <p className="font-bold">
-                                      Net Sales Breakdown:
+                                      {t(
+                                        "transactions.tooltips.netSalesBreakdown"
+                                      )}
+                                      :
                                     </p>
                                     <div className="grid grid-cols-2 gap-x-2">
-                                      <span>Revenue:</span>
+                                      <span>
+                                        {t("transactions.tooltips.revenue")}:
+                                      </span>
                                       <span className="text-right">
                                         {formatCurrency(transaction.revenue)}
                                       </span>
-                                      <span>Aff Commission:</span>
+                                      <span>
+                                        {t(
+                                          "transactions.tooltips.affCommission"
+                                        )}
+                                        :
+                                      </span>
                                       <span className="text-right text-destructive">
                                         -
                                         {formatCurrency(
                                           transaction.aff_commission || 0
                                         )}
                                       </span>
-                                      <span>Taxes:</span>
+                                      <span>
+                                        {t("transactions.tooltips.taxes")}:
+                                      </span>
                                       <span className="text-right text-destructive">
                                         -
                                         {formatCurrency(transaction.taxes || 0)}
                                       </span>
-                                      <span>Platform Fee (%):</span>
+                                      <span>
+                                        {t(
+                                          "transactions.tooltips.platformFeePercent"
+                                        )}
+                                        :
+                                      </span>
                                       <span className="text-right text-destructive">
                                         -
                                         {formatCurrency(
@@ -460,7 +521,12 @@ export function TransactionsTable() {
                                             (transaction.platform_tax || 0)
                                         )}
                                       </span>
-                                      <span>Platform Fee ($):</span>
+                                      <span>
+                                        {t(
+                                          "transactions.tooltips.platformFeeDollar"
+                                        )}
+                                        :
+                                      </span>
                                       <span className="text-right text-destructive">
                                         -
                                         {formatCurrency(
@@ -471,7 +537,9 @@ export function TransactionsTable() {
                                     </div>
                                     <hr className="my-1 border-border/50" />
                                     <div className="grid grid-cols-2 font-bold gap-x-2">
-                                      <span>Net Sales:</span>
+                                      <span>
+                                        {t("transactions.table.netSales")}:
+                                      </span>
                                       <span className="text-right">
                                         {formatCurrency(transaction.net_sales)}
                                       </span>
@@ -521,7 +589,7 @@ export function TransactionsTable() {
                           colSpan={6}
                           className="font-semibold text-foreground"
                         >
-                          Page Total
+                          {t("transactions.pageTotal")}
                         </TableCell>
                         <TableCell className="font-bold text-right text-primary">
                           {formatCurrency(currentPageRevenue)}
@@ -547,11 +615,14 @@ export function TransactionsTable() {
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1 || isLoadingTotal}
                 >
-                  Previous
+                  {t("common.previous")}
                 </Button>
                 <span className="text-sm text-muted-foreground">
-                  Page {totalPages > 0 ? currentPage : 0} of {totalPages}{" "}
-                  (Total: {totalTransactions} records)
+                  {t("transactions.pagination.page")}{" "}
+                  {totalPages > 0 ? currentPage : 0}{" "}
+                  {t("transactions.pagination.of")} {totalPages} (
+                  {t("transactions.pagination.total")}: {totalTransactions}{" "}
+                  {t("transactions.pagination.records")})
                 </span>
                 <Button
                   variant="outline"
@@ -563,7 +634,7 @@ export function TransactionsTable() {
                     totalPages === 0
                   }
                 >
-                  Next
+                  {t("common.next")}
                 </Button>
               </div>
             </>

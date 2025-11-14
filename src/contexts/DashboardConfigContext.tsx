@@ -5,6 +5,7 @@ import {
   type ReactNode,
   useMemo,
 } from "react";
+import { useTranslation } from "react-i18next";
 // O getCalculatedDateRange e a lógica da data range assumo que estão em /lib/data
 import { getCalculatedDateRange } from "@/lib/data";
 import { DashboardConfigContext } from "./DashboardConfigContextDefiniton";
@@ -13,6 +14,7 @@ import { DashboardConfigContext } from "./DashboardConfigContextDefiniton";
 import {
   loadConfigFromStorage,
   saveConfigToStorage,
+  type DashboardConfig,
 } from "@/services/configStorage";
 import { DATE_CONFIG_OPTIONS, getDateDbColumn } from "@/lib/dateConfig";
 
@@ -24,6 +26,7 @@ interface DateRange {
 // Constantes de Configuração
 const DEFAULT_DATE_COLUMN_ID = "transaction_date";
 const DEFAULT_DATE_RANGE_ID = "last_7_days";
+const DEFAULT_LANGUAGE = "pt-BR";
 
 // --- Provider ---
 
@@ -32,6 +35,7 @@ export const DashboardConfigProvider = ({
 }: {
   children: ReactNode;
 }) => {
+  const { i18n } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
 
   // Carrega a configuração inicial UMA VEZ
@@ -49,10 +53,15 @@ export const DashboardConfigProvider = ({
       initialConfig.dateRangeId || DEFAULT_DATE_RANGE_ID,
       new Date()
     )
+  );
+
+  // 4. ESTADO: IDIOMA
+  const [language, setLanguageState] = useState<string>(
+    initialConfig.language || DEFAULT_LANGUAGE
   ); // --- Funções de Persistência (Simplificada) --- // Essa função agora só delega a lógica de mesclagem e armazenamento para o Service
 
   const saveConfig = useCallback(
-    (newConfig: { dateRangeId?: string; dateColumnId?: string }) => {
+    (newConfig: DashboardConfig) => {
       saveConfigToStorage(newConfig);
     },
     [] // Sem dependências, pois o serviço gerencia a mesclagem.
@@ -65,8 +74,22 @@ export const DashboardConfigProvider = ({
     setCurrentDateRange(
       getCalculatedDateRange(selectedDateRangeOptionId, new Date())
     );
+    // Inicializa o idioma do i18n com o idioma salvo (apenas uma vez na montagem)
+    i18n.changeLanguage(language);
     setIsLoading(false);
-  }, [selectedDateRangeOptionId]); // Depende apenas do ID do range // --- 1. Lógica do DateConfig ---
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Executa apenas uma vez na montagem
+
+  // Recalcula o dateRange quando o ID da opção mudar
+  useEffect(() => {
+    if (selectedDateRangeOptionId !== "custom") {
+      setCurrentDateRange(
+        getCalculatedDateRange(selectedDateRangeOptionId, new Date())
+      );
+    }
+  }, [selectedDateRangeOptionId]);
+
+  // --- 1. Lógica do DateConfig ---
 
   const setDateConfig = useCallback(
     (optionId: string) => {
@@ -110,6 +133,17 @@ export const DashboardConfigProvider = ({
       setIsLoading(false);
     },
     [saveConfig]
+  );
+
+  // --- 3. Lógica do Idioma ---
+  const setLanguage = useCallback(
+    (lang: string) => {
+      setLanguageState(lang);
+      i18n.changeLanguage(lang);
+      localStorage.setItem("language", lang);
+      saveConfig({ language: lang });
+    },
+    [i18n, saveConfig]
   ); // --- Renderização ---
 
   return (
@@ -123,6 +157,8 @@ export const DashboardConfigProvider = ({
         updateDateRangeOption,
         updateCustomDateRange,
         isLoading,
+        language,
+        setLanguage,
       }}
     >
       {children}

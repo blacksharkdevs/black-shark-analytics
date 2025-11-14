@@ -8,6 +8,7 @@ import {
   CircleDollarSign,
   Settings,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   SidebarHeader,
   SidebarContent,
@@ -22,32 +23,41 @@ import { Button } from "../common/ui/button";
 import { motion } from "framer-motion";
 import { useThemeToggle } from "@/hooks/useThemeToggle";
 
-const menuItems = [
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    isRoot: true,
-  },
-  {
-    href: "/dashboard/transactions",
-    label: "Transactions",
-    icon: CircleDollarSign,
-  },
-  { href: "/dashboard/affiliates", label: "Affiliates", icon: Users },
-  { href: "/dashboard/reports", label: "Reports", icon: List },
-  {
-    href: "/dashboard/configurations",
-    label: "Configurations",
-    icon: Settings,
-  },
-];
-
 export function AppSidebar({ width }: { width: string }) {
+  const { t } = useTranslation();
   const location = useLocation();
   const pathname = location.pathname;
   const { isSidebarOpen, isMobile, toggleSidebar } = useSidebar();
   const { theme } = useThemeToggle();
+
+  const menuItems = [
+    {
+      href: "/dashboard",
+      label: t("navigation.dashboard"),
+      icon: LayoutDashboard,
+      isRoot: true,
+    },
+    {
+      href: "/dashboard/transactions",
+      label: t("navigation.transactions"),
+      icon: CircleDollarSign,
+    },
+    {
+      href: "/dashboard/affiliates",
+      label: t("navigation.affiliates"),
+      icon: Users,
+    },
+    {
+      href: "/dashboard/reports",
+      label: t("navigation.reports"),
+      icon: List,
+    },
+    {
+      href: "/dashboard/configurations",
+      label: t("navigation.configurations"),
+      icon: Settings,
+    },
+  ];
 
   const isActive = (href: string) => {
     if (href === "/dashboard") {

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import CountUp from "react-countup";
 import {
   Table,
@@ -29,6 +30,7 @@ interface AffiliateRevenue {
 }
 
 export function TopAffiliatesTable() {
+  const { t } = useTranslation();
   const { filteredSalesData: data, isLoadingData } = useDashboardData();
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
 
@@ -89,15 +91,16 @@ export function TopAffiliatesTable() {
       <Card className="h-full border rounded-none shadow-lg border-white/30">
         <CardHeader>
           <CardTitle className="flex items-center text-foreground">
-            <Users className="w-6 h-6 mr-2 text-accent" /> Top 5 Affiliates
+            <Users className="w-6 h-6 mr-2 text-accent" />{" "}
+            {t("dashboard.charts.topAffiliates")}
           </CardTitle>
           <CardDescription>
-            By total revenue in the selected period.
+            {t("dashboard.charts.topAffiliatesDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-full">
           <p className="text-center text-muted-foreground">
-            No affiliate data available for the selected filters.
+            {t("dashboard.charts.noAffiliateData")}
           </p>
         </CardContent>
       </Card>
@@ -108,20 +111,24 @@ export function TopAffiliatesTable() {
     <Card className="h-full border rounded-none shadow-lg border-white/30 backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="flex items-center text-foreground">
-          <Users className="w-6 h-6 mr-2 text-blue-600 dark:text-white" /> Top 5
-          Affiliates
+          <Users className="w-6 h-6 mr-2 text-blue-600 dark:text-white" />{" "}
+          {t("dashboard.charts.topAffiliates")}
         </CardTitle>
         <CardDescription className="text-muted-foreground">
-          By total revenue in the selected period.
+          {t("dashboard.charts.topAffiliatesDesc")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader className="text-muted-foreground">
             <TableRow className="hover:bg-transparent border-border/50">
-              <TableHead className="w-[50px]">Rank</TableHead>
-              <TableHead>Affiliate</TableHead>
-              <TableHead className="text-right">Total Revenue</TableHead>
+              <TableHead className="w-[50px]">
+                {t("dashboard.charts.rank")}
+              </TableHead>
+              <TableHead>{t("dashboard.charts.affiliate")}</TableHead>
+              <TableHead className="text-right">
+                {t("dashboard.charts.totalRevenue")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

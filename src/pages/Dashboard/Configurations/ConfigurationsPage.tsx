@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -9,27 +10,26 @@ import {
 import { Button } from "@/components/common/ui/button";
 import { Settings, LinkIcon, Package } from "lucide-react";
 
-const configCards = [
-  {
-    title: "SKU Mapping",
-    description:
-      "Configure o mapeamento entre SKUs da plataforma e produtos principais. Defina quais códigos de produto correspondem a cada item do seu catálogo.",
-    icon: LinkIcon,
-    path: "/dashboard/configurations/sku-mapping",
-    focus: "MAPEAMENTO",
-  },
-  {
-    title: "Main Products",
-    description:
-      "Gerencie seus produtos principais e suas configurações. Organize e categorize os produtos do seu negócio para análises mais eficientes.",
-    icon: Package,
-    path: "/dashboard/configurations/main-products",
-    focus: "CATÁLOGO",
-  },
-];
-
 export default function ConfigurationsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+
+  const configCards = [
+    {
+      title: t("configurations.skuMapping.title"),
+      description: t("configurations.skuMapping.description"),
+      icon: LinkIcon,
+      path: "/dashboard/configurations/sku-mapping",
+      focus: t("configurations.skuMapping.focus"),
+    },
+    {
+      title: t("configurations.mainProducts.title"),
+      description: t("configurations.mainProducts.description"),
+      icon: Package,
+      path: "/dashboard/configurations/main-products",
+      focus: t("configurations.mainProducts.focus"),
+    },
+  ];
 
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
@@ -38,11 +38,9 @@ export default function ConfigurationsPage() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Settings className="w-6 h-6 text-primary" />
-            <CardTitle>Configurations</CardTitle>
+            <CardTitle>{t("configurations.title")}</CardTitle>
           </div>
-          <CardDescription>
-            Configure os mapeamentos e produtos do seu sistema
-          </CardDescription>
+          <CardDescription>{t("configurations.description")}</CardDescription>
         </CardHeader>
         <CardContent>
           {/* Config Cards Grid */}
@@ -66,7 +64,7 @@ export default function ConfigurationsPage() {
                             {config.title}
                           </CardTitle>
                           <p className="text-xs font-semibold text-primary">
-                            Foco: {config.focus}
+                            {t("common.focus")}: {config.focus}
                           </p>
                         </div>
                       </div>
@@ -84,7 +82,7 @@ export default function ConfigurationsPage() {
                         navigate(config.path);
                       }}
                     >
-                      Acessar Configuração
+                      {t("configurations.accessConfiguration")}
                     </Button>
                   </CardContent>
                 </Card>
@@ -95,11 +93,12 @@ export default function ConfigurationsPage() {
           {/* Info Footer */}
           <div className="p-4 mt-6 rounded-lg bg-muted/30">
             <p className="text-sm text-muted-foreground">
-              💡 <strong>Dica:</strong> Configure o{" "}
-              <strong className="text-foreground">SKU Mapping</strong> primeiro
-              para garantir que seus produtos sejam reconhecidos corretamente,
-              depois organize seu catálogo em{" "}
-              <strong className="text-foreground">Main Products</strong>.
+              💡 <strong>{t("reports.tip")}:</strong>{" "}
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: t("configurations.tipText"),
+                }}
+              />
             </p>
           </div>
         </CardContent>

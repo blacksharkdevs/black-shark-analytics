@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { TableCell, TableRow } from "@/components/common/ui/table";
 import {
   Tooltip,
@@ -19,6 +20,7 @@ export function AffiliatesTableRow({
   item,
   isTopAffiliate,
 }: AffiliatesTableRowProps) {
+  const { t } = useTranslation();
   const getRefundTooltipContent = (item: AffiliatePerformanceData) => {
     const renderRow = (label: string, value: number, isSubtracted = false) => (
       <div className="grid grid-cols-2 gap-x-2">
@@ -33,18 +35,33 @@ export function AffiliatesTableRow({
     if (item.platform === "buygoods") {
       return (
         <div className="p-2 text-sm w-[280px] space-y-1">
-          <p className="font-bold">BuyGoods R+CB Cost</p>
+          <p className="font-bold">{t("affiliates.tooltips.buyGoodsCost")}</p>
           <p className="mb-2 text-xs italic">
-            Formula: Revenue - Aff Comm - Taxes - Platform Fees
+            {t("affiliates.tooltips.buyGoodsFormula")}
           </p>
-          {renderRow("Total Refund Amount", item.total_refund_amount)}
+          {renderRow(
+            t("affiliates.tooltips.totalRefundAmount"),
+            item.total_refund_amount
+          )}
           <hr className="my-1 border-dashed" />
-          {renderRow("Aff Commission", item.total_refund_commission, true)}
-          {renderRow("Taxes", item.total_refund_taxes, true)}
-          {renderRow("Platform Fees", item.total_refund_platform_fees, true)}
+          {renderRow(
+            t("affiliates.tooltips.affCommission"),
+            item.total_refund_commission,
+            true
+          )}
+          {renderRow(
+            t("affiliates.tooltips.taxes"),
+            item.total_refund_taxes,
+            true
+          )}
+          {renderRow(
+            t("affiliates.tooltips.platformFees"),
+            item.total_refund_platform_fees,
+            true
+          )}
           <hr className="my-1" />
           <div className="grid grid-cols-2 font-bold gap-x-2">
-            <span>Final R+CB Cost:</span>
+            <span>{t("affiliates.tooltips.finalCost")}:</span>
             <span
               className={cn(
                 "text-right",
@@ -60,13 +77,14 @@ export function AffiliatesTableRow({
 
     return (
       <div className="p-2 text-sm">
-        <p className="font-bold">{item.platform} R+CB Cost</p>
+        <p className="font-bold">
+          {item.platform} {t("affiliates.tooltips.rcbCost")}
+        </p>
         <p className="mb-2 text-xs italic">
-          For each refund/chargeback, the cost is the absolute value of the
-          original merchant commission.
+          {t("affiliates.tooltips.rcbDesc")}
         </p>
         <div className="grid grid-cols-2 font-bold gap-x-2">
-          <span>Final R+CB Cost:</span>
+          <span>{t("affiliates.tooltips.finalCost")}:</span>
           <span
             className={cn(
               "text-right",

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { StatsCard } from "./StatsCard";
 import {
   DollarSign,
@@ -20,42 +21,46 @@ type StatKey =
   | "back_sales"
   | "average_order_value";
 
-// 🚨 Corrigindo a tipagem do STATS_MAP para Record<string, ...> para tipagem segura
-const STATS_MAP: Record<
-  string,
-  { title: string; description: string; formula?: string }
-> = {
-  gross_sales: {
-    title: "Gross Sales",
-    description: "Revenue after platform fees & taxes",
-    formula: "Total Revenue - Platform Fees - Taxes",
-  },
-  total_sales: {
-    title: "Total Sales",
-    description: "Total number of transactions",
-  },
-  front_sales: {
-    title: "Front Sales",
-    description: "Number of initial sales (non-upsell new orders)",
-  },
-  back_sales: {
-    title: "Back Sales",
-    description: "Number of upsells/follow-ups (upsell new orders)",
-  },
-  average_order_value: {
-    title: "Average Order Value",
-    description: "Avg. gross sales per front sale",
-    formula: "Gross Sales / Front Sales",
-  },
-};
-
 export function StatsCards() {
+  const { t } = useTranslation();
   const { stats, isLoadingData } = useDashboardData();
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
   const isLoading = isLoadingData || isDateRangeLoading;
 
   // 🚨 Usamos o objeto stats com um cast seguro para garantir que as propriedades existam
   const safeStats = stats as Record<string, number>;
+
+  // STATS_MAP traduzido dinamicamente
+  const STATS_MAP: Record<
+    string,
+    { title: string; description: string; formula?: string }
+  > = useMemo(
+    () => ({
+      gross_sales: {
+        title: t("dashboard.stats.grossSales"),
+        description: t("dashboard.stats.grossSalesDesc"),
+        formula: t("dashboard.stats.grossSalesFormula"),
+      },
+      total_sales: {
+        title: t("dashboard.stats.totalSales"),
+        description: t("dashboard.stats.totalSalesDesc"),
+      },
+      front_sales: {
+        title: t("dashboard.stats.frontSales"),
+        description: t("dashboard.stats.frontSalesDesc"),
+      },
+      back_sales: {
+        title: t("dashboard.stats.backSales"),
+        description: t("dashboard.stats.backSalesDesc"),
+      },
+      average_order_value: {
+        title: t("dashboard.stats.aov"),
+        description: t("dashboard.stats.aovDesc"),
+        formula: t("dashboard.stats.aovFormula"),
+      },
+    }),
+    [t]
+  );
 
   const cardProps = useMemo(() => {
     // 1. CÁLCULO DE TOOLTIPS COMPLEXOS
@@ -128,7 +133,7 @@ export function StatsCards() {
         isMonetary,
       };
     });
-  }, [stats, isLoading, formatCurrency]);
+  }, [STATS_MAP, safeStats, isLoading]);
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">

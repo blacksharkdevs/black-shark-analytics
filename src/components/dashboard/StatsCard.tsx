@@ -36,7 +36,6 @@ export function StatsCard({
   formula,
   isMonetary = false,
 }: StatsCardProps) {
-  // --- Lógica para o CountUp ---
   const isCurrency = value.includes("$");
   const duration = 1.5;
 

@@ -1,4 +1,5 @@
 import { Search, Network, ListFilter } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/common/ui/input";
 import {
   Select,
@@ -28,6 +29,7 @@ export function AffiliatesFilters({
   onPlatformChange,
   onActionTypeChange,
 }: AffiliatesFiltersProps) {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-1 gap-4 p-4 mb-6 rounded-lg md:grid-cols-3 bg-muted/30">
       {/* Filtro de Busca */}
@@ -35,7 +37,7 @@ export function AffiliatesFilters({
         <Search className="w-5 h-5 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Search by Affiliate Name..."
+          placeholder={t("affiliates.searchPlaceholder")}
           className="w-full bg-background"
           onChange={(e) => onSearchChange(e.target.value)}
         />
@@ -50,10 +52,10 @@ export function AffiliatesFilters({
           disabled={isFetchingPlatforms || availablePlatforms.length === 0}
         >
           <SelectTrigger className="w-full bg-background">
-            <SelectValue placeholder="Filter by Platform" />
+            <SelectValue placeholder={t("filters.platform")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Platforms</SelectItem>
+            <SelectItem value="all">{t("filters.allPlatforms")}</SelectItem>
             {availablePlatforms.map((platform) => (
               <SelectItem key={platform} value={platform}>
                 {platform}
@@ -68,7 +70,7 @@ export function AffiliatesFilters({
         <ListFilter className="w-5 h-5 text-muted-foreground" />
         <Select value={selectedActionType} onValueChange={onActionTypeChange}>
           <SelectTrigger className="w-full bg-background">
-            <SelectValue placeholder="Select Action Type" />
+            <SelectValue placeholder={t("filters.actionType")} />
           </SelectTrigger>
           <SelectContent>
             {AFFILIATE_ACTION_TYPES.map((action) => (

@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -27,6 +28,7 @@ import { AffiliateSalesTrendChart } from "@/components/dashboard/affiliates/Affi
 import { formatCurrency } from "@/utils/index";
 
 function AffiliateDetailContent() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { name } = useParams<{ name: string }>();
   const affiliateName = decodeURIComponent(name || "");
@@ -84,16 +86,16 @@ function AffiliateDetailContent() {
         className="mb-4 border rounded-none border-border text-foreground hover:bg-accent/10"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to Affiliates
+        {t("common.backToAffiliates")}
       </Button>
       <div className="flex items-center gap-4">
         <User className="w-8 h-8 text-primary" />
         <div>
           <h1 className="text-3xl font-bold dark:text-white">
-            Affiliate: {affiliateName}
+            {t("affiliates.details.title", { name: affiliateName })}
           </h1>
           <p className="text-foreground">
-            Performance overview and transaction history
+            {t("affiliates.details.description")}
           </p>
         </div>
       </div>
@@ -101,43 +103,43 @@ function AffiliateDetailContent() {
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         <SimpleStatsCard
-          title="Gross Sales"
+          title={t("dashboard.stats.grossSales")}
           value={formatCurrency(stats.grossSales)}
           icon={DollarSign}
           isLoading={isLoading}
         />
         <SimpleStatsCard
-          title="Total Sales"
+          title={t("dashboard.stats.totalSales")}
           value={stats.totalSales.toString()}
           icon={ShoppingCart}
           isLoading={isLoading}
         />
         <SimpleStatsCard
-          title="AOV"
+          title={t("dashboard.stats.aov")}
           value={formatCurrency(stats.aov)}
           icon={TrendingUp}
           isLoading={isLoading}
         />
         <SimpleStatsCard
-          title="Refunds (Cost)"
+          title={t("dashboard.stats.refunds")}
           value={formatCurrency(stats.totalRefunds)}
           icon={TrendingDown}
           isLoading={isLoading}
         />
         <SimpleStatsCard
-          title="Net Final"
+          title={t("dashboard.stats.netFinal")}
           value={formatCurrency(stats.netFinal)}
           icon={Wallet}
           isLoading={isLoading}
         />
         <SimpleStatsCard
-          title="Total COGS"
+          title={t("dashboard.stats.totalCOGS")}
           value={formatCurrency(stats.totalCOGS)}
           icon={HandCoins}
           isLoading={isLoading}
         />
         <SimpleStatsCard
-          title="Profit"
+          title={t("dashboard.stats.profit")}
           value={formatCurrency(stats.totalProfit)}
           icon={Target}
           isLoading={isLoading}

@@ -29,6 +29,7 @@ import {
   TooltipTrigger,
 } from "@/components/common/ui/tooltip";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 import { useAffiliateDetail } from "@/hooks/useAffiliateDetail";
@@ -49,88 +50,106 @@ const renderRow = (label: string, value: number, isSubtracted = false) => (
   </div>
 );
 
-const getRefundTooltipContent = (transaction: SaleRecord) => {
-  const refundValue = calculateRefund(transaction);
-  const isRefundAction = [
-    "refund",
-    "chargeback",
-    "chargebackrefundtime",
-  ].includes(transaction.action_type);
-  if (!isRefundAction) return "Not a refund transaction.";
+export function AffiliateTransactionsTable() {
+  const { t } = useTranslation();
+  const { getCurrentDateDbColumn } = useDashboardConfig();
+  const { transactions, isLoading, pagination } = useAffiliateDetail();
 
-  if (
-    transaction.refund_amount !== null &&
-    transaction.taxes !== null &&
-    transaction.refund_amount === transaction.taxes
-  ) {
+  const getRefundTooltipContent = (transaction: SaleRecord) => {
+    const refundValue = calculateRefund(transaction);
+    const isRefundAction = [
+      "refund",
+      "chargeback",
+      "chargebackrefundtime",
+    ].includes(transaction.action_type);
+    if (!isRefundAction) return t("transactions.tooltips.notRefund");
+
+    if (
+      transaction.refund_amount !== null &&
+      transaction.taxes !== null &&
+      transaction.refund_amount === transaction.taxes
+    ) {
+      return (
+        <div className="p-1 space-y-1 text-sm text-foreground">
+          <p className="font-bold">{t("transactions.tooltips.refundExempt")}</p>
+          <p>{t("transactions.tooltips.refundExemptDesc")}</p>
+        </div>
+      );
+    }
+
+    if (transaction.platform === "buygoods") {
+      const baseRevenue = Math.abs(transaction.revenue);
+      const affCommission = transaction.aff_commission || 0;
+      const taxes = transaction.taxes || 0;
+      const platformFeePercentageAmount =
+        baseRevenue * (transaction.platform_tax || 0);
+      const platformFeeTransactionAmount =
+        transaction.platform_transaction_tax || 0;
+      const finalCost =
+        baseRevenue -
+        affCommission -
+        taxes -
+        platformFeePercentageAmount -
+        platformFeeTransactionAmount;
+
+      return (
+        <div className="p-1 space-y-1 text-sm text-foreground">
+          <p className="font-bold">
+            {t("transactions.tooltips.buyGoodsRefund")}
+          </p>
+          <p className="mb-2 text-xs italic">
+            {t("transactions.tooltips.buyGoodsFormula")}
+          </p>
+          {renderRow(t("transactions.tooltips.revenue"), baseRevenue, false)}
+          {renderRow(
+            t("transactions.tooltips.affCommission"),
+            affCommission,
+            true
+          )}
+          {renderRow(t("transactions.tooltips.taxes"), taxes, true)}
+          {renderRow(
+            t("transactions.tooltips.platformFeePercent"),
+            platformFeePercentageAmount,
+            true
+          )}
+          {renderRow(
+            t("transactions.tooltips.platformFeeDollar"),
+            platformFeeTransactionAmount,
+            true
+          )}
+          <hr className="my-1 border-border/50" />
+          <div className="grid grid-cols-2 font-bold gap-x-2">
+            <span>{t("transactions.tooltips.totalCost")}:</span>
+            <span className="text-right">{formatCurrency(finalCost)}</span>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="p-1 space-y-1 text-sm text-foreground">
-        <p className="font-bold">Refund Cost Exempt</p>
-        <p>
-          Refund Amount is equal to Taxes, so this cost is not counted here.
+        <p className="font-bold">
+          {t("transactions.tooltips.refundCost", {
+            platform: transaction.platform || "N/A",
+          })}
+          :
         </p>
-      </div>
-    );
-  }
-
-  if (transaction.platform === "buygoods") {
-    const baseRevenue = Math.abs(transaction.revenue);
-    const affCommission = transaction.aff_commission || 0;
-    const taxes = transaction.taxes || 0;
-    const platformFeePercentageAmount =
-      baseRevenue * (transaction.platform_tax || 0);
-    const platformFeeTransactionAmount =
-      transaction.platform_transaction_tax || 0;
-    const finalCost =
-      baseRevenue -
-      affCommission -
-      taxes -
-      platformFeePercentageAmount -
-      platformFeeTransactionAmount;
-
-    return (
-      <div className="p-1 space-y-1 text-sm text-foreground">
-        <p className="font-bold">BuyGoods Refund Cost</p>
         <p className="mb-2 text-xs italic">
-          Formula: Revenue - Aff Commission - Taxes - Platform Fees
+          {t("transactions.tooltips.merchantFormula")}
         </p>
-        {renderRow("Revenue", baseRevenue, false)}
-        {renderRow("Aff Commission", affCommission, true)}
-        {renderRow("Taxes", taxes, true)}
-        {renderRow("Platform Fee (%)", platformFeePercentageAmount, true)}
-        {renderRow("Platform Fee ($)", platformFeeTransactionAmount, true)}
+        {renderRow(
+          t("transactions.tooltips.merchantCommission"),
+          Math.abs(transaction.merchant_commission || 0),
+          false
+        )}
         <hr className="my-1 border-border/50" />
         <div className="grid grid-cols-2 font-bold gap-x-2">
-          <span>Total Cost:</span>
-          <span className="text-right">{formatCurrency(finalCost)}</span>
+          <span>{t("transactions.tooltips.totalCost")}:</span>
+          <span className="text-right">{formatCurrency(refundValue)}</span>
         </div>
       </div>
     );
-  }
-
-  return (
-    <div className="p-1 space-y-1 text-sm text-foreground">
-      <p className="font-bold">
-        Refund Cost ({transaction.platform || "N/A"}):
-      </p>
-      <p className="mb-2 text-xs italic">Formula: ABS(merchant_commission)</p>
-      {renderRow(
-        "Merchant Commission",
-        Math.abs(transaction.merchant_commission || 0),
-        false
-      )}
-      <hr className="my-1 border-border/50" />
-      <div className="grid grid-cols-2 font-bold gap-x-2">
-        <span>Total Cost:</span>
-        <span className="text-right">{formatCurrency(refundValue)}</span>
-      </div>
-    </div>
-  );
-};
-
-export function AffiliateTransactionsTable() {
-  const { getCurrentDateDbColumn } = useDashboardConfig();
-  const { transactions, isLoading, pagination } = useAffiliateDetail();
+  };
 
   const {
     currentPage,
@@ -149,10 +168,12 @@ export function AffiliateTransactionsTable() {
     <Card className="border-[1px] border-white/30 rounded-none shadow-lg">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-foreground">Transaction History</CardTitle>
+          <CardTitle className="text-foreground">
+            {t("affiliates.transactionHistory")}
+          </CardTitle>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground whitespace-nowrap">
-              Rows per page:
+              {t("transactions.rowsPerPage")}:
             </span>
             <Select
               value={itemsPerPage.toString()}
@@ -188,7 +209,7 @@ export function AffiliateTransactionsTable() {
           </div>
         ) : showNoTransactionsMessage ? (
           <div className="py-10 text-center text-muted-foreground">
-            No transactions found for this affiliate.
+            {t("affiliates.noTransactions")}
           </div>
         ) : (
           <>
@@ -196,21 +217,27 @@ export function AffiliateTransactionsTable() {
               <Table>
                 <TableHeader className="text-muted-foreground">
                   <TableRow className="hover:bg-transparent border-border/50">
-                    <TableHead className="w-[150px]">Sale ID</TableHead>
-                    <TableHead className="w-[180px]">Date (UTC)</TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Platform</TableHead>
+                    <TableHead className="w-[150px]">
+                      {t("transactions.table.saleId")}
+                    </TableHead>
+                    <TableHead className="w-[180px]">
+                      {t("transactions.table.dateUtc")}
+                    </TableHead>
+                    <TableHead>{t("transactions.table.product")}</TableHead>
+                    <TableHead>{t("transactions.table.customer")}</TableHead>
+                    <TableHead>{t("transactions.table.platform")}</TableHead>
                     <TableHead className="text-right w-[120px]">
-                      Revenue
+                      {t("transactions.table.revenue")}
                     </TableHead>
                     <TableHead className="text-right w-[120px]">
-                      Net Sales
+                      {t("transactions.table.netSales")}
                     </TableHead>
                     <TableHead className="text-right w-[120px]">
-                      Refund Calc
+                      {t("transactions.table.refundCalc")}
                     </TableHead>
-                    <TableHead className="w-[150px]">Action Type</TableHead>
+                    <TableHead className="w-[150px]">
+                      {t("transactions.table.actionType")}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="text-foreground">
@@ -287,25 +314,40 @@ export function AffiliateTransactionsTable() {
                               <TooltipContent className="bg-card border-border text-foreground">
                                 <div className="p-1 space-y-1 text-sm">
                                   <p className="font-bold">
-                                    Net Sales Breakdown:
+                                    {t(
+                                      "transactions.tooltips.netSalesBreakdown"
+                                    )}
+                                    :
                                   </p>
                                   <div className="grid grid-cols-2 gap-x-2">
-                                    <span>Revenue:</span>
+                                    <span>
+                                      {t("transactions.tooltips.revenue")}:
+                                    </span>
                                     <span className="text-right">
                                       {formatCurrency(transaction.revenue)}
                                     </span>
-                                    <span>Aff Commission:</span>
+                                    <span>
+                                      {t("transactions.tooltips.affCommission")}
+                                      :
+                                    </span>
                                     <span className="text-right text-destructive">
                                       -
                                       {formatCurrency(
                                         transaction.aff_commission || 0
                                       )}
                                     </span>
-                                    <span>Taxes:</span>
+                                    <span>
+                                      {t("transactions.tooltips.taxes")}:
+                                    </span>
                                     <span className="text-right text-destructive">
                                       -{formatCurrency(transaction.taxes || 0)}
                                     </span>
-                                    <span>Platform Fee (%):</span>
+                                    <span>
+                                      {t(
+                                        "transactions.tooltips.platformFeePercent"
+                                      )}
+                                      :
+                                    </span>
                                     <span className="text-right text-destructive">
                                       -
                                       {formatCurrency(
@@ -313,7 +355,12 @@ export function AffiliateTransactionsTable() {
                                           (transaction.platform_tax || 0)
                                       )}
                                     </span>
-                                    <span>Platform Fee ($):</span>
+                                    <span>
+                                      {t(
+                                        "transactions.tooltips.platformFeeDollar"
+                                      )}
+                                      :
+                                    </span>
                                     <span className="text-right text-destructive">
                                       -
                                       {formatCurrency(
@@ -324,7 +371,9 @@ export function AffiliateTransactionsTable() {
                                   </div>
                                   <hr className="my-1 border-border/50" />
                                   <div className="grid grid-cols-2 font-bold gap-x-2">
-                                    <span>Net Sales:</span>
+                                    <span>
+                                      {t("transactions.table.netSales")}:
+                                    </span>
                                     <span className="text-right">
                                       {formatCurrency(netSales)}
                                     </span>
@@ -371,7 +420,7 @@ export function AffiliateTransactionsTable() {
                         colSpan={5}
                         className="font-semibold text-foreground"
                       >
-                        Page Total
+                        {t("transactions.pageTotal")}
                       </TableCell>
                       <TableCell className="font-bold text-right text-primary">
                         {formatCurrency(
@@ -412,11 +461,14 @@ export function AffiliateTransactionsTable() {
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1 || isLoading}
               >
-                Previous
+                {t("common.previous")}
               </Button>
               <span className="text-sm text-muted-foreground">
-                Page {totalPages > 0 ? currentPage : 0} of {totalPages} (Total:{" "}
-                {totalTransactions} records)
+                {t("transactions.pagination.page")}{" "}
+                {totalPages > 0 ? currentPage : 0}{" "}
+                {t("transactions.pagination.of")} {totalPages} (
+                {t("transactions.pagination.total")}: {totalTransactions}{" "}
+                {t("transactions.pagination.records")})
               </span>
               <Button
                 variant="outline"
@@ -426,7 +478,7 @@ export function AffiliateTransactionsTable() {
                   currentPage === totalPages || isLoading || totalPages === 0
                 }
               >
-                Next
+                {t("common.next")}
               </Button>
             </div>
           </>

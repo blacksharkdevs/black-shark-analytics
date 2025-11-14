@@ -12,6 +12,10 @@ interface DashboardConfigContextType {
   updateDateRangeOption: (optionId: string) => void;
   updateCustomDateRange: (newRange: { from: Date; to: Date }) => void;
   isLoading: boolean;
+
+  // Idioma
+  language: string;
+  setLanguage: (lang: string) => void;
 }
 
 // --- Contexto ---

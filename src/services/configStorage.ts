@@ -2,11 +2,17 @@
 
 const CONFIG_LOCAL_STORAGE_KEY = "blackshark_dashboard_config";
 
+export interface DashboardConfig {
+  dateRangeId?: string;
+  dateColumnId?: string;
+  language?: string;
+}
+
 /**
  * Carrega a configuração do dashboard do Local Storage.
  * Retorna um objeto vazio se não houver dados ou se estiver rodando no lado do servidor.
  */
-export function loadConfigFromStorage(): any {
+export function loadConfigFromStorage(): DashboardConfig {
   if (typeof window === "undefined") {
     return {};
   }
@@ -24,7 +30,7 @@ export function loadConfigFromStorage(): any {
  * Salva a configuração atualizada no Local Storage.
  * @param config A porção da configuração a ser salva.
  */
-export function saveConfigToStorage(config: any): void {
+export function saveConfigToStorage(config: DashboardConfig): void {
   if (typeof window === "undefined") {
     return;
   }

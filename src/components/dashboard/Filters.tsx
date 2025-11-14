@@ -4,6 +4,7 @@ import type {
 } from "@/lib/config";
 import { Network } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 import {
   Select,
   SelectContent,
@@ -55,6 +56,7 @@ export function Filters({
   onSearchChange,
   searchDefaultValue,
 }: FiltersProps) {
+  const { t } = useTranslation();
   const hasPlatformFilter =
     platforms !== undefined &&
     onPlatformChange !== undefined &&
@@ -83,11 +85,11 @@ export function Filters({
         disabled={platforms.length === 0}
       >
         <SelectTrigger className="w-full transition-colors border rounded-none bg-card hover:bg-accent/20 border-input text-foreground">
-          <SelectValue placeholder="Filter by Platform" />
+          <SelectValue placeholder={t("filters.platform")} />
         </SelectTrigger>
         <SelectContent className="border rounded-none bg-card border-border">
           <SelectItem value="all" className="rounded-none text-foreground">
-            All Platforms
+            {t("filters.allPlatforms")}
           </SelectItem>
           {platforms.map((platform) => (
             <SelectItem

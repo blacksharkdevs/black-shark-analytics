@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import CountUp from "react-countup";
 import {
   Table,
@@ -32,6 +33,7 @@ interface ItemStats {
 }
 
 export function TopSellingItemsTable() {
+  const { t } = useTranslation();
   const { filteredSalesData: data, isLoadingData } = useDashboardData();
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
 
@@ -93,16 +95,16 @@ export function TopSellingItemsTable() {
       <Card className="h-full border rounded-none shadow-lg border-white/30">
         <CardHeader>
           <CardTitle className="flex items-center text-foreground">
-            <TrendingUp className="w-6 h-6 mr-2 text-accent" /> Top 5 Selling
-            Items
+            <TrendingUp className="w-6 h-6 mr-2 text-accent" />{" "}
+            {t("dashboard.charts.topSellingItems")}
           </CardTitle>
           <CardDescription>
-            By total revenue, respecting all filters.
+            {t("dashboard.charts.topSellingItemsDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="h-[280px] flex items-center justify-center">
           <p className="text-center text-muted-foreground">
-            No sales data available for the selected filters.
+            {t("dashboard.charts.noSalesDataFilters")}
           </p>
         </CardContent>
       </Card>
@@ -114,19 +116,23 @@ export function TopSellingItemsTable() {
       <CardHeader>
         <CardTitle className="flex items-center text-foreground">
           <TrendingUp className="w-6 h-6 mr-2 text-blue-600 dark:text-white" />{" "}
-          Top 5 Selling Items
+          {t("dashboard.charts.topSellingItems")}
         </CardTitle>
         <CardDescription className="text-muted-foreground">
-          By total revenue, respecting all filters.
+          {t("dashboard.charts.topSellingItemsDesc")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader className="text-muted-foreground">
             <TableRow className="hover:bg-transparent border-border/50">
-              <TableHead>Item Name (from Sale)</TableHead>
-              <TableHead className="text-right">Total Sales</TableHead>
-              <TableHead className="text-right">Total Revenue</TableHead>
+              <TableHead>{t("dashboard.charts.itemName")}</TableHead>
+              <TableHead className="text-right">
+                {t("dashboard.charts.totalSales")}
+              </TableHead>
+              <TableHead className="text-right">
+                {t("dashboard.charts.totalRevenue")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -143,7 +149,7 @@ export function TopSellingItemsTable() {
                         variant="secondary"
                         className="bg-transparent border-accent text-accent"
                       >
-                        Back-End
+                        {t("dashboard.charts.backEnd")}
                       </Badge>
                     )}
                   </div>

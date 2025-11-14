@@ -8,6 +8,7 @@ import {
   CardDescription,
 } from "@/components/common/ui/card";
 import { Users } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useAffiliates } from "@/hooks/useAffiliates";
 import { AffiliatesProvider } from "@/contexts/AffiliatesContext";
 import { type AffiliatePerformanceData } from "@/types/affiliates";
@@ -23,6 +24,7 @@ import {
 import { Filters } from "@/components/dashboard/Filters";
 
 function AffiliatesPageContent() {
+  const { t } = useTranslation();
   const {
     affiliateData,
     isLoadingData,
@@ -86,32 +88,31 @@ function AffiliatesPageContent() {
 
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
-      <Card className="shadow-lg border-[1px] border-gray-300/20">
+      <Card className="shadow-lg border-[1px] border-gray-300/30">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Users className="w-6 h-6 text-primary" />
-            <CardTitle>Affiliate Performance</CardTitle>
+            <CardTitle>{t("affiliates.pageTitle")}</CardTitle>
           </div>
-          <CardDescription>
-            Aggregated performance data for affiliates, calculated based on the
-            filters selected below.
-          </CardDescription>
+          <CardDescription>{t("affiliates.pageDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Filters
-            products={[{ id: "all", name: "All Products" }]}
-            selectedProduct="all"
-            onProductChange={() => {}}
-            actionTypes={AFFILIATE_ACTION_TYPES}
-            selectedActionType={selectedActionType}
-            onActionTypeChange={handleFilterChange.actionType}
-            platforms={availablePlatforms}
-            selectedPlatform={selectedPlatform}
-            onPlatformChange={handleFilterChange.platform}
-            isPlatformLoading={isFetchingPlatforms}
-            searchPlaceholder="Search by Affiliate Name..."
-            onSearchChange={handleFilterChange.search}
-          />
+          <div className="p-4 rounded-none shadow bg-card/50 border-[1px] border-white/30 0 mb-6">
+            <Filters
+              products={[{ id: "all", name: "All Products" }]}
+              selectedProduct="all"
+              onProductChange={() => {}}
+              actionTypes={AFFILIATE_ACTION_TYPES}
+              selectedActionType={selectedActionType}
+              onActionTypeChange={handleFilterChange.actionType}
+              platforms={availablePlatforms}
+              selectedPlatform={selectedPlatform}
+              onPlatformChange={handleFilterChange.platform}
+              isPlatformLoading={isFetchingPlatforms}
+              searchPlaceholder={t("affiliates.searchPlaceholder")}
+              onSearchChange={handleFilterChange.search}
+            />
+          </div>
 
           {showContentSkeleton ? (
             <AffiliatesLoadingSkeleton itemsPerPage={itemsPerPage} />

@@ -59,14 +59,6 @@ export async function fetchAllAffiliateTransactions(
   const queryFromUTC = currentDateRange.from.toISOString();
   const queryToUTC = currentDateRange.to.toISOString();
 
-  console.log(
-    "🔍 [AffiliateTransactionService] Fetching ALL transactions for:",
-    {
-      affiliateName,
-      dateRange: { from: queryFromUTC, to: queryToUTC },
-    }
-  );
-
   try {
     const query = supabase
       .from("sales_data")

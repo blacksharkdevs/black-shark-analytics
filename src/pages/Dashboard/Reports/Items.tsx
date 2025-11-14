@@ -1,5 +1,6 @@
 import { useReports } from "@/hooks/useReports"; // Nosso novo hook
 import { List, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   Card,
@@ -36,6 +37,8 @@ import {
 import { ItemsReportProvider } from "@/contexts/ReportsContext";
 
 function ItemsPageContent() {
+  const { t } = useTranslation();
+
   const {
     paginatedData,
     isLoadingData,
@@ -94,12 +97,9 @@ function ItemsPageContent() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <List className="w-6 h-6 text-primary" />
-            <CardTitle>Items Report</CardTitle>
+            <CardTitle>{t("items.title")}</CardTitle>
           </div>
-          <CardDescription>
-            A comprehensive list of all items sold, aggregated by revenue and
-            sales count, respecting the selected filters.
-          </CardDescription>
+          <CardDescription>{t("items.description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-between gap-4 mb-4 sm:flex-row">
@@ -107,7 +107,7 @@ function ItemsPageContent() {
               <Search className="absolute w-5 h-5 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search by item name or platform..."
+                placeholder={t("items.searchPlaceholder")}
                 className="w-full pl-10 bg-background/70"
                 onChange={(e) => debouncedSearch(e.target.value)} // Usamos o handler
               />
@@ -122,7 +122,7 @@ function ItemsPageContent() {
             </div>
           ) : showNoDataMessage ? (
             <div className="py-10 text-center text-muted-foreground">
-              No items data found for the selected filters.
+              {t("items.noDataMessage")}
             </div>
           ) : (
             <>
@@ -130,13 +130,19 @@ function ItemsPageContent() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[100px]">Rank</TableHead>
-                      <TableHead>Item Name (from Sale)</TableHead>
-                      <TableHead>Platform</TableHead>
-                      <TableHead className="text-right">Total Sales</TableHead>
-                      <TableHead className="text-right">Total Units</TableHead>
+                      <TableHead className="w-[100px]">
+                        {t("items.table.rank")}
+                      </TableHead>
+                      <TableHead>{t("items.table.itemName")}</TableHead>
+                      <TableHead>{t("items.table.platform")}</TableHead>
                       <TableHead className="text-right">
-                        Total Revenue
+                        {t("items.table.totalSales")}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {t("items.table.totalUnits")}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {t("items.table.totalRevenue")}
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -156,7 +162,7 @@ function ItemsPageContent() {
                                   variant="secondary"
                                   className="border-accent text-accent"
                                 >
-                                  Back-End
+                                  {t("items.table.backEndBadge")}
                                 </Badge>
                               )}
                             </div>
@@ -182,7 +188,7 @@ function ItemsPageContent() {
                           colSpan={3}
                           className="font-semibold text-muted-foreground"
                         >
-                          Page Totals
+                          {t("items.table.pageTotals")}
                         </TableCell>
                         <TableCell className="font-bold text-right">
                           {paginatedData
@@ -208,7 +214,7 @@ function ItemsPageContent() {
                           colSpan={3}
                           className="pt-2 font-semibold text-muted-foreground"
                         >
-                          Overall Totals
+                          {t("items.table.overallTotals")}
                         </TableCell>
                         <TableCell className="pt-2 font-bold text-right">
                           {aggregatedAndFilteredData
@@ -236,7 +242,7 @@ function ItemsPageContent() {
               <div className="flex items-center justify-between py-4 space-x-2">
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground whitespace-nowrap">
-                    Rows per page:
+                    {t("items.pagination.rowsPerPage")}
                   </span>
                   <Select
                     value={itemsPerPage.toString()}
@@ -255,8 +261,11 @@ function ItemsPageContent() {
                   </Select>
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  Page {totalPages > 0 ? currentPage : 0} of {totalPages}{" "}
-                  (Total: {aggregatedAndFilteredData.length} unique items)
+                  {t("items.pagination.page")}{" "}
+                  {totalPages > 0 ? currentPage : 0} {t("items.pagination.of")}{" "}
+                  {totalPages} ({t("items.pagination.total")}:{" "}
+                  {aggregatedAndFilteredData.length}{" "}
+                  {t("items.pagination.uniqueItems")})
                 </span>
                 <div className="flex items-center gap-2">
                   <Button
@@ -265,7 +274,7 @@ function ItemsPageContent() {
                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1 || isLoadingData}
                   >
-                    Previous
+                    {t("items.pagination.previous")}
                   </Button>
                   <Button
                     variant="outline"
@@ -279,7 +288,7 @@ function ItemsPageContent() {
                       totalPages === 0
                     }
                   >
-                    Next
+                    {t("items.pagination.next")}
                   </Button>
                 </div>
               </div>

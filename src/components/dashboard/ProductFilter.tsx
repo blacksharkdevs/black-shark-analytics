@@ -6,6 +6,7 @@ import {
   SelectValue,
 } from "@/components/common/ui/select";
 import { Package } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Product as ProductConfig } from "@/lib/config";
 
 interface ProductFilterProps {
@@ -19,6 +20,7 @@ export function ProductFilter({
   selectedProduct,
   onProductChange,
 }: ProductFilterProps) {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center gap-2">
       <Package className="hidden text-blue-600 dark:text-white sm:block" />
@@ -28,7 +30,7 @@ export function ProductFilter({
         disabled={products.length <= 1}
       >
         <SelectTrigger className="w-full transition-colors border rounded-none bg-card hover:bg-accent/20 border-input text-foreground">
-          <SelectValue placeholder="Select Product" />
+          <SelectValue placeholder={t("filters.product")} />
         </SelectTrigger>
         <SelectContent className="border rounded-none bg-card border-border">
           {products.map((product) => (

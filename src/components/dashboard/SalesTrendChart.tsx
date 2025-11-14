@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { parseISO, format as dateFnsFormat, isSameDay } from "date-fns";
 import {
   LineChart,
@@ -28,15 +29,6 @@ import { useDashboardData } from "@/hooks/useDashboardData"; // 🔑 Hook de Dad
 import { useDashboardConfig } from "@/hooks/useDashboardConfig"; // 🔑 Hook de Configuração
 import { type ChartConfig } from "@/components/common/ui/chart";
 
-// --- CONFIGURAÇÃO DO GRÁFICO (Cores Dinâmicas) ---
-// Note que 'revenue' usa a variável CSS do Tailwind (primary), que muda com o tema.
-const chartConfig = {
-  revenue: {
-    label: "Revenue (USD)",
-    color: "hsl(var(--primary))", // Usa a cor primária (Preto/Branco)
-  },
-} satisfies ChartConfig;
-
 // --- FORMATADORES UTC ---
 // Formata o valor do YAxis (eixo vertical)
 const formatYAxisValue = (value: number): string => {
@@ -50,12 +42,24 @@ const formatYAxisValue = (value: number): string => {
 };
 
 export function SalesTrendChart() {
+  const { t } = useTranslation();
   // 🔑 CONSUMO: Puxando dados e estados dos Contextos
   const { filteredSalesData: data, isLoadingData } = useDashboardData();
   const { currentDateRange: dateRange, isLoading: isDateRangeLoading } =
     useDashboardConfig();
 
   const isLoading = isLoadingData || isDateRangeLoading;
+
+  // Config do gráfico traduzida
+  const chartConfig = useMemo(
+    () => ({
+      revenue: {
+        label: t("dashboard.charts.revenueLabel"),
+        color: "hsl(var(--primary))",
+      },
+    }),
+    [t]
+  ) satisfies ChartConfig;
 
   // Intl formatters explicitly using UTC for display consistency
   const timeFormatter = useMemo(
@@ -171,14 +175,14 @@ export function SalesTrendChart() {
     return (
       <Card className="col-span-1 border rounded-none shadow-lg lg:col-span-3 border-white/30">
         <CardHeader>
-          <CardTitle>Sales Trend</CardTitle>
+          <CardTitle>{t("dashboard.charts.salesTrend")}</CardTitle>
           <CardDescription>
-            Revenue over the selected period (UTC).
+            {t("dashboard.charts.salesTrendDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="h-[400px] flex items-center justify-center">
           <p className="text-muted-foreground">
-            No sales data available for the selected period.
+            {t("dashboard.charts.noSalesData")}
           </p>
         </CardContent>
       </Card>
@@ -188,9 +192,11 @@ export function SalesTrendChart() {
   return (
     <Card className="col-span-1 border rounded-none shadow-lg lg:col-span-3 border-white/30 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="text-foreground">Sales Trend</CardTitle>
+        <CardTitle className="text-foreground">
+          {t("dashboard.charts.salesTrend")}
+        </CardTitle>
         <CardDescription>
-          Revenue over the selected period (UTC).
+          {t("dashboard.charts.salesTrendDesc")}
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-6 pl-2 pr-6">

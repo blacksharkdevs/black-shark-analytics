@@ -6,8 +6,6 @@ import { type ProductConfig } from "@/types/index";
  * @returns {Promise<ProductConfig[]>} Lista de produtos, incluindo a opção "All Products".
  */
 export async function fetchProductsForFilter(): Promise<ProductConfig[]> {
-  console.log("Serviço: Buscando lista de produtos...");
-
   // 1. Busca os dados brutos
   const { data, error } = await supabase
     .from("config_products")
@@ -35,8 +33,6 @@ export async function fetchProductsForFilter(): Promise<ProductConfig[]> {
  * @returns {Promise<string[]>} Lista de nomes de plataformas.
  */
 export async function fetchDistinctSalesPlatforms(): Promise<string[]> {
-  console.log("Serviço: Buscando lista de plataformas...");
-
   const { data, error } = await supabase.rpc(
     "get_distinct_sales_platforms" // Assumindo que este RPC retorna [{ platform: string }]
   );

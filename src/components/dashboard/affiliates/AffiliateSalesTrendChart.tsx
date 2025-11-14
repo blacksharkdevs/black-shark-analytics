@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { parseISO, format as dateFnsFormat, isSameDay } from "date-fns";
 import {
   LineChart,
@@ -53,6 +54,7 @@ export function AffiliateSalesTrendChart({
   isLoading,
   dateRange,
 }: AffiliateSalesTrendChartProps) {
+  const { t } = useTranslation();
   const timeFormatter = useMemo(
     () =>
       new Intl.DateTimeFormat("default", {
@@ -148,14 +150,14 @@ export function AffiliateSalesTrendChart({
     return (
       <Card className="border rounded-none shadow-lg border-white/30">
         <CardHeader>
-          <CardTitle>Sales Trend</CardTitle>
+          <CardTitle>{t("dashboard.charts.salesTrend")}</CardTitle>
           <CardDescription>
-            Revenue over the selected period (UTC).
+            {t("dashboard.charts.salesTrendDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="h-[400px] flex items-center justify-center">
           <p className="text-muted-foreground">
-            No sales data available for the selected period.
+            {t("dashboard.charts.noSalesData")}
           </p>
         </CardContent>
       </Card>
@@ -165,9 +167,11 @@ export function AffiliateSalesTrendChart({
   return (
     <Card className="border rounded-none shadow-lg border-white/30 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="text-foreground">Sales Trend</CardTitle>
+        <CardTitle className="text-foreground">
+          {t("dashboard.charts.salesTrend")}
+        </CardTitle>
         <CardDescription>
-          Revenue over the selected period (UTC).
+          {t("dashboard.charts.salesTrendDesc")}
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-6 pl-2 pr-6">

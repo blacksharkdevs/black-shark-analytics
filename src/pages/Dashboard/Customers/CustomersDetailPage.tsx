@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -14,6 +15,7 @@ import { useCustomerHistory } from "@/hooks/useCustomerHistory";
 import { CustomerTransactionsTable } from "@/components/dashboard/customer/CustomerTransactionsTable";
 
 function CustomersDetailPageContent() {
+  const { t } = useTranslation();
   const params = useParams();
   const navigate = useNavigate();
   const email = decodeURIComponent(params.email as string);
@@ -37,7 +39,7 @@ function CustomersDetailPageContent() {
         className="mb-4 border rounded-none border-border text-foreground hover:bg-accent/10"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to Transactions
+        {t("common.backToTransactions")}
       </Button>
 
       <Card className="border rounded-none shadow-lg bg-card border-border">
@@ -46,10 +48,10 @@ function CustomersDetailPageContent() {
             <User className="w-6 h-6 text-blue-600" />
             <div className="flex-1">
               <CardTitle className="text-foreground">
-                Transaction History
+                {t("customers.details.title")}
               </CardTitle>
               <CardDescription className="text-muted-foreground">
-                Showing all records for customer:{" "}
+                {t("customers.details.description")}{" "}
                 <span className="font-mono font-semibold text-primary">
                   {customerName || customerEmail}
                 </span>
@@ -73,7 +75,7 @@ function CustomersDetailPageContent() {
             </div>
           ) : showNoTransactionsMessage ? (
             <div className="py-10 text-center text-muted-foreground">
-              No transactions found for this customer.
+              {t("customers.details.noTransactions")}
             </div>
           ) : (
             <CustomerTransactionsTable transactions={transactions} />

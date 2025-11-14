@@ -4,6 +4,8 @@ import { isSameDay, format as dateFnsFormat } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
+import { useTranslation } from "react-i18next";
+import { useTranslatedDateRangeOptions } from "@/hooks/useTranslatedOptions";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/common/ui/button";
@@ -19,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/common/ui/select";
-import { DATE_RANGE_OPTIONS } from "@/lib/config";
 
 interface DateRangePickerProps {
   className?: string;
@@ -36,6 +37,8 @@ export function DateRangePicker({
   onGlobalRangeOptionChange,
   onGlobalCustomDateApply,
 }: DateRangePickerProps) {
+  const { t } = useTranslation();
+  const DATE_RANGE_OPTIONS = useTranslatedDateRangeOptions();
   const [popoverOpen, setPopoverOpen] = React.useState(false);
   const [localDateRange, setLocalDateRange] = React.useState<
     DateRange | undefined
@@ -69,7 +72,7 @@ export function DateRangePicker({
   };
 
   const formatDateForDisplay = (date: Date | undefined): string => {
-    if (!date) return "Pick a date";
+    if (!date) return t("dateRange.pickDate");
     return dateFnsFormat(date, "dd/MM/yy");
   };
 
@@ -87,7 +90,7 @@ export function DateRangePicker({
           )} - ${formatDateForDisplay(currentGlobalRange.to)}`
         : formatDateForDisplay(currentGlobalRange.from);
   } else {
-    buttonText = selectedOptionDetails?.name || "Select date range";
+    buttonText = selectedOptionDetails?.name || t("dateRange.selectDateRange");
   }
 
   return (
@@ -99,7 +102,7 @@ export function DateRangePicker({
         onValueChange={handlePresetChange}
       >
         <SelectTrigger className="w-full sm:w-[180px] h-10 bg-card text-foreground border border-input hover:bg-blue-500 hover:text-white transition-colors rounded-none">
-          <SelectValue placeholder="Select date range" />
+          <SelectValue placeholder={t("dateRange.selectDateRange")} />
         </SelectTrigger>
         <SelectContent className="border rounded-none bg-card border-border">
           {DATE_RANGE_OPTIONS.map((option) => (
@@ -149,7 +152,7 @@ export function DateRangePicker({
               size="sm"
               className="rounded-none bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              Aplicar
+              {t("dateRange.apply")}
             </Button>
           </div>
         </PopoverContent>

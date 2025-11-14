@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import CountUp from "react-countup";
 import {
   Table,
@@ -29,6 +30,7 @@ interface ProductRevenue {
 }
 
 export function TopProductsTable() {
+  const { t } = useTranslation();
   const { filteredSalesData: data, isLoadingData } = useDashboardData();
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
 
@@ -87,15 +89,15 @@ export function TopProductsTable() {
           <CardTitle className="flex items-center text-foreground">
             {/* Mantido o seu estilo de ícone original */}
             <Package className="w-6 h-6 mr-2 text-blue-700 dark:text-white" />{" "}
-            Top 5 Products
+            {t("dashboard.charts.topProducts")}
           </CardTitle>
           <CardDescription>
-            By total revenue in the selected period.
+            {t("dashboard.charts.topProductsDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-full">
           <p className="text-center text-muted-foreground">
-            No product data available for the selected filters.
+            {t("dashboard.charts.noProductData")}
           </p>
         </CardContent>
       </Card>
@@ -107,19 +109,21 @@ export function TopProductsTable() {
       <CardHeader>
         <CardTitle className="flex items-center text-foreground">
           {/* Mantido o seu estilo de ícone original */}
-          <Package className="w-6 h-6 mr-2 text-blue-600 dark:text-white" /> Top
-          5 Products
+          <Package className="w-6 h-6 mr-2 text-blue-600 dark:text-white" />{" "}
+          {t("dashboard.charts.topProducts")}
         </CardTitle>
         <CardDescription className="text-muted-foreground">
-          By total revenue in the selected period.
+          {t("dashboard.charts.topProductsDesc")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader className="text-muted-foreground">
             <TableRow className="hover:bg-transparent border-border/50">
-              <TableHead>Product</TableHead>
-              <TableHead className="text-right">Total Revenue</TableHead>
+              <TableHead>{t("dashboard.charts.product")}</TableHead>
+              <TableHead className="text-right">
+                {t("dashboard.charts.totalRevenue")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

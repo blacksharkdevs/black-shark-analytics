@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Sun, Moon, Globe, CalendarCog, LogOut } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useSidebar } from "@/hooks/useSidebar";
@@ -15,6 +16,7 @@ import {
 } from "@/components/common/ui/avatar";
 import { Skeleton } from "@/components/common/ui/skeleton";
 import { DateRangePicker } from "@/components/domain/DateRangePicker";
+import { LanguageSelector } from "@/components/layout/LanguageSelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +35,7 @@ const DEFAULT_TIMEZONE =
   TIMEZONE_OPTIONS.find((tz) => !tz.disabled) || TIMEZONE_OPTIONS[0];
 
 export function Header() {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const location = useLocation();
   const { toggleSidebar } = useSidebar();
@@ -59,25 +62,25 @@ export function Header() {
 
   const availableTimezones = TIMEZONE_OPTIONS;
 
-  let headerTitle = "Dashboard";
+  let headerTitle = t("navigation.dashboard");
   const pathname = location.pathname;
   if (pathname.includes("/dashboard/reports")) {
-    headerTitle = "Reports";
+    headerTitle = t("navigation.reports");
   } else if (pathname.includes("/dashboard/configurations")) {
-    headerTitle = "Configurations";
+    headerTitle = t("navigation.configurations");
   } else if (
     pathname.includes("/dashboard/affiliates") ||
     pathname.includes("/dashboard/customers")
   ) {
-    headerTitle = "Affiliates";
+    headerTitle = t("navigation.affiliates");
   } else if (
     pathname.includes("/dashboard/vendas") ||
     pathname.includes("/dashboard/reembolsos") ||
     pathname.includes("/dashboard/transactions")
   ) {
-    headerTitle = "Sales";
+    headerTitle = t("navigation.sales");
   } else if (pathname === "/dashboard" || pathname === "/dashboard/") {
-    headerTitle = "Dashboard";
+    headerTitle = t("navigation.dashboard");
   }
 
   return (
@@ -120,11 +123,14 @@ export function Header() {
             size="icon"
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            className="w-10 h-10 rounded-full text-foreground"
+            className="w-10 h-10 rounded-full text-foreground hover:dark:bg-blue-700"
           >
             <Sun className="w-5 h-5 transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute w-5 h-5 transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" />
           </Button>
+
+          {/* Seletor de Idioma */}
+          <LanguageSelector />
 
           {user && (
             <DropdownMenu>
@@ -158,7 +164,7 @@ export function Header() {
                       {user.username}
                     </p>
                     <p className="text-xs leading-none text-blue-400">
-                      Administrator Access
+                      {t("header.administratorAccess")}
                     </p>
                   </div>
                 </DropdownMenuLabel>
@@ -166,7 +172,7 @@ export function Header() {
 
                 {/* 🚨 COLUNAS DE DATA (ITEM DIRETO) */}
                 <DropdownMenuLabel className="px-2 pt-2 pb-1 text-xs font-semibold text-muted-foreground">
-                  COLUNAS DE DATA
+                  {t("header.dateColumns")}
                 </DropdownMenuLabel>
                 <DropdownMenuRadioGroup
                   value={selectedDateConfig}
@@ -188,7 +194,7 @@ export function Header() {
 
                 {/* 🚨 TIMEZONE (ITEM DIRETO) */}
                 <DropdownMenuLabel className="px-2 pt-2 pb-1 text-xs font-semibold text-muted-foreground">
-                  FUSO HORÁRIO
+                  {t("header.timezone")}
                 </DropdownMenuLabel>
                 <DropdownMenuRadioGroup
                   value={selectedTimezone.value}
@@ -216,7 +222,7 @@ export function Header() {
                   className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
-                  <span>Sair</span>
+                  <span>{t("navigation.logout")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

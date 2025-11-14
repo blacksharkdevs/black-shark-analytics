@@ -69,11 +69,6 @@ export async function fetchAffiliatePerformance(
     action_type_param: actionTypeParam,
   };
 
-  console.log(
-    "🔍 Service: Chamando RPC 'get_affiliate_performance'",
-    rpcParams
-  );
-
   // 2. Chama o RPC
   const { data, error } = await supabase.rpc(
     "get_affiliate_performance",
