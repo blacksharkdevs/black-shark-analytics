@@ -74,7 +74,7 @@ function ItemsPageContent() {
 
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
-      <div className="p-4 rounded-lg shadow bg-card/50">
+      <div className="p-4 rounded-lg shadow bg-card/50 border-[1px] border-white/30">
         <FilterControls
           products={availableProducts}
           selectedProduct={selectedProduct}

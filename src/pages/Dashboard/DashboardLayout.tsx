@@ -30,7 +30,7 @@ function DashboardLayoutContent() {
         }}
       >
         <Header />
-        <main className="flex-1 p-4 overflow-y-auto md:p-8">
+        <main className="flex-1 overflow-y-auto">
           {isLoadingData ? (
             <LoadingScreen backgroundTransparent={true} />
           ) : (

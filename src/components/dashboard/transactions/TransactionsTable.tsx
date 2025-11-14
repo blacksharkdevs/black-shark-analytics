@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Search } from "lucide-react";
+import { ArrowDown, ArrowUp, CircleDollarSign, Search } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -238,9 +238,9 @@ export function TransactionsTable() {
     !isLoadingTotal && paginatedTransactions.length === 0;
 
   return (
-    <div className="container p-0 mx-auto space-y-6">
+    <div className="container p-6 mx-auto space-y-6 md:p-8">
       {/* --- 1. Filtros e Busca --- */}
-      <div className="p-4 border-[1px] border-white/30 rounded-none shadow">
+      <div className="p-4 border-[1px] border-white/30 bg-card/50 rounded-none shadow">
         <FilterControls
           products={availableProducts}
           selectedProduct={selectedProduct}
@@ -259,7 +259,10 @@ export function TransactionsTable() {
       {/* --- 2. Tabela de Transações --- */}
       <Card className="border-[1px] border-white/30 rounded-none shadow-lg ">
         <CardHeader>
-          <CardTitle className="text-foreground">All Transactions</CardTitle>
+          <div className="flex items-center space-x-2">
+            <CircleDollarSign className="w-6 h-6 text-primary" />
+            <CardTitle className="text-foreground">All Transactions</CardTitle>
+          </div>
           <CardDescription>
             Browse, search, and filter through all sales records (Dates in UTC).
           </CardDescription>

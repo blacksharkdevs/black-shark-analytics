@@ -24,8 +24,8 @@ function DashboardPageContent() {
   const isCombinedLoading = isFetchingProducts || isDateRangeLoading;
 
   return (
-    <div className="container p-0 mx-auto space-y-6">
-      <div className="p-4 border rounded-none shadow bg-card/50 border-border">
+    <div className="container p-4 mx-auto space-y-6 md:p-8">
+      <div className="p-4 rounded-none shadow bg-card/50 border-[1px] border-white/30">
         <Filters
           products={availableProducts}
           selectedProduct={selectedProduct}

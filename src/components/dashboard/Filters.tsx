@@ -106,7 +106,7 @@ export function Filters({
   return (
     <div
       className={cn(
-        "grid grid-cols-1 gap-4 mb-6",
+        "grid grid-cols-1 gap-4",
         !hasSearchFilter && !hasPlatformFilter && "md:grid-cols-2",
         (hasSearchFilter || hasPlatformFilter) &&
           !(hasSearchFilter && hasPlatformFilter) &&

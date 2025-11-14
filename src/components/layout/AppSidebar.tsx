@@ -1,13 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import {
-  ListOrdered,
   Users,
   Package,
   Link as LinkIcon,
   LayoutDashboard,
   ChevronLeft,
   ChevronRight,
-  ChartArea,
+  List,
+  CircleDollarSign,
 } from "lucide-react";
 import {
   SidebarHeader,
@@ -31,9 +31,13 @@ const menuItems = [
     icon: LayoutDashboard,
     isRoot: true,
   },
-  { href: "/dashboard/transactions", label: "Transactions", icon: ListOrdered },
+  {
+    href: "/dashboard/transactions",
+    label: "Transactions",
+    icon: CircleDollarSign,
+  },
   { href: "/dashboard/affiliates", label: "Affiliates", icon: Users },
-  { href: "/dashboard/reports", label: "Reports", icon: ChartArea },
+  { href: "/dashboard/reports/items", label: "Reports", icon: List },
 ];
 
 // const reportsMenuItems = [
