@@ -1,19 +1,17 @@
 import { Link, useLocation } from "react-router-dom";
 import {
   Users,
-  Package,
-  Link as LinkIcon,
   LayoutDashboard,
   ChevronLeft,
   ChevronRight,
   List,
   CircleDollarSign,
+  Settings,
 } from "lucide-react";
 import {
   SidebarHeader,
   SidebarContent,
   SidebarMenu,
-  SidebarSeparator,
 } from "@/components/common/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { SidebarLinkItem } from "./SidebarLinkItem";
@@ -37,33 +35,11 @@ const menuItems = [
     icon: CircleDollarSign,
   },
   { href: "/dashboard/affiliates", label: "Affiliates", icon: Users },
-  { href: "/dashboard/reports/items", label: "Reports", icon: List },
-];
-
-// const reportsMenuItems = [
-//   { href: "/dashboard/reports/items", label: "Items Report", icon: List },
-//   {
-//     href: "/dashboard/reports/daily-units",
-//     label: "Daily Units Report",
-//     icon: BarChartHorizontal,
-//   },
-//   {
-//     href: "/dashboard/reports/main-product-inspector",
-//     label: "Product Inspector",
-//     icon: AreaChart,
-//   },
-// ];
-
-const configMenuItems = [
+  { href: "/dashboard/reports", label: "Reports", icon: List },
   {
-    href: "/dashboard/configurations/sku-mapping",
-    label: "SKU Mapping",
-    icon: LinkIcon,
-  },
-  {
-    href: "/dashboard/configurations/main-products",
-    label: "Main Products",
-    icon: Package,
+    href: "/dashboard/configurations",
+    label: "Configurations",
+    icon: Settings,
   },
 ];
 
@@ -135,14 +111,6 @@ export function AppSidebar({ width }: { width: string }) {
       <SidebarContent className="flex flex-col flex-1 px-3 py-4">
         <SidebarMenu className="flex-1 gap-2">
           {menuItems.map((item) => (
-            <SidebarLinkItem key={item.href} item={item} isActive={isActive} />
-          ))}
-          {/* <SidebarSeparator />
-          {reportsMenuItems.map((item) => (
-            <SidebarLinkItem key={item.href} item={item} isActive={isActive} />
-          ))} */}
-          <SidebarSeparator />
-          {configMenuItems.map((item) => (
             <SidebarLinkItem key={item.href} item={item} isActive={isActive} />
           ))}
         </SidebarMenu>
