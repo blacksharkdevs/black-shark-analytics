@@ -4,12 +4,10 @@ import {
   Users,
   Package,
   Link as LinkIcon,
-  AreaChart,
-  List,
-  BarChartHorizontal,
   LayoutDashboard,
   ChevronLeft,
   ChevronRight,
+  ChartArea,
 } from "lucide-react";
 import {
   SidebarHeader,
@@ -33,23 +31,24 @@ const menuItems = [
     icon: LayoutDashboard,
     isRoot: true,
   },
-  { href: "/dashboard/transactions", label: "Transactions", icon: ListOrdered }, // 🚨 ROTA ADICIONADA
+  { href: "/dashboard/transactions", label: "Transactions", icon: ListOrdered },
   { href: "/dashboard/affiliates", label: "Affiliates", icon: Users },
+  { href: "/dashboard/reports", label: "Reports", icon: ChartArea },
 ];
 
-const reportsMenuItems = [
-  { href: "/dashboard/reports/items", label: "Items Report", icon: List },
-  {
-    href: "/dashboard/reports/daily-units",
-    label: "Daily Units Report",
-    icon: BarChartHorizontal,
-  },
-  {
-    href: "/dashboard/reports/main-product-inspector",
-    label: "Product Inspector",
-    icon: AreaChart,
-  },
-];
+// const reportsMenuItems = [
+//   { href: "/dashboard/reports/items", label: "Items Report", icon: List },
+//   {
+//     href: "/dashboard/reports/daily-units",
+//     label: "Daily Units Report",
+//     icon: BarChartHorizontal,
+//   },
+//   {
+//     href: "/dashboard/reports/main-product-inspector",
+//     label: "Product Inspector",
+//     icon: AreaChart,
+//   },
+// ];
 
 const configMenuItems = [
   {
@@ -134,10 +133,10 @@ export function AppSidebar({ width }: { width: string }) {
           {menuItems.map((item) => (
             <SidebarLinkItem key={item.href} item={item} isActive={isActive} />
           ))}
-          <SidebarSeparator />
+          {/* <SidebarSeparator />
           {reportsMenuItems.map((item) => (
             <SidebarLinkItem key={item.href} item={item} isActive={isActive} />
-          ))}
+          ))} */}
           <SidebarSeparator />
           {configMenuItems.map((item) => (
             <SidebarLinkItem key={item.href} item={item} isActive={isActive} />

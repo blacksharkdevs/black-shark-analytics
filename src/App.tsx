@@ -12,6 +12,7 @@ import TransactionDetailPage from "./pages/Dashboard/Transactions/TransactionDet
 import CustomersDetailPage from "./pages/Dashboard/Customers/CustomersDetailPage";
 import AffiliatesPage from "./pages/Dashboard/Affiliates/AffiliatesPage";
 import AffiliateDetailPage from "./pages/Dashboard/Affiliates/AffiliateDetailPage";
+import ReportsPage from "./pages/Dashboard/Reports/ReportsPage";
 
 function RootProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -44,8 +45,11 @@ export default function App() {
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="transactions/:id" element={<TransactionDetailPage />} />
           <Route path="customers/:email" element={<CustomersDetailPage />} />
+
           <Route path="affiliates" element={<AffiliatesPage />} />
           <Route path="affiliates/:name" element={<AffiliateDetailPage />} />
+
+          <Route path="reports" element={<ReportsPage />} />
         </Route>
 
         <Route path="*" element={<div>404 | Página Não Encontrada</div>} />

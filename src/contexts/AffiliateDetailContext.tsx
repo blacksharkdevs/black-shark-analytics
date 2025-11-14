@@ -20,7 +20,6 @@ export function AffiliateDetailProvider({
   children,
   affiliateName,
 }: AffiliateDetailProviderProps) {
-  // CONSUMO DE CONTEXTO EXTERNO
   const {
     currentDateRange,
     getCurrentDateDbColumn,

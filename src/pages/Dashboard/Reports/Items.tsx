@@ -35,7 +35,7 @@ import {
 } from "@/lib/reportFilters";
 import { ItemsReportProvider } from "@/contexts/ReportsContext";
 
-function ReportsPageContent() {
+function ItemsPageContent() {
   const {
     paginatedData,
     isLoadingData,
@@ -291,10 +291,10 @@ function ReportsPageContent() {
   );
 }
 
-export default function ReportsPage() {
+export default function ItemsPage() {
   return (
     <ItemsReportProvider>
-      <ReportsPageContent />
+      <ItemsPageContent />
     </ItemsReportProvider>
   );
 }
