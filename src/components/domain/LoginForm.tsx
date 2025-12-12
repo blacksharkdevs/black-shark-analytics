@@ -28,7 +28,10 @@ import { LoadingScreen } from "../common/LoadingScreen";
 import { useThemeToggle } from "@/hooks/useThemeToggle";
 
 const loginSchema = z.object({
-  username: z.string().min(1, { message: "O nome de usuário é obrigatório" }),
+  email: z
+    .string()
+    .min(1, { message: "O email é obrigatório" })
+    .email({ message: "Email inválido" }),
   password: z.string().min(1, { message: "A senha é obrigatória" }),
 });
 
@@ -62,7 +65,7 @@ export function LoginForm() {
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { username: "", password: "" },
+    defaultValues: { email: "", password: "" },
   });
 
   useEffect(() => {
@@ -70,7 +73,7 @@ export function LoginForm() {
   }, [controls]);
 
   const onSubmit = async (data: LoginFormValues) => {
-    const success = await login(data.username, data.password);
+    const success = await login(data.email, data.password);
 
     if (success) {
       setIsLoginSuccess(true);
@@ -79,7 +82,7 @@ export function LoginForm() {
 
       toast({
         title: "Falha no Login",
-        description: "Nome de usuário ou senha inválidos.",
+        description: "Email ou senha inválidos.",
         variant: "destructive",
       });
     }
@@ -124,21 +127,21 @@ export function LoginForm() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2">
             {/* 🚨 TEXTO: text-foreground */}
-            <Label htmlFor="username" className="text-white">
-              Username
+            <Label htmlFor="email" className="text-white">
+              Email
             </Label>
             <Input
-              id="username"
-              type="text"
-              placeholder="blackshark"
-              {...form.register("username")}
+              id="email"
+              type="email"
+              placeholder="admin@blackshark.com"
+              {...form.register("email")}
               disabled={isLoading}
               className="border rounded-none border-border text-foreground focus:ring-accent"
-              aria-invalid={form.formState.errors.username ? "true" : "false"}
+              aria-invalid={form.formState.errors.email ? "true" : "false"}
             />
-            {form.formState.errors.username && (
+            {form.formState.errors.email && (
               <p className="text-sm text-destructive">
-                {form.formState.errors.username.message}
+                {form.formState.errors.email.message}
               </p>
             )}
           </div>
@@ -195,7 +198,7 @@ export function LoginForm() {
           </Button>
         </form>
         <p className="mt-4 text-sm text-center text-blue-600/70">
-          Tip: Use the `blackshark` user or your DB migration credentials.
+          Tip: Use admin@blackshark.com / admin123 for testing.
         </p>
       </CardContent>
     </AnimatedCard>
