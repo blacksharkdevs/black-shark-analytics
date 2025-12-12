@@ -107,8 +107,8 @@ export function SalesTrendChart() {
       }));
 
       data.forEach((record) => {
-        // Usar occurredAt ao invés de transaction_date
-        const transactionDateObject = parseISO(record.occurredAt);
+        // Usar createdAt para filtrar por data de criação no sistema
+        const transactionDateObject = parseISO(record.createdAt);
         const hourInUTC = transactionDateObject.getUTCHours();
 
         const targetHourEntry = hourlyData.find(
@@ -129,8 +129,8 @@ export function SalesTrendChart() {
     } else {
       // --- VISUALIZAÇÃO DIÁRIA (Multi Day) ---
       aggregatedData = data.reduce((acc, record) => {
-        // Usar occurredAt ao invés de transaction_date
-        const transactionDateObject = parseISO(record.occurredAt);
+        // Usar createdAt para filtrar por data de criação no sistema
+        const transactionDateObject = parseISO(record.createdAt);
         const dateKey = dateFnsFormat(transactionDateObject, "yyyy-MM-dd");
 
         if (!acc[dateKey]) {

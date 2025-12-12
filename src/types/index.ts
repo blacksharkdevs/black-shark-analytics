@@ -144,4 +144,4 @@ export interface Transaction {
 export type SaleRecord = Transaction;
 
 // Tipo para ordenação de colunas
-export type SortColumn = keyof Transaction | "calc_charged_day" | "net_sales";
+export type SortColumn = keyof Transaction | "net_sales";

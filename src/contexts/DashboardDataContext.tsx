@@ -223,11 +223,14 @@ interface DashboardDataContextType {
   filteredSalesData: Transaction[];
   availableProducts: Array<{ id: string; name: string }>;
   availableOfferTypes: Array<{ id: string; name: string }>;
+  availablePlatforms: Array<{ id: string; name: string }>;
   availableAffiliates: Array<{ id: string; name: string }>;
   selectedProduct: string;
   setSelectedProduct: (productId: string) => void;
   selectedOfferType: string;
   setSelectedOfferType: (offerType: string) => void;
+  selectedPlatform: string;
+  setSelectedPlatform: (platform: string) => void;
   stats: DashboardStats;
   isLoadingData: boolean;
 }
@@ -254,6 +257,7 @@ export function DashboardDataProvider({
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<string>("all");
   const [selectedOfferType, setSelectedOfferType] = useState<string>("all");
+  const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
   const [isLoadingData, setIsLoadingData] = useState(true);
 
   const fetchAllTransactions = useCallback(async () => {
@@ -297,10 +301,7 @@ export function DashboardDataProvider({
 
     allTransactions.forEach((transaction) => {
       if (transaction.product && transaction.productId) {
-        productsMap.set(transaction.productId, {
-          id: transaction.productId,
-          name: transaction.product.name,
-        });
+        productsMap.set(transaction.productId, { ...transaction.product });
       }
     });
 
@@ -363,19 +364,49 @@ export function DashboardDataProvider({
     return affiliates;
   }, [allTransactions]);
 
+  // Lista dinâmica de Plataformas baseada nas transações
+  const availablePlatforms = useMemo(() => {
+    const platformsSet = new Set<string>();
+
+    allTransactions.forEach((transaction) => {
+      if (transaction.platform) {
+        platformsSet.add(transaction.platform);
+      }
+    });
+
+    const platforms = [
+      { id: "all", name: "All Platforms" },
+      ...Array.from(platformsSet)
+        .sort()
+        .map((platform) => ({
+          id: platform,
+          name: platform,
+        })),
+    ];
+
+    return platforms;
+  }, [allTransactions]);
+
   const filteredSalesData = useMemo(() => {
     let filtered = allTransactions;
 
+    // Filtro por produto
     if (selectedProduct !== "all") {
       filtered = filtered.filter((t) => t.productId === selectedProduct);
     }
 
+    // Filtro por OfferType (FRONTEND, UPSELL, DOWNSELL, ORDER_BUMP)
     if (selectedOfferType !== "all") {
       filtered = filtered.filter((t) => t.offerType === selectedOfferType);
     }
 
+    // Filtro por Platform (BUYGOODS, CLICKBANK, CARTPANDA, DIGISTORE)
+    if (selectedPlatform !== "all") {
+      filtered = filtered.filter((t) => t.platform === selectedPlatform);
+    }
+
     return filtered;
-  }, [allTransactions, selectedProduct, selectedOfferType]);
+  }, [allTransactions, selectedProduct, selectedOfferType, selectedPlatform]);
 
   const stats = useMemo(() => {
     return calculateDashboardStats(filteredSalesData);
@@ -385,11 +416,14 @@ export function DashboardDataProvider({
     filteredSalesData,
     availableProducts,
     availableOfferTypes,
+    availablePlatforms,
     availableAffiliates,
     selectedProduct,
     setSelectedProduct,
     selectedOfferType,
     setSelectedOfferType,
+    selectedPlatform,
+    setSelectedPlatform,
     stats,
     isLoadingData,
   };

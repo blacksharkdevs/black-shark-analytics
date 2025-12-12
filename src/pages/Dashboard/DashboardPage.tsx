@@ -11,10 +11,13 @@ export default function DashboardPage() {
   const {
     availableProducts,
     availableOfferTypes,
+    availablePlatforms,
     selectedProduct,
     setSelectedProduct,
     selectedOfferType,
     setSelectedOfferType,
+    selectedPlatform,
+    setSelectedPlatform,
     isLoadingData,
   } = useDashboardData();
 
@@ -29,9 +32,12 @@ export default function DashboardPage() {
           products={availableProducts}
           selectedProduct={selectedProduct}
           onProductChange={setSelectedProduct}
-          actionTypes={availableOfferTypes}
-          selectedActionType={selectedOfferType}
-          onActionTypeChange={setSelectedOfferType}
+          offerTypes={availableOfferTypes}
+          selectedOfferType={selectedOfferType}
+          onOfferTypeChange={setSelectedOfferType}
+          platforms={availablePlatforms}
+          selectedPlatform={selectedPlatform}
+          onPlatformChange={setSelectedPlatform}
           isLoading={isCombinedLoading}
         />
       </div>

@@ -58,14 +58,21 @@
   },
   "filters": {
     "product": "Produto",
-    "actionType": "Tipo de Ação",
+    "offerType": "Tipo de Oferta",
     "platform": "Plataforma",
     "allProducts": "Todos os Produtos",
-    "allActionTypes": "Todos os Tipos de Ação",
+    "allOfferTypes": "Todos os Tipos de Oferta",
     "allPlatforms": "Todas as Plataformas",
     "dateRange": "Período",
     "status": "Status",
     "searchPlaceholder": "Buscar..."
+  },
+  "offerTypes": {
+    "all": "Todos os Tipos",
+    "FRONTEND": "Frontend",
+    "UPSELL": "Upsell",
+    "DOWNSELL": "Downsell",
+    "ORDER_BUMP": "Order Bump"
   },
   "dateRange": {
     "today": "Hoje",

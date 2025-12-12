@@ -14,6 +14,13 @@ export const STATIC_PRODUCTS_FALLBACK: Product[] = [
   { id: "prod_beta", name: "Product Beta" },
 ];
 
+// Tipos de ação baseados na nova estrutura Transaction
+// all: todos os registros
+// all_incomes: type: "SALE" (todas as vendas)
+// front_sale: type: "SALE" AND offerType: "FRONTEND"
+// back_sale: type: "SALE" AND offerType IN ("UPSELL", "DOWNSELL", "ORDER_BUMP")
+// rebill: type: "REBILL"
+// all_refunds: type IN ("REFUND", "CHARGEBACK")
 export const ACTION_TYPES: ActionType[] = [
   { id: "all", name: "All Actions" },
   { id: "all_incomes", name: "All Incomes" },
@@ -29,14 +36,12 @@ export const AFFILIATE_ACTION_TYPES: ActionType[] = [
   { id: "back_sale", name: "Back Sale" },
 ];
 
-export const ITEM_TYPE_OPTIONS = [
-  { id: "front", name: "Front" },
-  { id: "up1", name: "Up1" },
-  { id: "up2", name: "Up2" },
-  { id: "up3", name: "Up3" },
-  { id: "dw1", name: "Dw1" },
-  { id: "dw2", name: "Dw2" },
-  { id: "dw3", name: "Dw3" },
+// Tipos de oferta baseados no enum OfferType
+export const OFFER_TYPE_OPTIONS = [
+  { id: "FRONTEND", name: "Frontend" },
+  { id: "UPSELL", name: "Upsell" },
+  { id: "DOWNSELL", name: "Downsell" },
+  { id: "ORDER_BUMP", name: "Order Bump" },
 ];
 
 export const DATE_RANGE_OPTIONS = [
@@ -69,10 +74,9 @@ export const TIMEZONE_OPTIONS: TimezoneOption[] = [
 export interface DateConfigOption {
   id: string;
   name: string;
-  db_column: "transaction_date" | "calc_charged_day";
+  db_column: "createdAt";
 }
 
 export const DATE_CONFIG_OPTIONS: DateConfigOption[] = [
-  { id: "default_date", name: "Default Date", db_column: "transaction_date" },
-  { id: "platform_date", name: "Platform Date", db_column: "calc_charged_day" },
+  { id: "default_date", name: "Default Date", db_column: "createdAt" },
 ];

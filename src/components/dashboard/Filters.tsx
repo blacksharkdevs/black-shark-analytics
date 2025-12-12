@@ -1,38 +1,39 @@
-import type {
-  Product as ProductConfig,
-  ActionType as ActionTypeConfig,
-} from "@/lib/timezone_date";
-import { Network } from "lucide-react";
+import type { Product as ProductConfig } from "@/lib/timezone_date";
 import { cn } from "@/lib/utils";
-import { useTranslation } from "react-i18next";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/common/ui/select";
 
-// 🚨 Componentes recém-criados
+// 🚨 Componentes de Filtro
 import { ProductFilter } from "./ProductFilter";
-import { ActionTypeFilter } from "./ActionTypeFilter";
+import { OfferTypeFilter } from "./OfferTypeFilter";
+import { PlatformFilter } from "./PlatformFilter";
 import { SearchFilter } from "./SearchFilter";
 import { FiltersSkeleton } from "./FiltersSkeleton";
+
+interface OfferTypeConfig {
+  id: string;
+  name: string;
+}
+
+interface PlatformConfig {
+  id: string;
+  name: string;
+}
 
 interface FiltersProps {
   products: ProductConfig[];
   selectedProduct: string;
   onProductChange: (productId: string) => void;
-  actionTypes: ActionTypeConfig[];
-  selectedActionType: string;
-  onActionTypeChange: (actionTypeId: string) => void;
-  isLoading?: boolean;
 
-  // Filtro de Plataforma Opcional
-  platforms?: string[];
-  selectedPlatform?: string;
-  onPlatformChange?: (platform: string) => void;
-  isPlatformLoading?: boolean;
+  // Filtro de Tipo de Oferta
+  offerTypes: OfferTypeConfig[];
+  selectedOfferType: string;
+  onOfferTypeChange: (offerTypeId: string) => void;
+
+  // Filtro de Plataforma
+  platforms: PlatformConfig[];
+  selectedPlatform: string;
+  onPlatformChange: (platformId: string) => void;
+
+  isLoading?: boolean;
 
   // Filtro de Busca Opcional
   searchPlaceholder?: string;
@@ -44,76 +45,34 @@ export function Filters({
   products,
   selectedProduct,
   onProductChange,
-  actionTypes,
-  selectedActionType,
-  onActionTypeChange,
-  isLoading = false,
+  offerTypes,
+  selectedOfferType,
+  onOfferTypeChange,
   platforms,
   selectedPlatform,
   onPlatformChange,
-  isPlatformLoading = false,
+  isLoading = false,
   searchPlaceholder,
   onSearchChange,
   searchDefaultValue,
 }: FiltersProps) {
-  const { t } = useTranslation();
-  const hasPlatformFilter =
-    platforms !== undefined &&
-    onPlatformChange !== undefined &&
-    selectedPlatform !== undefined;
-
   const hasSearchFilter = onSearchChange !== undefined;
 
-  const isTotalLoading = isLoading || isPlatformLoading;
-
-  if (isTotalLoading) {
+  if (isLoading) {
     return (
       <FiltersSkeleton
-        hasPlatformFilter={hasPlatformFilter}
+        hasPlatformFilter={true}
         hasSearchFilter={hasSearchFilter}
       />
     );
   }
 
-  // 🚨 Plataforma Filter (Renderizado inline para simplicidade)
-  const PlatformFilter = hasPlatformFilter && platforms && (
-    <div className="flex items-center gap-2">
-      <Network className="hidden w-5 h-5 text-blue-600 dark:text-white sm:block" />
-      <Select
-        value={selectedPlatform!}
-        onValueChange={onPlatformChange!}
-        disabled={platforms.length === 0}
-      >
-        <SelectTrigger className="w-full transition-colors border rounded-none bg-card hover:bg-accent/20 border-input text-foreground">
-          <SelectValue placeholder={t("filters.platform")} />
-        </SelectTrigger>
-        <SelectContent className="border rounded-none bg-card border-border">
-          <SelectItem value="all" className="rounded-none text-foreground">
-            {t("filters.allPlatforms")}
-          </SelectItem>
-          {platforms.map((platform) => (
-            <SelectItem
-              key={platform}
-              value={platform}
-              className="rounded-none text-foreground"
-            >
-              {platform}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  );
-
   return (
     <div
       className={cn(
         "grid grid-cols-1 gap-4",
-        !hasSearchFilter && !hasPlatformFilter && "md:grid-cols-2",
-        (hasSearchFilter || hasPlatformFilter) &&
-          !(hasSearchFilter && hasPlatformFilter) &&
-          "md:grid-cols-2 lg:grid-cols-3",
-        hasSearchFilter && hasPlatformFilter && "md:grid-cols-2 lg:grid-cols-4"
+        !hasSearchFilter && "md:grid-cols-2 lg:grid-cols-3",
+        hasSearchFilter && "md:grid-cols-2 lg:grid-cols-4"
       )}
     >
       {/* Filtro 0: Busca (Condicional) */}
@@ -132,15 +91,19 @@ export function Filters({
         onProductChange={onProductChange}
       />
 
-      {/* Filtro 2: Tipos de Ação */}
-      <ActionTypeFilter
-        actionTypes={actionTypes}
-        selectedActionType={selectedActionType}
-        onActionTypeChange={onActionTypeChange}
+      {/* Filtro 2: Tipo de Oferta (OfferType) */}
+      <OfferTypeFilter
+        offerTypes={offerTypes}
+        selectedOfferType={selectedOfferType}
+        onOfferTypeChange={onOfferTypeChange}
       />
 
-      {/* Filtro 3: Plataforma (Condicional) */}
-      {PlatformFilter}
+      {/* Filtro 3: Plataforma */}
+      <PlatformFilter
+        platforms={platforms}
+        selectedPlatform={selectedPlatform}
+        onPlatformChange={onPlatformChange}
+      />
     </div>
   );
 }

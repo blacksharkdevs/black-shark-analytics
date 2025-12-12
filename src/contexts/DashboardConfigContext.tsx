@@ -48,21 +48,16 @@ interface DashboardConfigContextType {
 // CONSTANTES
 // ===================================================================
 
-const DEFAULT_DATE_COLUMN_ID = "transaction_date";
+const DEFAULT_DATE_COLUMN_ID = "createdAt";
 const DEFAULT_DATE_RANGE_ID = "last_7_days";
 const DEFAULT_LANGUAGE = "pt-BR";
 const CONFIG_LOCAL_STORAGE_KEY = "blackshark_dashboard_config";
 
 const DATE_CONFIG_OPTIONS: DateConfigOption[] = [
   {
-    id: "transaction_date",
+    id: "createdAt",
     name: "Data da Transação",
-    db_column: "transaction_date",
-  },
-  {
-    id: "calc_charged_day",
-    name: "Dia do Cobrança",
-    db_column: "calc_charged_day",
+    db_column: "createdAt",
   },
 ];
 
@@ -111,16 +106,11 @@ function saveConfigToStorage(config: DashboardConfig): void {
 /**
  * Retorna a coluna do banco de dados baseada no ID da configuração.
  */
-function getDateDbColumn(
-  selectedDateConfigId: string
-): "transaction_date" | "calc_charged_day" {
+function getDateDbColumn(selectedDateConfigId: string): "createdAt" {
   const currentConfig = DATE_CONFIG_OPTIONS.find(
     (opt) => opt.id === selectedDateConfigId
   );
-  return (
-    (currentConfig?.db_column as "transaction_date" | "calc_charged_day") ||
-    "transaction_date"
-  );
+  return (currentConfig?.db_column as "createdAt") || "createdAt";
 }
 
 /**
