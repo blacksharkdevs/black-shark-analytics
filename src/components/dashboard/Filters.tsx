@@ -1,7 +1,7 @@
 import type {
   Product as ProductConfig,
   ActionType as ActionTypeConfig,
-} from "@/lib/config";
+} from "@/lib/timezone_date";
 import { Network } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";

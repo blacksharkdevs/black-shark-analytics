@@ -19,10 +19,9 @@ import {
 } from "@/components/common/ui/card";
 import { Package } from "lucide-react";
 import { Skeleton } from "@/components/common/ui/skeleton";
-
-import { useDashboardData } from "@/hooks/useDashboardData";
-import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 import { formatCurrency } from "@/utils/index";
+import { useDashboardData } from "@/contexts/DashboardDataContext";
+import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 
 interface ProductRevenue {
   productName: string;

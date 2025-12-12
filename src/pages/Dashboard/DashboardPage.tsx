@@ -1,14 +1,13 @@
 import { Filters } from "@/components/dashboard/Filters";
-import { useDashboardData } from "@/hooks/useDashboardData";
-import { useDashboardConfig } from "@/hooks/useDashboardConfig";
-import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
 import { StatsCards } from "@/components/dashboard/StatsCards";
-import { SalesTrendChart } from "@/components/dashboard/SalesTrendChart";
-import { TopAffiliatesTable } from "@/components/dashboard/TopAffiliatesTable";
-import { TopSellingItemsTable } from "@/components/dashboard/TopSellingItemsTable";
-import { TopProductsTable } from "@/components/dashboard/TopProductsTable";
+import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
+import { useDashboardData } from "@/contexts/DashboardDataContext";
+// import { SalesTrendChart } from "@/components/dashboard/SalesTrendChart";
+// import { TopAffiliatesTable } from "@/components/dashboard/TopAffiliatesTable";
+// import { TopSellingItemsTable } from "@/components/dashboard/TopSellingItemsTable";
+// import { TopProductsTable } from "@/components/dashboard/TopProductsTable";
 
-function DashboardPageContent() {
+export default function DashboardPage() {
   const {
     availableProducts,
     availableOfferTypes,
@@ -41,7 +40,7 @@ function DashboardPageContent() {
         <StatsCards />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      {/* <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-3">
           <SalesTrendChart />
         </div>
@@ -57,15 +56,7 @@ function DashboardPageContent() {
         <div className="lg:col-span-1">
           <TopProductsTable />
         </div>
-      </div>
+      </div> */}
     </div>
-  );
-}
-
-export default function DashboardPage() {
-  return (
-    <DashboardDataProvider>
-      <DashboardPageContent />
-    </DashboardDataProvider>
   );
 }

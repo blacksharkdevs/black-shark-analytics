@@ -7,7 +7,7 @@ import {
 } from "@/components/common/ui/select";
 import { Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { Product as ProductConfig } from "@/lib/config";
+import type { Product as ProductConfig } from "@/lib/timezone_date";
 
 interface ProductFilterProps {
   products: ProductConfig[];

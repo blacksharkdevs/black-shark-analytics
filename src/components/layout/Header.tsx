@@ -3,9 +3,8 @@ import { useLocation } from "react-router-dom";
 import { Sun, Moon, Globe, CalendarCog, LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useSidebar } from "@/hooks/useSidebar";
-import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 import { useThemeToggle } from "@/hooks/useThemeToggle";
 
 import { Button } from "@/components/common/ui/button";
@@ -28,8 +27,9 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/common/ui/dropdown-menu"; // 🚨 Sub-components removidos dos imports
 
-import { DATE_CONFIG_OPTIONS, TIMEZONE_OPTIONS } from "@/lib/config";
+import { DATE_CONFIG_OPTIONS, TIMEZONE_OPTIONS } from "@/lib/timezone_date";
 import { SharkSwim } from "../common/SharkSwin";
+import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 
 const DEFAULT_TIMEZONE =
   TIMEZONE_OPTIONS.find((tz) => !tz.disabled) || TIMEZONE_OPTIONS[0];

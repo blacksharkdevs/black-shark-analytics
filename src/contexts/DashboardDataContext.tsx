@@ -1,10 +1,244 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useDashboardConfig } from "@/hooks/useDashboardConfig";
-import { DashboardDataContext } from "./DashboardDataContextDefinition";
-import type { Transaction } from "@/types/index";
+/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  createContext,
+  useContext,
+} from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { useDashboardConfig } from "./DashboardConfigContext";
 
-import { fetchSalesDataForDashboard } from "@/services/dashboardService";
-import { calculateDashboardStats } from "@/lib/dashboardCalculations";
+// ===================================================================
+// TIPOS INTERNOS
+// ===================================================================
+
+type Decimal = number | string;
+type ISODate = string;
+
+type Platform = "BUYGOODS" | "CLICKBANK" | "CARTPANDA" | "DIGISTORE";
+type TransactionType = "SALE" | "REFUND" | "CHARGEBACK" | "REBILL";
+type OfferType = "FRONTEND" | "UPSELL" | "DOWNSELL" | "ORDER_BUMP";
+type TransactionStatus =
+  | "COMPLETED"
+  | "PENDING"
+  | "FAILED"
+  | "REFUNDED"
+  | "CHARGEBACK";
+
+interface Customer {
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
+  country?: string | null;
+  state?: string | null;
+  city?: string | null;
+  zip?: string | null;
+  createdAt: ISODate;
+  updatedAt: ISODate;
+}
+
+interface Affiliate {
+  id: string;
+  externalId: string;
+  platform: Platform;
+  name?: string | null;
+  email?: string | null;
+}
+
+interface Product {
+  id: string;
+  externalId: string;
+  platform: Platform;
+  name: string;
+  family?: string | null;
+  unitCount: number;
+  cogs: Decimal;
+  createdAt: ISODate;
+}
+
+interface Transaction {
+  id: string;
+  externalId: string;
+  platform: Platform;
+  type: TransactionType;
+  offerType?: OfferType | null;
+  status: TransactionStatus;
+  occurredAt: ISODate;
+  refundedAt?: ISODate | null;
+  grossAmount: Decimal;
+  taxAmount: Decimal;
+  shippingAmount: Decimal;
+  platformFee: Decimal;
+  affiliateCommission: Decimal;
+  netAmount: Decimal;
+  currency: string;
+  customerId: string;
+  productId?: string | null;
+  affiliateId?: string | null;
+  customer?: Customer;
+  product?: Product;
+  affiliate?: Affiliate;
+  quantity: number;
+  marketingData?: Record<string, any> | null;
+  metadata?: Record<string, any> | null;
+  isTest: boolean;
+  createdAt: ISODate;
+  updatedAt: ISODate;
+}
+
+interface DashboardStats {
+  totalRevenue: number;
+  grossSales: number;
+  totalTaxes: number;
+  totalPlatformFees: number;
+  platformFeePercentage: number;
+  platformFeeFixed: number;
+  totalSalesTransactions: number;
+  frontSalesCount: number;
+  backSalesCount: number;
+  averageOrderValue: number;
+}
+
+interface DateRange {
+  from: Date;
+  to: Date;
+}
+
+// ===================================================================
+// FUNÇÕES AUXILIARES INTERNAS
+// ===================================================================
+
+const MAX_RECORDS_FOR_DASHBOARD_STATS = 1000;
+
+/**
+ * Busca transações do Supabase com filtros de data.
+ */
+async function fetchTransactionsFromSupabase(
+  dateRange: DateRange,
+  dateColumn: string
+): Promise<Transaction[]> {
+  if (!dateRange?.from || !dateRange?.to) {
+    return [];
+  }
+
+  try {
+    const queryFromUTC = dateRange.from.toISOString();
+    const queryToUTC = dateRange.to.toISOString();
+
+    const { data, error } = await supabase
+      .from("transactions")
+      .select(
+        `
+        *,
+        product:products(*),
+        affiliate:affiliates(*),
+        customer:customers(*)
+      `
+      )
+      .gte(dateColumn, queryFromUTC)
+      .lte(dateColumn, queryToUTC)
+      .limit(MAX_RECORDS_FOR_DASHBOARD_STATS)
+      .order(dateColumn, { ascending: false });
+
+    if (error) {
+      console.error("Erro ao buscar transações do Supabase:", error);
+      return [];
+    }
+
+    if (data && data.length === MAX_RECORDS_FOR_DASHBOARD_STATS) {
+      console.warn(
+        `Aviso: Limite de ${MAX_RECORDS_FOR_DASHBOARD_STATS} registros atingido.`
+      );
+    }
+
+    return (data as Transaction[]) || [];
+  } catch (error) {
+    console.error("Erro ao buscar dados do dashboard:", error);
+    return [];
+  }
+}
+
+/**
+ * Calcula estatísticas do dashboard a partir das transações.
+ */
+function calculateDashboardStats(salesData: Transaction[]): DashboardStats {
+  const totalRevenue = salesData.reduce(
+    (sum, record) => sum + Number(record.grossAmount),
+    0
+  );
+  const totalTaxes = salesData.reduce(
+    (sum, record) => sum + Number(record.taxAmount || 0),
+    0
+  );
+  const totalPlatformFees = salesData.reduce(
+    (sum, record) => sum + Number(record.platformFee || 0),
+    0
+  );
+
+  const platformFeePercentage = totalPlatformFees * 0.7;
+  const platformFeeFixed = totalPlatformFees * 0.3;
+
+  const grossSales = salesData.reduce(
+    (sum, record) => sum + Number(record.netAmount),
+    0
+  );
+
+  const totalSalesTransactions = salesData.filter(
+    (record) => record.type === "SALE"
+  ).length;
+  const frontSalesCount = salesData.filter(
+    (record) => record.type === "SALE" && record.offerType === "FRONTEND"
+  ).length;
+  const backSalesCount = salesData.filter(
+    (record) => record.type === "SALE" && record.offerType !== "FRONTEND"
+  ).length;
+
+  const averageOrderValue =
+    frontSalesCount > 0 ? grossSales / frontSalesCount : 0;
+
+  return {
+    totalRevenue,
+    grossSales,
+    totalTaxes,
+    platformFeePercentage,
+    platformFeeFixed,
+    totalPlatformFees,
+    totalSalesTransactions,
+    frontSalesCount,
+    backSalesCount,
+    averageOrderValue,
+  };
+}
+
+// ===================================================================
+// CONTEXT DEFINITION
+// ===================================================================
+
+interface DashboardDataContextType {
+  filteredSalesData: Transaction[];
+  availableProducts: Array<{ id: string; name: string }>;
+  availableOfferTypes: Array<{ id: string; name: string }>;
+  availableAffiliates: Array<{ id: string; name: string }>;
+  selectedProduct: string;
+  setSelectedProduct: (productId: string) => void;
+  selectedOfferType: string;
+  setSelectedOfferType: (offerType: string) => void;
+  stats: DashboardStats;
+  isLoadingData: boolean;
+}
+
+const DashboardDataContext = createContext<
+  DashboardDataContextType | undefined
+>(undefined);
+
+// ===================================================================
+// PROVIDER
+// ===================================================================
 
 export function DashboardDataProvider({
   children,
@@ -17,17 +251,11 @@ export function DashboardDataProvider({
     isLoading: isDateRangeLoading,
   } = useDashboardConfig();
 
-  // Estado de dados brutos (todas as transações sem filtro de produto/offerType)
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
-
-  // Filtros
   const [selectedProduct, setSelectedProduct] = useState<string>("all");
   const [selectedOfferType, setSelectedOfferType] = useState<string>("all");
-
-  // Loading states
   const [isLoadingData, setIsLoadingData] = useState(true);
 
-  // Buscar todas as transações (sem filtros de produto/offerType)
   const fetchAllTransactions = useCallback(async () => {
     if (
       isDateRangeLoading ||
@@ -43,13 +271,13 @@ export function DashboardDataProvider({
     setIsLoadingData(true);
 
     try {
-      // Buscar TODAS as transações do período (sem filtro de produto/offerType)
-      const transactions = await fetchSalesDataForDashboard({
+      const dateColumn = getCurrentDateDbColumn();
+      const transactions = await fetchTransactionsFromSupabase(
         currentDateRange,
-        getCurrentDateDbColumn,
-        selectedProduct: "all", // Forçar buscar todos
-        selectedActionType: "all", // Forçar buscar todos
-      });
+        dateColumn
+      );
+
+      console.log(`Fetched ${transactions.length} transactions for dashboard.`);
 
       setAllTransactions(transactions);
     } catch (error) {
@@ -62,9 +290,8 @@ export function DashboardDataProvider({
 
   useEffect(() => {
     fetchAllTransactions();
-  }, [fetchAllTransactions]); // ➡️ REFACTOR 3.1: Cálculos de métricas isolados (Usando função pura)
+  }, [fetchAllTransactions]);
 
-  // Extrair produtos únicos das transações
   const availableProducts = useMemo(() => {
     const productsMap = new Map<string, { id: string; name: string }>();
 
@@ -87,7 +314,6 @@ export function DashboardDataProvider({
     return products;
   }, [allTransactions]);
 
-  // Extrair offerTypes únicos das transações
   const availableOfferTypes = useMemo(() => {
     const offerTypesSet = new Set<string>();
 
@@ -110,7 +336,6 @@ export function DashboardDataProvider({
     return offerTypes;
   }, [allTransactions]);
 
-  // Extrair afiliados únicos das transações
   const availableAffiliates = useMemo(() => {
     const affiliatesMap = new Map<string, { id: string; name: string }>();
 
@@ -138,16 +363,13 @@ export function DashboardDataProvider({
     return affiliates;
   }, [allTransactions]);
 
-  // Aplicar filtros localmente
   const filteredSalesData = useMemo(() => {
     let filtered = allTransactions;
 
-    // Filtro de produto
     if (selectedProduct !== "all") {
       filtered = filtered.filter((t) => t.productId === selectedProduct);
     }
 
-    // Filtro de offerType
     if (selectedOfferType !== "all") {
       filtered = filtered.filter((t) => t.offerType === selectedOfferType);
     }
@@ -155,7 +377,6 @@ export function DashboardDataProvider({
     return filtered;
   }, [allTransactions, selectedProduct, selectedOfferType]);
 
-  // Calcular stats com dados filtrados
   const stats = useMemo(() => {
     return calculateDashboardStats(filteredSalesData);
   }, [filteredSalesData]);
@@ -178,4 +399,18 @@ export function DashboardDataProvider({
       {children}
     </DashboardDataContext.Provider>
   );
+}
+
+// ===================================================================
+// HOOK
+// ===================================================================
+
+export function useDashboardData() {
+  const context = useContext(DashboardDataContext);
+  if (context === undefined) {
+    throw new Error(
+      "useDashboardData must be used within a DashboardDataProvider"
+    );
+  }
+  return context;
 }

@@ -18,7 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/common/ui/card";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Eye, EyeOff } from "lucide-react"; // Usamos UserPlus para registro
 import { DotLoader } from "../common/ui/DotLoader";

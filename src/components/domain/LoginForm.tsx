@@ -18,7 +18,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/common/ui/card";
-import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, Eye, EyeOff } from "lucide-react";
 import { DotLoader } from "../common/ui/DotLoader";
@@ -26,6 +25,7 @@ import { SharkSwim } from "../common/SharkSwin";
 import { useNavigate } from "react-router-dom";
 import { LoadingScreen } from "../common/LoadingScreen";
 import { useThemeToggle } from "@/hooks/useThemeToggle";
+import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = z.object({
   email: z

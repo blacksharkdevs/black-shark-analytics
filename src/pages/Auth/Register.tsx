@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { RegisterForm } from "@/components/domain/RegisterForm";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { OceanBackground } from "@/components/layout/OceanBackground";
 import { OceanSoundPlayer } from "@/components/common/OceanSoundPlayer";
 

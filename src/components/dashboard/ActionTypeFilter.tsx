@@ -7,7 +7,7 @@ import {
 } from "@/components/common/ui/select";
 import { ListFilter } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { ActionType as ActionTypeConfig } from "@/lib/config";
+import type { ActionType as ActionTypeConfig } from "@/lib/timezone_date";
 
 interface ActionTypeFilterProps {
   actionTypes: ActionTypeConfig[];

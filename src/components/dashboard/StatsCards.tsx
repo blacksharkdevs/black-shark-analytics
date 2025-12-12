@@ -2,10 +2,9 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { StatsCard } from "./StatsCard";
 import { DollarSign, BarChart3, Users, BadgePercent } from "lucide-react";
-
-import { useDashboardData } from "@/hooks/useDashboardData";
-import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 import { formatCurrency } from "@/utils/index";
+import { useDashboardData } from "@/contexts/DashboardDataContext";
+import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 
 // Tipagem segura para as chaves (necessário para a lógica do useMemo)
 type StatKey =
@@ -21,7 +20,7 @@ export function StatsCards() {
   const isLoading = isLoadingData || isDateRangeLoading;
 
   // 🚨 Usamos o objeto stats com um cast seguro para garantir que as propriedades existam
-  const safeStats = stats as Record<string, number>;
+  const safeStats = stats as unknown as Record<string, number>;
 
   // STATS_MAP traduzido dinamicamente
   const STATS_MAP: Record<

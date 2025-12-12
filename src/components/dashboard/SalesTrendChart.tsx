@@ -24,10 +24,9 @@ import {
   ChartContainer,
   ChartTooltipContent,
 } from "@/components/common/ui/chart"; // Assumindo que este wrapper existe
-
-import { useDashboardData } from "@/hooks/useDashboardData"; // 🔑 Hook de Dados
-import { useDashboardConfig } from "@/hooks/useDashboardConfig"; // 🔑 Hook de Configuração
 import { type ChartConfig } from "@/components/common/ui/chart";
+import { useDashboardData } from "@/contexts/DashboardDataContext";
+import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 
 // --- FORMATADORES UTC ---
 // Formata o valor do YAxis (eixo vertical)

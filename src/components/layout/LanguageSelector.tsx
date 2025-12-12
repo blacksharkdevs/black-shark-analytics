@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/common/ui/dropdown-menu";
-import { useDashboardConfig } from "@/hooks/useDashboardConfig";
+import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { useTranslation } from "react-i18next";
 
 export function LanguageSelector() {

@@ -7,8 +7,7 @@
 const DEV_API_URL = "http://localhost:3000";
 
 // URL de produção
-const PROD_API_URL =
-  import.meta.env.VITE_API_URL || "https://api.blackshark.com";
+const PROD_API_URL = import.meta.env.VITE_API_URL;
 
 // Define se está em modo de desenvolvimento
 const isDevelopment = import.meta.env.VITE_ENV === "development";

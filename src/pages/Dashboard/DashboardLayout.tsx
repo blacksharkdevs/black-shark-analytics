@@ -2,14 +2,16 @@ import { Outlet } from "react-router-dom";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Header } from "@/components/layout/Header";
 import { SidebarProvider } from "@/contexts/SidebarContext";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { DashboardSkeleton } from "@/components/layout/DashboardSkeleton";
 import { useSidebar } from "@/hooks/useSidebar";
 import { DashboardConfigProvider } from "@/contexts/DashboardConfigContext";
 import { TooltipProvider } from "@/components/common/ui/tooltip";
 import { LoadingScreen } from "@/components/common/LoadingScreen";
-import { useDashboardData } from "@/hooks/useDashboardData";
-import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
+import {
+  DashboardDataProvider,
+  useDashboardData,
+} from "@/contexts/DashboardDataContext";
 
 const SIDEBAR_WIDTH = "280px";
 
