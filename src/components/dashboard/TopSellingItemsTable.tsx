@@ -42,8 +42,11 @@ export function TopSellingItemsTable() {
 
   const topItems = useMemo(() => {
     const itemStatsMap = data.reduce((acc, record) => {
-      const productName = record.product_name_from_sale || "Unknown Item";
-      const isUpsell = record.action_type === "back_sale";
+      // Filtrar apenas vendas completadas
+      if (record.type !== "SALE" || record.status !== "COMPLETED") return acc;
+
+      const productName = record.product?.name || "Unknown Item";
+      const isUpsell = record.offerType !== "FRONTEND";
       const key = `${productName}-${isUpsell}`;
 
       if (!acc[key]) {
@@ -54,8 +57,8 @@ export function TopSellingItemsTable() {
           isUpsell: isUpsell,
         } as ItemStats;
       }
-      acc[key].totalRevenue += record.revenue;
-      acc[key].totalSales += 1;
+      acc[key].totalRevenue += Number(record.grossAmount);
+      acc[key].totalSales += record.quantity;
       return acc;
     }, {} as Record<string, ItemStats>);
 

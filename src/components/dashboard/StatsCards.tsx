@@ -1,13 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { StatsCard } from "./StatsCard";
-import {
-  DollarSign,
-  BarChart3,
-  Users,
-  Package,
-  BadgePercent,
-} from "lucide-react";
+import { DollarSign, BarChart3, Users, BadgePercent } from "lucide-react";
 
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
@@ -18,7 +12,6 @@ type StatKey =
   | "gross_sales"
   | "total_sales"
   | "front_sales"
-  | "back_sales"
   | "average_order_value";
 
 export function StatsCards() {
@@ -48,10 +41,6 @@ export function StatsCards() {
       front_sales: {
         title: t("dashboard.stats.frontSales"),
         description: t("dashboard.stats.frontSalesDesc"),
-      },
-      back_sales: {
-        title: t("dashboard.stats.backSales"),
-        description: t("dashboard.stats.backSalesDesc"),
       },
       average_order_value: {
         title: t("dashboard.stats.aov"),
@@ -97,11 +86,6 @@ export function StatsCards() {
         id: "front_sales" as StatKey,
         Icon: Users,
         rawValue: safeStats.frontSalesCount,
-      },
-      {
-        id: "back_sales" as StatKey,
-        Icon: Package,
-        rawValue: safeStats.backSalesCount,
       },
       {
         id: "average_order_value" as StatKey,

@@ -39,8 +39,12 @@ export function TopAffiliatesTable() {
 
   const topAffiliates = useMemo(() => {
     const affiliateRevenueMap = data.reduce((acc, record) => {
-      if (record.revenue < 0) return acc;
-      const affName = record.aff_name || "Direct";
+      // Filtrar apenas vendas completadas
+      if (record.type !== "SALE" || record.status !== "COMPLETED") return acc;
+      if (Number(record.grossAmount) < 0) return acc;
+
+      const affName =
+        record.affiliate?.name || record.affiliate?.email || "Direct";
 
       if (!acc[affName]) {
         acc[affName] = {
@@ -48,7 +52,7 @@ export function TopAffiliatesTable() {
           totalRevenue: 0,
         } as AffiliateRevenue;
       }
-      acc[affName].totalRevenue += record.revenue;
+      acc[affName].totalRevenue += Number(record.grossAmount);
       return acc;
     }, {} as Record<string, AffiliateRevenue>);
 

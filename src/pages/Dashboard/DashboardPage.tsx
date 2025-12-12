@@ -1,7 +1,6 @@
 import { Filters } from "@/components/dashboard/Filters";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
-import { ACTION_TYPES } from "@/lib/config";
 import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { SalesTrendChart } from "@/components/dashboard/SalesTrendChart";
@@ -12,16 +11,17 @@ import { TopProductsTable } from "@/components/dashboard/TopProductsTable";
 function DashboardPageContent() {
   const {
     availableProducts,
+    availableOfferTypes,
     selectedProduct,
     setSelectedProduct,
-    selectedActionType,
-    setSelectedActionType,
-    isFetchingProducts,
+    selectedOfferType,
+    setSelectedOfferType,
+    isLoadingData,
   } = useDashboardData();
 
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
 
-  const isCombinedLoading = isFetchingProducts || isDateRangeLoading;
+  const isCombinedLoading = isLoadingData || isDateRangeLoading;
 
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
@@ -30,25 +30,30 @@ function DashboardPageContent() {
           products={availableProducts}
           selectedProduct={selectedProduct}
           onProductChange={setSelectedProduct}
-          actionTypes={ACTION_TYPES}
-          selectedActionType={selectedActionType}
-          onActionTypeChange={setSelectedActionType}
+          actionTypes={availableOfferTypes}
+          selectedActionType={selectedOfferType}
+          onActionTypeChange={setSelectedOfferType}
           isLoading={isCombinedLoading}
         />
       </div>
+
       <div className="container p-0 mx-auto space-y-6">
         <StatsCards />
       </div>
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
           <SalesTrendChart />
         </div>
+
         <div className="lg:col-span-1">
           <TopAffiliatesTable />
         </div>
-        <div className="lg:col-span-2">
+
+        <div className="lg:col-span-1">
           <TopSellingItemsTable />
         </div>
+
         <div className="lg:col-span-1">
           <TopProductsTable />
         </div>

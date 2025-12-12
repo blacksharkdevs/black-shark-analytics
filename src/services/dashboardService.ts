@@ -1,7 +1,5 @@
-import { supabase } from "@/lib/supabaseClient";
-import { transformSupabaseSaleToRecord } from "@/lib/data";
-import { applyActionTypeFilter } from "@/lib/transactionFilters";
-import { type SaleRecord } from "@/types/index"; // Assumindo que os tipos estão aqui
+import { httpClient } from "@/lib/httpClient";
+import { type Transaction } from "@/types/index";
 
 // Definição do limite máximo de registros para garantir performance do cálculo no cliente
 const MAX_RECORDS_FOR_DASHBOARD_STATS = 50000;
@@ -24,56 +22,67 @@ export interface FetchDashboardDataParams {
  * Aplica filtros de data, produto e tipo de ação, limitando o número de registros.
  *
  * @param params Os parâmetros de filtro.
- * @returns {Promise<SaleRecord[]>} Uma Promise com os dados transformados.
+ * @returns {Promise<Transaction[]>} Uma Promise com os dados transformados.
  */
 export async function fetchSalesDataForDashboard(
   params: FetchDashboardDataParams
-): Promise<SaleRecord[]> {
-  const {
-    currentDateRange,
-    getCurrentDateDbColumn,
-    selectedProduct,
-    selectedActionType,
-  } = params;
+): Promise<Transaction[]> {
+  const { currentDateRange, selectedProduct, selectedActionType } = params;
 
-  const queryFromUTC = currentDateRange.from.toISOString();
-  const queryToUTC = currentDateRange.to.toISOString();
-  const dateDbColumn = getCurrentDateDbColumn();
+  try {
+    // Construir query params
+    const queryParams = new URLSearchParams();
 
-  let query = supabase
-    .from("sales_data")
-    .select(
-      // Seleção de colunas otimizada para os cálculos do dashboard
-      "*,config_products!inner(merchant_id,product_name,platform_tax,platform_transaction_tax)"
-    )
-    .gte(dateDbColumn, queryFromUTC)
-    .lte(dateDbColumn, queryToUTC);
+    // Filtros de data
+    queryParams.append("startDate", currentDateRange.from.toISOString());
+    queryParams.append("endDate", currentDateRange.to.toISOString());
 
-  // Aplicação de filtros de Produto
-  if (selectedProduct !== "all") {
-    query = query.eq("merchant_id", selectedProduct);
-  }
+    // Filtro de produto
+    if (selectedProduct !== "all") {
+      queryParams.append("productId", selectedProduct);
+    }
 
-  // Aplicação de filtros de Ação (reutilizando a lógica do Transactions)
-  query = applyActionTypeFilter(query, selectedActionType);
+    // Filtro de tipo de ação/transação
+    if (selectedActionType !== "all") {
+      // Mapear action types legados para os novos tipos
+      const typeMapping: Record<string, string> = {
+        all_incomes: "SALE",
+        front_sale: "SALE",
+        back_sale: "SALE",
+        rebill: "REBILL",
+        all_refunds: "REFUND",
+      };
 
-  // Limitação e Ordenação
-  query = query.limit(MAX_RECORDS_FOR_DASHBOARD_STATS);
-  query = query.order(dateDbColumn, { ascending: true }); // Ordena para gráficos de tendência
+      const mappedType = typeMapping[selectedActionType];
+      if (mappedType) {
+        queryParams.append("type", mappedType);
+      }
 
-  const { data: rawSalesData, error } = await query;
+      // Filtros adicionais para offerType se necessário
+      if (selectedActionType === "front_sale") {
+        queryParams.append("offerType", "FRONTEND");
+      } else if (selectedActionType === "back_sale") {
+        queryParams.append("offerType", "UPSELL,DOWNSELL,ORDER_BUMP");
+      }
+    }
 
-  if (error) {
+    // Limite de registros
+    queryParams.append("limit", MAX_RECORDS_FOR_DASHBOARD_STATS.toString());
+
+    // Fazer requisição
+    const transactions = await httpClient.get<Transaction[]>(
+      `/api/v1/transactions?${queryParams.toString()}`
+    );
+
+    if (transactions.length === MAX_RECORDS_FOR_DASHBOARD_STATS) {
+      console.warn(
+        `Warning: Dashboard query reached the maximum limit of ${MAX_RECORDS_FOR_DASHBOARD_STATS} records.`
+      );
+    }
+
+    return transactions;
+  } catch (error) {
     console.error("Error fetching sales data:", error);
     return [];
   }
-
-  if (rawSalesData && rawSalesData.length === MAX_RECORDS_FOR_DASHBOARD_STATS) {
-    console.warn(
-      `Warning: Dashboard query reached the maximum limit of ${MAX_RECORDS_FOR_DASHBOARD_STATS} records.`
-    );
-  }
-
-  // Transforma e retorna
-  return rawSalesData ? rawSalesData.map(transformSupabaseSaleToRecord) : [];
 }

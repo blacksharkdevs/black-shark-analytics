@@ -141,13 +141,13 @@ export function Header() {
                 >
                   <Avatar className="h-9 w-9">
                     <AvatarImage
-                      src={`https://placehold.co/100x100.png?text=${user.username
-                        .charAt(0)
+                      src={`https://placehold.co/100x100.png?text=${user.email
+                        ?.charAt(0)
                         .toUpperCase()}`}
-                      alt={user.username}
+                      alt={user.email}
                     />
                     <AvatarFallback className="bg-accent/20 text-foreground">
-                      {user.username.charAt(0).toUpperCase()}
+                      {user.email.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -161,7 +161,7 @@ export function Header() {
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1 text-foreground">
                     <p className="text-sm font-medium leading-none">
-                      {user.username}
+                      {user.email || "Usuário"}
                     </p>
                     <p className="text-xs leading-none text-blue-400">
                       {t("header.administratorAccess")}

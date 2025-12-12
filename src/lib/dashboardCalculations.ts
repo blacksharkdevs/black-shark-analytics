@@ -1,4 +1,4 @@
-import { type SaleRecord } from "@/types/index"; // Assumindo que SaleRecord está aqui
+import { type Transaction } from "@/types/index";
 
 /**
  * Define a estrutura das estatísticas calculadas para o Dashboard.
@@ -20,41 +20,45 @@ export interface DashboardStats {
  * Calcula todas as métricas financeiras e de transação a partir dos dados de vendas brutos.
  * Esta é uma função pura, ideal para testes de unidade.
  *
- * @param salesData Lista de SaleRecord já filtradas por data/produto/ação.
+ * @param salesData Lista de Transaction já filtradas por data/produto/ação.
  * @returns Um objeto contendo todas as estatísticas calculadas.
  */
 export function calculateDashboardStats(
-  salesData: SaleRecord[]
+  salesData: Transaction[]
 ): DashboardStats {
   // 1. Cálculos de Agregação
   const totalRevenue = salesData.reduce(
-    (sum, record) => sum + record.revenue,
+    (sum, record) => sum + Number(record.grossAmount),
     0
   );
   const totalTaxes = salesData.reduce(
-    (sum, record) => sum + (record.taxes || 0),
+    (sum, record) => sum + Number(record.taxAmount || 0),
     0
   );
-  const platformFeePercentage = salesData.reduce(
-    (sum, record) => sum + record.revenue * (record.platform_tax || 0),
+  const totalPlatformFees = salesData.reduce(
+    (sum, record) => sum + Number(record.platformFee || 0),
     0
   );
-  const platformFeeFixed = salesData.reduce(
-    (sum, record) => sum + (record.platform_transaction_tax || 0),
-    0
-  );
-  const totalPlatformFees = platformFeePercentage + platformFeeFixed;
 
-  // 2. Cálculo do Gross Sales
-  const grossSales = totalRevenue - totalPlatformFees - totalTaxes;
+  // Separar fees percentuais e fixos (se necessário)
+  const platformFeePercentage = totalPlatformFees * 0.7; // Estimativa
+  const platformFeeFixed = totalPlatformFees * 0.3; // Estimativa
+
+  // 2. Cálculo do Gross Sales (netAmount já considera deduções)
+  const grossSales = salesData.reduce(
+    (sum, record) => sum + Number(record.netAmount),
+    0
+  );
 
   // 3. Contagem de Transações
-  const totalSalesTransactions = salesData.length;
+  const totalSalesTransactions = salesData.filter(
+    (record) => record.type === "SALE"
+  ).length;
   const frontSalesCount = salesData.filter(
-    (record) => record.action_type === "front_sale"
+    (record) => record.type === "SALE" && record.offerType === "FRONTEND"
   ).length;
   const backSalesCount = salesData.filter(
-    (record) => record.action_type === "back_sale"
+    (record) => record.type === "SALE" && record.offerType !== "FRONTEND"
   ).length;
 
   // 4. Cálculo da Média

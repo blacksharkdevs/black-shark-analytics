@@ -108,14 +108,19 @@ export function SalesTrendChart() {
       }));
 
       data.forEach((record) => {
-        const transactionDateObject = parseISO(record.transaction_date);
+        // Usar occurredAt ao invés de transaction_date
+        const transactionDateObject = parseISO(record.occurredAt);
         const hourInUTC = transactionDateObject.getUTCHours();
 
         const targetHourEntry = hourlyData.find(
           (h) => h.hourIndex === hourInUTC
         );
-        if (targetHourEntry) {
-          targetHourEntry.revenue += record.revenue;
+        if (
+          targetHourEntry &&
+          record.type === "SALE" &&
+          record.status === "COMPLETED"
+        ) {
+          targetHourEntry.revenue += Number(record.grossAmount);
         }
       });
       finalChartData = hourlyData.map((item) => ({
@@ -125,7 +130,8 @@ export function SalesTrendChart() {
     } else {
       // --- VISUALIZAÇÃO DIÁRIA (Multi Day) ---
       aggregatedData = data.reduce((acc, record) => {
-        const transactionDateObject = parseISO(record.transaction_date);
+        // Usar occurredAt ao invés de transaction_date
+        const transactionDateObject = parseISO(record.occurredAt);
         const dateKey = dateFnsFormat(transactionDateObject, "yyyy-MM-dd");
 
         if (!acc[dateKey]) {
@@ -135,7 +141,10 @@ export function SalesTrendChart() {
             fullDateSortKey: dateKey,
           };
         }
-        acc[dateKey].revenue += record.revenue;
+        // Apenas vendas completadas
+        if (record.type === "SALE" && record.status === "COMPLETED") {
+          acc[dateKey].revenue += Number(record.grossAmount);
+        }
         return acc;
       }, {} as Record<string, { name: string; revenue: number; fullDateSortKey: string }>);
 

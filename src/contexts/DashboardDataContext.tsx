@@ -1,17 +1,10 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-// Removemos supabase e transformSupabaseSaleToRecord
-import { type Product as ProductConfig } from "@/lib/config";
 import { useDashboardConfig } from "@/hooks/useDashboardConfig";
 import { DashboardDataContext } from "./DashboardDataContextDefinition";
-import type { SaleRecord } from "@/types/index";
+import type { Transaction } from "@/types/index";
 
-// Serviços e Lógica Reutilizada
-import { fetchProductsForFilter } from "@/services/configService"; // Reutiliza
-import { fetchSalesDataForDashboard } from "@/services/dashboardService"; // Novo serviço de fetch
-import { calculateDashboardStats } from "@/lib/dashboardCalculations"; // Nova lógica de cálculo
-
-// Não é mais necessário, pois está no Service
-// const MAX_RECORDS_FOR_DASHBOARD_STATS = 50000;
+import { fetchSalesDataForDashboard } from "@/services/dashboardService";
+import { calculateDashboardStats } from "@/lib/dashboardCalculations";
 
 export function DashboardDataProvider({
   children,
@@ -24,86 +17,160 @@ export function DashboardDataProvider({
     isLoading: isDateRangeLoading,
   } = useDashboardConfig();
 
-  const [filteredSalesData, setFilteredSalesData] = useState<SaleRecord[]>([]);
-  const [availableProducts, setAvailableProducts] = useState<ProductConfig[]>([
-    { id: "all", name: "All Products" },
-  ]);
+  // Estado de dados brutos (todas as transações sem filtro de produto/offerType)
+  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
+
+  // Filtros
   const [selectedProduct, setSelectedProduct] = useState<string>("all");
-  const [selectedActionType, setSelectedActionType] = useState<string>("all");
+  const [selectedOfferType, setSelectedOfferType] = useState<string>("all");
+
+  // Loading states
   const [isLoadingData, setIsLoadingData] = useState(true);
-  const [isFetchingProducts, setIsFetchingProducts] = useState(true); // ➡️ REFACTOR 1.1: Usando o serviço de config (reutilizado do Transactions)
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      setIsFetchingProducts(true);
-      const products = await fetchProductsForFilter();
-      setAvailableProducts(products);
-      setIsFetchingProducts(false);
-    };
-    loadProducts();
-  }, []); // ➡️ REFACTOR 2.1: Função de fetch limpa, apenas chama o serviço
-
-  const fetchAndFilterData = useCallback(async () => {
-    // 1. GUARDS: Verifica dependências de carregamento e dados de filtro
+  // Buscar todas as transações (sem filtros de produto/offerType)
+  const fetchAllTransactions = useCallback(async () => {
     if (
       isDateRangeLoading ||
-      isFetchingProducts ||
       !currentDateRange ||
       !currentDateRange.from ||
       !currentDateRange.to
     ) {
       setIsLoadingData(false);
-      setFilteredSalesData([]);
+      setAllTransactions([]);
       return;
     }
 
     setIsLoadingData(true);
 
     try {
-      // 2. Chamada do Service
-      const salesData = await fetchSalesDataForDashboard({
+      // Buscar TODAS as transações do período (sem filtro de produto/offerType)
+      const transactions = await fetchSalesDataForDashboard({
         currentDateRange,
         getCurrentDateDbColumn,
-        selectedProduct,
-        selectedActionType,
+        selectedProduct: "all", // Forçar buscar todos
+        selectedActionType: "all", // Forçar buscar todos
       });
 
-      // 3. Atualiza estado
-      setFilteredSalesData(salesData);
+      setAllTransactions(transactions);
     } catch (error) {
-      console.error("Erro ao buscar dados do Dashboard no Service:", error);
-      setFilteredSalesData([]);
+      console.error("Erro ao buscar dados do Dashboard:", error);
+      setAllTransactions([]);
     } finally {
       setIsLoadingData(false);
     }
-  }, [
-    currentDateRange,
-    selectedProduct,
-    selectedActionType,
-    isFetchingProducts,
-    isDateRangeLoading,
-    getCurrentDateDbColumn,
-  ]);
+  }, [currentDateRange, isDateRangeLoading, getCurrentDateDbColumn]);
 
   useEffect(() => {
-    fetchAndFilterData();
-  }, [fetchAndFilterData]); // ➡️ REFACTOR 3.1: Cálculos de métricas isolados (Usando função pura)
+    fetchAllTransactions();
+  }, [fetchAllTransactions]); // ➡️ REFACTOR 3.1: Cálculos de métricas isolados (Usando função pura)
 
+  // Extrair produtos únicos das transações
+  const availableProducts = useMemo(() => {
+    const productsMap = new Map<string, { id: string; name: string }>();
+
+    allTransactions.forEach((transaction) => {
+      if (transaction.product && transaction.productId) {
+        productsMap.set(transaction.productId, {
+          id: transaction.productId,
+          name: transaction.product.name,
+        });
+      }
+    });
+
+    const products = [
+      { id: "all", name: "All Products" },
+      ...Array.from(productsMap.values()).sort((a, b) =>
+        a.name.localeCompare(b.name)
+      ),
+    ];
+
+    return products;
+  }, [allTransactions]);
+
+  // Extrair offerTypes únicos das transações
+  const availableOfferTypes = useMemo(() => {
+    const offerTypesSet = new Set<string>();
+
+    allTransactions.forEach((transaction) => {
+      if (transaction.offerType) {
+        offerTypesSet.add(transaction.offerType);
+      }
+    });
+
+    const offerTypes = [
+      { id: "all", name: "All Offers" },
+      ...Array.from(offerTypesSet)
+        .sort()
+        .map((type) => ({
+          id: type,
+          name: type.charAt(0) + type.slice(1).toLowerCase(),
+        })),
+    ];
+
+    return offerTypes;
+  }, [allTransactions]);
+
+  // Extrair afiliados únicos das transações
+  const availableAffiliates = useMemo(() => {
+    const affiliatesMap = new Map<string, { id: string; name: string }>();
+
+    allTransactions.forEach((transaction) => {
+      if (transaction.affiliate && transaction.affiliateId) {
+        const affiliateName =
+          transaction.affiliate.name ||
+          transaction.affiliate.email ||
+          "Unknown";
+        affiliatesMap.set(transaction.affiliateId, {
+          id: transaction.affiliateId,
+          name: affiliateName,
+        });
+      }
+    });
+
+    const affiliates = [
+      { id: "all", name: "All Affiliates" },
+      { id: "direct", name: "Direct (No Affiliate)" },
+      ...Array.from(affiliatesMap.values()).sort((a, b) =>
+        a.name.localeCompare(b.name)
+      ),
+    ];
+
+    return affiliates;
+  }, [allTransactions]);
+
+  // Aplicar filtros localmente
+  const filteredSalesData = useMemo(() => {
+    let filtered = allTransactions;
+
+    // Filtro de produto
+    if (selectedProduct !== "all") {
+      filtered = filtered.filter((t) => t.productId === selectedProduct);
+    }
+
+    // Filtro de offerType
+    if (selectedOfferType !== "all") {
+      filtered = filtered.filter((t) => t.offerType === selectedOfferType);
+    }
+
+    return filtered;
+  }, [allTransactions, selectedProduct, selectedOfferType]);
+
+  // Calcular stats com dados filtrados
   const stats = useMemo(() => {
-    // Apenas passa o dado filtrado para a função de cálculo
     return calculateDashboardStats(filteredSalesData);
   }, [filteredSalesData]);
 
   const contextValue = {
     filteredSalesData,
     availableProducts,
+    availableOfferTypes,
+    availableAffiliates,
     selectedProduct,
     setSelectedProduct,
-    selectedActionType,
-    setSelectedActionType,
+    selectedOfferType,
+    setSelectedOfferType,
     stats,
     isLoadingData,
-    isFetchingProducts,
   };
 
   return (

@@ -39,7 +39,10 @@ export function TopProductsTable() {
 
   const topProducts = useMemo(() => {
     const productRevenueMap = data.reduce((acc, record) => {
-      const productName = record.product_name || "Unknown Product";
+      // Filtrar apenas vendas completadas
+      if (record.type !== "SALE" || record.status !== "COMPLETED") return acc;
+
+      const productName = record.product?.name || "Unknown Product";
 
       if (!acc[productName]) {
         acc[productName] = {
@@ -47,7 +50,7 @@ export function TopProductsTable() {
           totalRevenue: 0,
         } as ProductRevenue;
       }
-      acc[productName].totalRevenue += record.revenue;
+      acc[productName].totalRevenue += Number(record.grossAmount);
       return acc;
     }, {} as Record<string, ProductRevenue>);
 

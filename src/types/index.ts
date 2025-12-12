@@ -135,3 +135,13 @@ export interface Transaction {
   createdAt: ISODate;
   updatedAt: ISODate;
 }
+
+// ----------------------------------------------------------------------
+// 🔹 ALIASES (Para compatibilidade com código legado)
+// ----------------------------------------------------------------------
+
+// SaleRecord é um alias de Transaction para manter compatibilidade
+export type SaleRecord = Transaction;
+
+// Tipo para ordenação de colunas
+export type SortColumn = keyof Transaction | "calc_charged_day" | "net_sales";
