@@ -49,23 +49,23 @@ export function StatsCards() {
     () => ({
       gross_sales: {
         title: t("dashboard.stats.grossSales"),
-        description: "Revenue after platform fees & taxes",
+        description: t("dashboard.stats.grossSalesDesc"),
       },
       net_sales: {
-        title: "Net Sales",
-        description: "Final payout after all deductions",
+        title: t("dashboard.stats.netSales"),
+        description: t("dashboard.stats.netSalesDesc"),
       },
       total_sales: {
-        title: "Total Sales",
-        description: "Number of completed sales transactions",
+        title: t("dashboard.stats.totalSalesCount"),
+        description: t("dashboard.stats.totalSalesCountDesc"),
       },
       total_losses: {
-        title: "Total Losses",
-        description: "Total value lost from refunds & chargebacks",
+        title: t("dashboard.stats.totalLosses"),
+        description: t("dashboard.stats.totalLossesDesc"),
       },
       average_order_value: {
-        title: "Average Order Value",
-        description: "Avg. gross sales per front sale",
+        title: t("dashboard.stats.averageOrderValue"),
+        description: t("dashboard.stats.averageOrderValueDesc"),
       },
     }),
     [t]
