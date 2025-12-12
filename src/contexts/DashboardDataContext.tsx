@@ -61,7 +61,7 @@ interface Product {
   createdAt: ISODate;
 }
 
-interface Transaction {
+export interface Transaction {
   id: string;
   externalId: string;
   platform: Platform;
@@ -91,14 +91,20 @@ interface Transaction {
   updatedAt: ISODate;
 }
 
-interface DashboardStats {
-  totalRevenue: number;
-  grossSales: number;
+// ⚡ ATUALIZADO: Interface completa para os novos Cards
+export interface DashboardStats {
+  totalRevenue: number; // Geralmente igual ao Gross Sales
+  grossSales: number; // Valor bruto cobrado do cliente
+  netSales: number; // Valor líquido (Gross - Fees - Refunds - Comissões)
+
   totalTaxes: number;
   totalPlatformFees: number;
-  platformFeePercentage: number;
-  platformFeeFixed: number;
+  totalAffiliateCommissions: number; // Novo campo
+
   totalSalesTransactions: number;
+  totalRefundsCount: number; // Novo campo
+  totalChargebacksCount: number; // Novo campo
+
   frontSalesCount: number;
   backSalesCount: number;
   averageOrderValue: number;
@@ -113,11 +119,10 @@ interface DateRange {
 // FUNÇÕES AUXILIARES INTERNAS
 // ===================================================================
 
-const MAX_RECORDS_FOR_DASHBOARD_STATS = 1000;
+// 🚀 AUMENTADO: 1000 é pouco para análises mensais. 10k é seguro pro browser.
+const MAX_RECORDS_FOR_DASHBOARD_STATS = 50000;
+const BATCH_SIZE = 1000; // Supabase tem limite de ~1000 registros por query com joins
 
-/**
- * Busca transações do Supabase com filtros de data.
- */
 async function fetchTransactionsFromSupabase(
   dateRange: DateRange,
   dateColumn: string
@@ -130,33 +135,60 @@ async function fetchTransactionsFromSupabase(
     const queryFromUTC = dateRange.from.toISOString();
     const queryToUTC = dateRange.to.toISOString();
 
-    const { data, error } = await supabase
-      .from("transactions")
-      .select(
-        `
-        *,
-        product:products(*),
-        affiliate:affiliates(*),
-        customer:customers(*)
-      `
-      )
-      .gte(dateColumn, queryFromUTC)
-      .lte(dateColumn, queryToUTC)
-      .limit(MAX_RECORDS_FOR_DASHBOARD_STATS)
-      .order(dateColumn, { ascending: false });
+    let allData: Transaction[] = [];
+    let rangeStart = 0;
+    let hasMore = true;
 
-    if (error) {
-      console.error("Erro ao buscar transações do Supabase:", error);
-      return [];
+    // Buscar em lotes para contornar limite do Supabase
+    while (hasMore && allData.length < MAX_RECORDS_FOR_DASHBOARD_STATS) {
+      const rangeEnd = rangeStart + BATCH_SIZE - 1;
+
+      const { data, error } = await supabase
+        .from("transactions")
+        .select(
+          `
+          *,
+          product:products(*),
+          affiliate:affiliates(*),
+          customer:customers(*)
+        `
+        )
+        .gte(dateColumn, queryFromUTC)
+        .lte(dateColumn, queryToUTC)
+        .order(dateColumn, { ascending: false })
+        .range(rangeStart, rangeEnd);
+
+      if (error) {
+        console.error("Erro ao buscar transações do Supabase:", error);
+        break;
+      }
+
+      if (!data || data.length === 0) {
+        hasMore = false;
+        break;
+      }
+
+      allData = [...allData, ...(data as Transaction[])];
+
+      // Se recebemos menos que o tamanho do lote, não há mais dados
+      if (data.length < BATCH_SIZE) {
+        hasMore = false;
+      } else {
+        rangeStart += BATCH_SIZE;
+      }
     }
 
-    if (data && data.length === MAX_RECORDS_FOR_DASHBOARD_STATS) {
+    if (allData.length >= MAX_RECORDS_FOR_DASHBOARD_STATS) {
       console.warn(
-        `Aviso: Limite de ${MAX_RECORDS_FOR_DASHBOARD_STATS} registros atingido.`
+        `Aviso: Limite de ${MAX_RECORDS_FOR_DASHBOARD_STATS} registros atingido. Os dados podem estar incompletos.`
       );
     }
 
-    return (data as Transaction[]) || [];
+    console.log(
+      `✅ ${allData.length} transações carregadas do período selecionado`
+    );
+
+    return allData;
   } catch (error) {
     console.error("Erro ao buscar dados do dashboard:", error);
     return [];
@@ -167,48 +199,69 @@ async function fetchTransactionsFromSupabase(
  * Calcula estatísticas do dashboard a partir das transações.
  */
 function calculateDashboardStats(salesData: Transaction[]): DashboardStats {
-  const totalRevenue = salesData.reduce(
-    (sum, record) => sum + Number(record.grossAmount),
-    0
-  );
-  const totalTaxes = salesData.reduce(
-    (sum, record) => sum + Number(record.taxAmount || 0),
-    0
-  );
-  const totalPlatformFees = salesData.reduce(
-    (sum, record) => sum + Number(record.platformFee || 0),
-    0
-  );
+  // Inicializa acumuladores
+  let grossSales = 0;
+  let netSales = 0;
+  let totalTaxes = 0;
+  let totalPlatformFees = 0;
+  let totalAffiliateCommissions = 0;
 
-  const platformFeePercentage = totalPlatformFees * 0.7;
-  const platformFeeFixed = totalPlatformFees * 0.3;
+  let totalSalesTransactions = 0;
+  let totalRefundsCount = 0;
+  let totalChargebacksCount = 0;
+  let frontSalesCount = 0;
+  let backSalesCount = 0;
 
-  const grossSales = salesData.reduce(
-    (sum, record) => sum + Number(record.netAmount),
-    0
-  );
+  // Loop único para performance (O(n))
+  salesData.forEach((record) => {
+    const type = record.type;
+    const status = record.status;
+    const offerType = record.offerType;
 
-  const totalSalesTransactions = salesData.filter(
-    (record) => record.type === "SALE"
-  ).length;
-  const frontSalesCount = salesData.filter(
-    (record) => record.type === "SALE" && record.offerType === "FRONTEND"
-  ).length;
-  const backSalesCount = salesData.filter(
-    (record) => record.type === "SALE" && record.offerType !== "FRONTEND"
-  ).length;
+    // Métricas Financeiras (somar tudo, mesmo reembolsados, para ter histórico,
+    // ou filtrar se quiser apenas "Net Realizado". Aqui somamos o bruto histórico)
+    // Nota: Se quiser excluir reembolsos do Gross, adicione: && status !== 'REFUNDED'
+    if (type === "SALE") {
+      grossSales += Number(record.grossAmount || 0);
+      netSales += Number(record.netAmount || 0); // O Net Amount do banco já deve descontar taxas
+      totalTaxes += Number(record.taxAmount || 0);
+      totalPlatformFees += Number(record.platformFee || 0);
+      totalAffiliateCommissions += Number(record.affiliateCommission || 0);
 
+      totalSalesTransactions += 1;
+
+      if (offerType === "FRONTEND") {
+        frontSalesCount += 1;
+      } else {
+        backSalesCount += 1;
+      }
+    }
+
+    // Contagem de Reembolsos
+    if (type === "REFUND" || status === "REFUNDED") {
+      totalRefundsCount += 1;
+    }
+
+    // Contagem de Chargebacks
+    if (type === "CHARGEBACK" || status === "CHARGEBACK") {
+      totalChargebacksCount += 1;
+    }
+  });
+
+  // AOV (Ticket Médio)
   const averageOrderValue =
     frontSalesCount > 0 ? grossSales / frontSalesCount : 0;
 
   return {
-    totalRevenue,
+    totalRevenue: grossSales, // Alias
     grossSales,
+    netSales,
     totalTaxes,
-    platformFeePercentage,
-    platformFeeFixed,
     totalPlatformFees,
+    totalAffiliateCommissions,
     totalSalesTransactions,
+    totalRefundsCount,
+    totalChargebacksCount,
     frontSalesCount,
     backSalesCount,
     averageOrderValue,
@@ -221,16 +274,26 @@ function calculateDashboardStats(salesData: Transaction[]): DashboardStats {
 
 interface DashboardDataContextType {
   filteredSalesData: Transaction[];
+
+  // Opções de Filtro
   availableProducts: Product[];
   availableOfferTypes: Array<{ id: string; name: string }>;
   availablePlatforms: Array<{ id: string; name: string }>;
   availableAffiliates: Array<{ id: string; name: string }>;
+
+  // Estados Selecionados
   selectedProduct: string;
   setSelectedProduct: (productId: string) => void;
+
   selectedOfferType: string;
   setSelectedOfferType: (offerType: string) => void;
+
   selectedPlatform: string;
   setSelectedPlatform: (platform: string) => void;
+
+  selectedAffiliate: string; // 🆕 Novo filtro
+  setSelectedAffiliate: (affiliateId: string) => void; // 🆕 Novo setter
+
   stats: DashboardStats;
   isLoadingData: boolean;
 }
@@ -255,9 +318,13 @@ export function DashboardDataProvider({
   } = useDashboardConfig();
 
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
+
+  // Filtros
   const [selectedProduct, setSelectedProduct] = useState<string>("all");
   const [selectedOfferType, setSelectedOfferType] = useState<string>("all");
   const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
+  const [selectedAffiliate, setSelectedAffiliate] = useState<string>("all"); // 🆕
+
   const [isLoadingData, setIsLoadingData] = useState(true);
 
   const fetchAllTransactions = useCallback(async () => {
@@ -282,7 +349,6 @@ export function DashboardDataProvider({
       );
 
       console.log(`Fetched ${transactions.length} transactions for dashboard.`);
-
       setAllTransactions(transactions);
     } catch (error) {
       console.error("Erro ao buscar dados do Dashboard:", error);
@@ -296,9 +362,10 @@ export function DashboardDataProvider({
     fetchAllTransactions();
   }, [fetchAllTransactions]);
 
+  // --- MEMOS PARA LISTAS DE FILTROS ---
+
   const availableProducts = useMemo(() => {
     const productsMap = new Map<string, Product>();
-
     allTransactions.forEach((transaction) => {
       if (transaction.product && transaction.productId) {
         productsMap.set(transaction.productId, transaction.product);
@@ -308,7 +375,7 @@ export function DashboardDataProvider({
     const allProductsOption: Product = {
       id: "all",
       externalId: "all",
-      platform: "BUYGOODS" as Platform,
+      platform: "BUYGOODS", // dummy
       name: "All Products",
       family: null,
       unitCount: 0,
@@ -316,47 +383,45 @@ export function DashboardDataProvider({
       createdAt: new Date().toISOString(),
     };
 
-    const products = [
+    return [
       allProductsOption,
       ...Array.from(productsMap.values()).sort((a, b) =>
         a.name.localeCompare(b.name)
       ),
     ];
-
-    return products;
   }, [allTransactions]);
 
   const availableOfferTypes = useMemo(() => {
     const offerTypesSet = new Set<string>();
-
     allTransactions.forEach((transaction) => {
       if (transaction.offerType) {
         offerTypesSet.add(transaction.offerType);
       }
     });
 
-    const offerTypes = [
+    return [
       { id: "all", name: "All Offers" },
       ...Array.from(offerTypesSet)
         .sort()
         .map((type) => ({
           id: type,
-          name: type.charAt(0) + type.slice(1).toLowerCase(),
+          name: type.charAt(0) + type.slice(1).toLowerCase(), // Capitalize
         })),
     ];
-
-    return offerTypes;
   }, [allTransactions]);
 
   const availableAffiliates = useMemo(() => {
     const affiliatesMap = new Map<string, { id: string; name: string }>();
-
     allTransactions.forEach((transaction) => {
-      if (transaction.affiliate && transaction.affiliateId) {
+      if (transaction.affiliateId) {
+        // Lógica defensiva para nome
         const affiliateName =
-          transaction.affiliate.name ||
-          transaction.affiliate.email ||
-          "Unknown";
+          transaction.affiliate?.name ||
+          transaction.affiliate?.email ||
+          (transaction.affiliateId === "direct"
+            ? "Direct"
+            : "Unknown Affiliate");
+
         affiliatesMap.set(transaction.affiliateId, {
           id: transaction.affiliateId,
           name: affiliateName,
@@ -364,28 +429,21 @@ export function DashboardDataProvider({
       }
     });
 
-    const affiliates = [
+    return [
       { id: "all", name: "All Affiliates" },
-      { id: "direct", name: "Direct (No Affiliate)" },
       ...Array.from(affiliatesMap.values()).sort((a, b) =>
         a.name.localeCompare(b.name)
       ),
     ];
-
-    return affiliates;
   }, [allTransactions]);
 
-  // Lista dinâmica de Plataformas baseada nas transações
   const availablePlatforms = useMemo(() => {
     const platformsSet = new Set<string>();
-
     allTransactions.forEach((transaction) => {
-      if (transaction.platform) {
-        platformsSet.add(transaction.platform);
-      }
+      if (transaction.platform) platformsSet.add(transaction.platform);
     });
 
-    const platforms = [
+    return [
       { id: "all", name: "All Platforms" },
       ...Array.from(platformsSet)
         .sort()
@@ -394,30 +452,38 @@ export function DashboardDataProvider({
           name: platform,
         })),
     ];
-
-    return platforms;
   }, [allTransactions]);
+
+  // --- FILTRAGEM DOS DADOS ---
 
   const filteredSalesData = useMemo(() => {
     let filtered = allTransactions;
 
-    // Filtro por produto
     if (selectedProduct !== "all") {
       filtered = filtered.filter((t) => t.productId === selectedProduct);
     }
 
-    // Filtro por OfferType (FRONTEND, UPSELL, DOWNSELL, ORDER_BUMP)
     if (selectedOfferType !== "all") {
       filtered = filtered.filter((t) => t.offerType === selectedOfferType);
     }
 
-    // Filtro por Platform (BUYGOODS, CLICKBANK, CARTPANDA, DIGISTORE)
     if (selectedPlatform !== "all") {
       filtered = filtered.filter((t) => t.platform === selectedPlatform);
     }
 
+    // 🆕 Filtro de Afiliado implementado
+    if (selectedAffiliate !== "all") {
+      filtered = filtered.filter((t) => t.affiliateId === selectedAffiliate);
+    }
+
     return filtered;
-  }, [allTransactions, selectedProduct, selectedOfferType, selectedPlatform]);
+  }, [
+    allTransactions,
+    selectedProduct,
+    selectedOfferType,
+    selectedPlatform,
+    selectedAffiliate,
+  ]);
 
   const stats = useMemo(() => {
     return calculateDashboardStats(filteredSalesData);
@@ -429,12 +495,16 @@ export function DashboardDataProvider({
     availableOfferTypes,
     availablePlatforms,
     availableAffiliates,
+
     selectedProduct,
     setSelectedProduct,
     selectedOfferType,
     setSelectedOfferType,
     selectedPlatform,
     setSelectedPlatform,
+    selectedAffiliate, // Exportando novo estado
+    setSelectedAffiliate, // Exportando novo setter
+
     stats,
     isLoadingData,
   };

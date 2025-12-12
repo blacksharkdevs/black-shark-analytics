@@ -39,7 +39,9 @@ export function ProductFilter({
               value={product.id}
               className="rounded-none text-foreground"
             >
-              {` ${product.name} (${product.platform}) `}
+              {product.name === "All Products"
+                ? t("filters.allProducts")
+                : ` ${product.name} (${product.platform}) `}
             </SelectItem>
           ))}
         </SelectContent>
