@@ -1,5 +1,5 @@
-import { Filters } from "@/components/dashboard/Filters";
-import { StatsCards } from "@/components/dashboard/StatsCards";
+import { Filters } from "@/components/dashboard/filters/Filters";
+import { StatsCards } from "@/components/dashboard/stats/Stats";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 // import { SalesTrendChart } from "@/components/dashboard/SalesTrendChart";

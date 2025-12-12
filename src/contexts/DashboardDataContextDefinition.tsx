@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { SaleRecord } from "@/types/index";
+import type { SaleRecord, Product } from "@/types/index";
 import { createContext } from "react";
-
-interface ProductConfig {
-  id: string;
-  name: string;
-}
 
 interface OfferTypeConfig {
   id: string;
@@ -25,7 +20,7 @@ interface PlatformConfig {
 
 interface DashboardDataContextType {
   filteredSalesData: SaleRecord[];
-  availableProducts: ProductConfig[];
+  availableProducts: Product[];
   availableOfferTypes: OfferTypeConfig[];
   availablePlatforms: PlatformConfig[];
   availableAffiliates: AffiliateConfig[];

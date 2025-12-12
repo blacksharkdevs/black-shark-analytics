@@ -221,7 +221,7 @@ function calculateDashboardStats(salesData: Transaction[]): DashboardStats {
 
 interface DashboardDataContextType {
   filteredSalesData: Transaction[];
-  availableProducts: Array<{ id: string; name: string }>;
+  availableProducts: Product[];
   availableOfferTypes: Array<{ id: string; name: string }>;
   availablePlatforms: Array<{ id: string; name: string }>;
   availableAffiliates: Array<{ id: string; name: string }>;
@@ -297,16 +297,27 @@ export function DashboardDataProvider({
   }, [fetchAllTransactions]);
 
   const availableProducts = useMemo(() => {
-    const productsMap = new Map<string, { id: string; name: string }>();
+    const productsMap = new Map<string, Product>();
 
     allTransactions.forEach((transaction) => {
       if (transaction.product && transaction.productId) {
-        productsMap.set(transaction.productId, { ...transaction.product });
+        productsMap.set(transaction.productId, transaction.product);
       }
     });
 
+    const allProductsOption: Product = {
+      id: "all",
+      externalId: "all",
+      platform: "BUYGOODS" as Platform,
+      name: "All Products",
+      family: null,
+      unitCount: 0,
+      cogs: 0,
+      createdAt: new Date().toISOString(),
+    };
+
     const products = [
-      { id: "all", name: "All Products" },
+      allProductsOption,
       ...Array.from(productsMap.values()).sort((a, b) =>
         a.name.localeCompare(b.name)
       ),

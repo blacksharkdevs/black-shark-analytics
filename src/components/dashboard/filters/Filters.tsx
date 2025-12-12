@@ -1,5 +1,5 @@
-import type { Product as ProductConfig } from "@/lib/timezone_date";
 import { cn } from "@/lib/utils";
+import type { Product } from "@/types/index";
 
 // 🚨 Componentes de Filtro
 import { ProductFilter } from "./ProductFilter";
@@ -19,7 +19,7 @@ interface PlatformConfig {
 }
 
 interface FiltersProps {
-  products: ProductConfig[];
+  products: Product[];
   selectedProduct: string;
   onProductChange: (productId: string) => void;
 

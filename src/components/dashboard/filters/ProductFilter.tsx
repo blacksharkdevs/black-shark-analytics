@@ -5,12 +5,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/common/ui/select";
+import type { Product } from "@/types/index";
 import { Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { Product as ProductConfig } from "@/lib/timezone_date";
 
 interface ProductFilterProps {
-  products: ProductConfig[];
+  products: Product[];
   selectedProduct: string;
   onProductChange: (productId: string) => void;
 }
