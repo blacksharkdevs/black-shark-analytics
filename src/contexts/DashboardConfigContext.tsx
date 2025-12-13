@@ -8,7 +8,6 @@ import {
   createContext,
 } from "react";
 import { useTranslation } from "react-i18next";
-import * as dateFns from "date-fns";
 
 // ===================================================================
 // TIPOS INTERNOS
@@ -114,7 +113,73 @@ function getDateDbColumn(selectedDateConfigId: string): "createdAt" {
 }
 
 /**
+ * Retorna a meia-noite UTC de uma data (00:00:00.000Z).
+ */
+function getStartOfDayUTC(date: Date): Date {
+  const yyyy = date.getUTCFullYear();
+  const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(date.getUTCDate()).padStart(2, "0");
+  return new Date(`${yyyy}-${mm}-${dd}T00:00:00.000Z`);
+}
+
+/**
+ * Retorna o final do dia UTC de uma data (23:59:59.999Z).
+ */
+function getEndOfDayUTC(date: Date): Date {
+  const yyyy = date.getUTCFullYear();
+  const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(date.getUTCDate()).padStart(2, "0");
+  return new Date(`${yyyy}-${mm}-${dd}T23:59:59.999Z`);
+}
+
+/**
+ * Subtrai dias de uma data em UTC.
+ */
+function subtractDaysUTC(date: Date, days: number): Date {
+  const result = new Date(date);
+  result.setUTCDate(result.getUTCDate() - days);
+  return result;
+}
+
+/**
+ * Retorna o primeiro dia do mês em UTC.
+ */
+function getStartOfMonthUTC(date: Date): Date {
+  const yyyy = date.getUTCFullYear();
+  const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
+  return new Date(`${yyyy}-${mm}-01T00:00:00.000Z`);
+}
+
+/**
+ * Retorna o último dia do mês em UTC.
+ */
+function getEndOfMonthUTC(date: Date): Date {
+  const yyyy = date.getUTCFullYear();
+  const mm = date.getUTCMonth() + 1; // 0-11, então +1
+  // Criar data do primeiro dia do próximo mês e subtrair 1 milissegundo
+  const nextMonth = new Date(Date.UTC(yyyy, mm, 1));
+  return new Date(nextMonth.getTime() - 1);
+}
+
+/**
+ * Retorna o primeiro dia do ano em UTC.
+ */
+function getStartOfYearUTC(date: Date): Date {
+  const yyyy = date.getUTCFullYear();
+  return new Date(`${yyyy}-01-01T00:00:00.000Z`);
+}
+
+/**
+ * Retorna o último dia do ano em UTC.
+ */
+function getEndOfYearUTC(date: Date): Date {
+  const yyyy = date.getUTCFullYear();
+  return new Date(`${yyyy}-12-31T23:59:59.999Z`);
+}
+
+/**
  * Calcula o range de datas baseado na opção selecionada.
+ * SEMPRE trabalha em UTC para evitar problemas de timezone.
  */
 function getCalculatedDateRange(
   rangeOptionId: string,
@@ -124,48 +189,49 @@ function getCalculatedDateRange(
   let fromDate: Date;
   let toDate: Date;
 
-  const todayAnchorDate = referenceDateUTC;
-  const yesterday = dateFns.subDays(todayAnchorDate, 1);
+  // Garantir que estamos trabalhando em UTC puro
+  const todayUTC = new Date(referenceDateUTC.toISOString());
+  const yesterdayUTC = subtractDaysUTC(todayUTC, 1);
 
   switch (rangeOptionId) {
     case "today":
-      fromDate = dateFns.startOfDay(todayAnchorDate);
-      toDate = dateFns.endOfDay(todayAnchorDate);
+      fromDate = getStartOfDayUTC(todayUTC);
+      toDate = getEndOfDayUTC(todayUTC);
       break;
     case "yesterday":
-      fromDate = dateFns.startOfDay(yesterday);
-      toDate = dateFns.endOfDay(yesterday);
+      fromDate = getStartOfDayUTC(yesterdayUTC);
+      toDate = getEndOfDayUTC(yesterdayUTC);
       break;
     case "last_7_days":
-      fromDate = dateFns.startOfDay(dateFns.subDays(todayAnchorDate, 6));
-      toDate = dateFns.endOfDay(todayAnchorDate);
+      fromDate = getStartOfDayUTC(subtractDaysUTC(todayUTC, 6));
+      toDate = getEndOfDayUTC(todayUTC);
       break;
     case "last_30_days":
-      fromDate = dateFns.startOfDay(dateFns.subDays(todayAnchorDate, 29));
-      toDate = dateFns.endOfDay(todayAnchorDate);
+      fromDate = getStartOfDayUTC(subtractDaysUTC(todayUTC, 29));
+      toDate = getEndOfDayUTC(todayUTC);
       break;
     case "this_month":
-      fromDate = dateFns.startOfDay(dateFns.startOfMonth(todayAnchorDate));
-      toDate = dateFns.endOfDay(dateFns.endOfMonth(todayAnchorDate));
+      fromDate = getStartOfMonthUTC(todayUTC);
+      toDate = getEndOfMonthUTC(todayUTC);
       break;
     case "this_year":
-      fromDate = dateFns.startOfDay(dateFns.startOfYear(todayAnchorDate));
-      toDate = dateFns.endOfDay(dateFns.endOfYear(todayAnchorDate));
+      fromDate = getStartOfYearUTC(todayUTC);
+      toDate = getEndOfYearUTC(todayUTC);
       break;
     case "custom":
       if (customRangeInput?.from) {
-        fromDate = dateFns.startOfDay(customRangeInput.from);
+        fromDate = getStartOfDayUTC(customRangeInput.from);
         toDate = customRangeInput.to
-          ? dateFns.endOfDay(customRangeInput.to)
-          : dateFns.endOfDay(customRangeInput.from);
+          ? getEndOfDayUTC(customRangeInput.to)
+          : getEndOfDayUTC(customRangeInput.from);
       } else {
-        fromDate = dateFns.startOfDay(todayAnchorDate);
-        toDate = dateFns.endOfDay(todayAnchorDate);
+        fromDate = getStartOfDayUTC(todayUTC);
+        toDate = getEndOfDayUTC(todayUTC);
       }
       break;
     default:
-      fromDate = dateFns.startOfDay(dateFns.subDays(todayAnchorDate, 6));
-      toDate = dateFns.endOfDay(todayAnchorDate);
+      fromDate = getStartOfDayUTC(subtractDaysUTC(todayUTC, 6));
+      toDate = getEndOfDayUTC(todayUTC);
       break;
   }
   return { from: fromDate, to: toDate };

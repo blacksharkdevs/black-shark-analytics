@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { parseISO, format as dateFnsFormat, isSameDay } from "date-fns";
+import type { Transaction } from "@/types/index";
 import {
   LineChart,
   Line,
@@ -106,7 +107,7 @@ export function SalesTrendChart() {
         hourIndex: i,
       }));
 
-      data.forEach((record) => {
+      data.forEach((record: Transaction) => {
         // Usar createdAt para filtrar por data de criação no sistema
         const transactionDateObject = parseISO(record.createdAt);
         const hourInUTC = transactionDateObject.getUTCHours();
@@ -128,24 +129,36 @@ export function SalesTrendChart() {
       }));
     } else {
       // --- VISUALIZAÇÃO DIÁRIA (Multi Day) ---
-      aggregatedData = data.reduce((acc, record) => {
-        // Usar createdAt para filtrar por data de criação no sistema
-        const transactionDateObject = parseISO(record.createdAt);
-        const dateKey = dateFnsFormat(transactionDateObject, "yyyy-MM-dd");
+      aggregatedData = data.reduce(
+        (
+          acc: Record<
+            string,
+            { name: string; revenue: number; fullDateSortKey: string }
+          >,
+          record: Transaction
+        ) => {
+          // Usar createdAt para filtrar por data de criação no sistema
+          const transactionDateObject = parseISO(record.createdAt);
+          const dateKey = dateFnsFormat(transactionDateObject, "yyyy-MM-dd");
 
-        if (!acc[dateKey]) {
-          acc[dateKey] = {
-            name: shortDateFormatter.format(transactionDateObject),
-            revenue: 0,
-            fullDateSortKey: dateKey,
-          };
-        }
-        // Apenas vendas completadas
-        if (record.type === "SALE" && record.status === "COMPLETED") {
-          acc[dateKey].revenue += Number(record.grossAmount);
-        }
-        return acc;
-      }, {} as Record<string, { name: string; revenue: number; fullDateSortKey: string }>);
+          if (!acc[dateKey]) {
+            acc[dateKey] = {
+              name: shortDateFormatter.format(transactionDateObject),
+              revenue: 0,
+              fullDateSortKey: dateKey,
+            };
+          }
+          // Apenas vendas completadas
+          if (record.type === "SALE" && record.status === "COMPLETED") {
+            acc[dateKey].revenue += Number(record.grossAmount);
+          }
+          return acc;
+        },
+        {} as Record<
+          string,
+          { name: string; revenue: number; fullDateSortKey: string }
+        >
+      );
 
       finalChartData = Object.values(aggregatedData)
         .sort((a, b) => a.fullDateSortKey.localeCompare(b.fullDateSortKey))
