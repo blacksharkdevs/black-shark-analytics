@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Sun, Moon, Globe, CalendarCog, LogOut } from "lucide-react";
+import { Sun, Moon, LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,16 +22,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-} from "@/components/common/ui/dropdown-menu"; // 🚨 Sub-components removidos dos imports
+} from "@/components/common/ui/dropdown-menu";
 
-import { DATE_CONFIG_OPTIONS, TIMEZONE_OPTIONS } from "@/lib/timezone_date";
 import { SharkSwim } from "../common/SharkSwin";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
-
-const DEFAULT_TIMEZONE =
-  TIMEZONE_OPTIONS.find((tz) => !tz.disabled) || TIMEZONE_OPTIONS[0];
 
 export function Header() {
   const { t } = useTranslation();
@@ -42,25 +35,12 @@ export function Header() {
   const { toggleTheme } = useThemeToggle();
 
   const {
-    selectedDateConfig,
-    setDateConfig,
     selectedDateRangeOptionId,
     currentDateRange,
     updateDateRangeOption,
     updateCustomDateRange,
     isLoading: isDateRangeLoading,
   } = useDashboardConfig();
-
-  // Simulação de Timezone (mantida para a UI)
-  const [selectedTimezone, setSelectedTimezone] = useState(DEFAULT_TIMEZONE);
-  const setTimezone = (timezoneValue: string) => {
-    const newTz = TIMEZONE_OPTIONS.find(
-      (tz) => tz.value === timezoneValue && !tz.disabled
-    );
-    if (newTz) setSelectedTimezone(newTz);
-  };
-
-  const availableTimezones = TIMEZONE_OPTIONS;
 
   let headerTitle = t("navigation.dashboard");
   const pathname = location.pathname;
@@ -168,51 +148,6 @@ export function Header() {
                     </p>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-accent/50" />
-
-                {/* 🚨 COLUNAS DE DATA (ITEM DIRETO) */}
-                <DropdownMenuLabel className="px-2 pt-2 pb-1 text-xs font-semibold text-muted-foreground">
-                  {t("header.dateColumns")}
-                </DropdownMenuLabel>
-                <DropdownMenuRadioGroup
-                  value={selectedDateConfig}
-                  onValueChange={setDateConfig}
-                >
-                  {DATE_CONFIG_OPTIONS.map((dc) => (
-                    <DropdownMenuRadioItem
-                      key={dc.id}
-                      value={dc.id}
-                      className="text-foreground hover:bg-accent/10"
-                    >
-                      <CalendarCog className="w-4 h-4 mr-2" />
-                      {dc.name}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-
-                <DropdownMenuSeparator className="bg-accent/50" />
-
-                {/* 🚨 TIMEZONE (ITEM DIRETO) */}
-                <DropdownMenuLabel className="px-2 pt-2 pb-1 text-xs font-semibold text-muted-foreground">
-                  {t("header.timezone")}
-                </DropdownMenuLabel>
-                <DropdownMenuRadioGroup
-                  value={selectedTimezone.value}
-                  onValueChange={setTimezone}
-                >
-                  {availableTimezones.map((tz) => (
-                    <DropdownMenuRadioItem
-                      key={tz.value}
-                      value={tz.value}
-                      className="text-foreground hover:bg-accent/10"
-                      disabled={tz.disabled}
-                    >
-                      <Globe className="w-4 h-4 mr-2" />
-                      {tz.label}
-                      {tz.offsetLabel && ` (${tz.offsetLabel})`}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
 
                 <DropdownMenuSeparator className="bg-accent/50" />
 
