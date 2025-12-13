@@ -61,7 +61,7 @@ const DATE_CONFIG_OPTIONS: DateConfigOption[] = [
 ];
 
 // ===================================================================
-// FUNÇÕES AUXILIARES INTERNAS
+// FUNÇÕES AUXILIARES INTERNAS (AJUSTADO PARA BRASIL UTC-3)
 // ===================================================================
 
 /**
@@ -71,7 +71,6 @@ function loadConfigFromStorage(): DashboardConfig {
   if (typeof window === "undefined") {
     return {};
   }
-
   try {
     const stored = localStorage.getItem(CONFIG_LOCAL_STORAGE_KEY);
     return stored ? JSON.parse(stored) : {};
@@ -88,11 +87,9 @@ function saveConfigToStorage(config: DashboardConfig): void {
   if (typeof window === "undefined") {
     return;
   }
-
   try {
     const currentConfig = loadConfigFromStorage();
     const updatedConfig = { ...currentConfig, ...config };
-
     localStorage.setItem(
       CONFIG_LOCAL_STORAGE_KEY,
       JSON.stringify(updatedConfig)
@@ -112,126 +109,146 @@ function getDateDbColumn(selectedDateConfigId: string): "createdAt" {
   return (currentConfig?.db_column as "createdAt") || "createdAt";
 }
 
+// --- 🚨 LÓGICA DE FUSO HORÁRIO (BRT -> UTC) 🚨 ---
+
+// Offset do Brasil (Brasília) em relação ao UTC é -3 horas (na maior parte do ano).
+// Se quiser suporte a horário de verão antigo ou fusos diferentes, use date-fns-tz.
+// Aqui vamos no manual robusto para -03:00.
+const BRT_OFFSET_HOURS = 3;
+
 /**
- * Retorna a meia-noite UTC de uma data (00:00:00.000Z).
+ * Cria uma data UTC que representa o INÍCIO do dia no Brasil (00:00:00 BRT).
+ * Ex: 12/12 00:00 BRT -> 12/12 03:00 UTC
  */
-function getStartOfDayUTC(date: Date): Date {
-  const yyyy = date.getUTCFullYear();
-  const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const dd = String(date.getUTCDate()).padStart(2, "0");
-  return new Date(`${yyyy}-${mm}-${dd}T00:00:00.000Z`);
+function getBrazilStartOfDayInUTC(date: Date): Date {
+  const y = date.getFullYear();
+  const m = date.getMonth();
+  const d = date.getDate();
+
+  // Converte para UTC adicionando o offset de 3 horas
+  // 00:00 BRT + 3h = 03:00 UTC
+  // Nota: Usamos Date.UTC para forçar a criação em UTC puro com os componentes certos
+  return new Date(Date.UTC(y, m, d, BRT_OFFSET_HOURS, 0, 0, 0));
 }
 
 /**
- * Retorna o final do dia UTC de uma data (23:59:59.999Z).
+ * Cria uma data UTC que representa o FINAL do dia no Brasil (23:59:59 BRT).
+ * Ex: 12/12 23:59 BRT -> 13/12 02:59 UTC
  */
-function getEndOfDayUTC(date: Date): Date {
-  const yyyy = date.getUTCFullYear();
-  const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const dd = String(date.getUTCDate()).padStart(2, "0");
-  return new Date(`${yyyy}-${mm}-${dd}T23:59:59.999Z`);
+function getBrazilEndOfDayInUTC(date: Date): Date {
+  const y = date.getFullYear();
+  const m = date.getMonth();
+  const d = date.getDate();
+
+  // 23:59:59.999 BRT + 3h = 02:59:59.999 UTC do dia seguinte
+  return new Date(Date.UTC(y, m, d, 23 + BRT_OFFSET_HOURS, 59, 59, 999));
 }
 
 /**
- * Subtrai dias de uma data em UTC.
+ * Subtrai dias de uma data (mantendo a lógica local).
  */
-function subtractDaysUTC(date: Date, days: number): Date {
+function subtractDays(date: Date, days: number): Date {
   const result = new Date(date);
-  result.setUTCDate(result.getUTCDate() - days);
+  result.setDate(result.getDate() - days);
   return result;
 }
 
 /**
- * Retorna o primeiro dia do mês em UTC.
+ * Início do mês Brasil em UTC
  */
-function getStartOfMonthUTC(date: Date): Date {
-  const yyyy = date.getUTCFullYear();
-  const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
-  return new Date(`${yyyy}-${mm}-01T00:00:00.000Z`);
+function getBrazilStartOfMonthInUTC(date: Date): Date {
+  const y = date.getFullYear();
+  const m = date.getMonth();
+  // Dia 1, 00:00 BRT -> 03:00 UTC
+  return new Date(Date.UTC(y, m, 1, BRT_OFFSET_HOURS, 0, 0, 0));
 }
 
 /**
- * Retorna o último dia do mês em UTC.
+ * Fim do mês Brasil em UTC
  */
-function getEndOfMonthUTC(date: Date): Date {
-  const yyyy = date.getUTCFullYear();
-  const mm = date.getUTCMonth() + 1; // 0-11, então +1
-  // Criar data do primeiro dia do próximo mês e subtrair 1 milissegundo
-  const nextMonth = new Date(Date.UTC(yyyy, mm, 1));
-  return new Date(nextMonth.getTime() - 1);
+function getBrazilEndOfMonthInUTC(date: Date): Date {
+  const y = date.getFullYear();
+  const m = date.getMonth();
+  // Dia 0 do próximo mês = Último dia do mês atual
+  const lastDay = new Date(y, m + 1, 0).getDate();
+
+  return new Date(Date.UTC(y, m, lastDay, 23 + BRT_OFFSET_HOURS, 59, 59, 999));
 }
 
 /**
- * Retorna o primeiro dia do ano em UTC.
+ * Início do ano Brasil em UTC
  */
-function getStartOfYearUTC(date: Date): Date {
-  const yyyy = date.getUTCFullYear();
-  return new Date(`${yyyy}-01-01T00:00:00.000Z`);
+function getBrazilStartOfYearInUTC(date: Date): Date {
+  const y = date.getFullYear();
+  return new Date(Date.UTC(y, 0, 1, BRT_OFFSET_HOURS, 0, 0, 0));
 }
 
 /**
- * Retorna o último dia do ano em UTC.
+ * Fim do ano Brasil em UTC
  */
-function getEndOfYearUTC(date: Date): Date {
-  const yyyy = date.getUTCFullYear();
-  return new Date(`${yyyy}-12-31T23:59:59.999Z`);
+function getBrazilEndOfYearInUTC(date: Date): Date {
+  const y = date.getFullYear();
+  return new Date(Date.UTC(y, 11, 31, 23 + BRT_OFFSET_HOURS, 59, 59, 999));
 }
 
 /**
  * Calcula o range de datas baseado na opção selecionada.
- * SEMPRE trabalha em UTC para evitar problemas de timezone.
+ * Agora respeitando o dia Brasileiro convertido para UTC.
  */
 function getCalculatedDateRange(
   rangeOptionId: string,
-  referenceDateUTC: Date,
+  referenceDate: Date, // Data "Hoje" do navegador do usuário
   customRangeInput?: { from?: Date; to?: Date }
 ): { from: Date; to: Date } {
   let fromDate: Date;
   let toDate: Date;
 
-  // Garantir que estamos trabalhando em UTC puro
-  const todayUTC = new Date(referenceDateUTC.toISOString());
-  const yesterdayUTC = subtractDaysUTC(todayUTC, 1);
+  // Referência é sempre o "agora" local
+  const today = new Date(referenceDate);
+  const yesterday = subtractDays(today, 1);
 
   switch (rangeOptionId) {
     case "today":
-      fromDate = getStartOfDayUTC(todayUTC);
-      toDate = getEndOfDayUTC(todayUTC);
+      fromDate = getBrazilStartOfDayInUTC(today);
+      toDate = getBrazilEndOfDayInUTC(today);
       break;
     case "yesterday":
-      fromDate = getStartOfDayUTC(yesterdayUTC);
-      toDate = getEndOfDayUTC(yesterdayUTC);
+      fromDate = getBrazilStartOfDayInUTC(yesterday);
+      toDate = getBrazilEndOfDayInUTC(yesterday);
       break;
     case "last_7_days":
-      fromDate = getStartOfDayUTC(subtractDaysUTC(todayUTC, 6));
-      toDate = getEndOfDayUTC(todayUTC);
+      // Últimos 7 dias INCLUINDO hoje? Ou 7 dias passados?
+      // Padrão analytics costuma ser: (Hoje - 6 dias) até (Hoje)
+      fromDate = getBrazilStartOfDayInUTC(subtractDays(today, 6));
+      toDate = getBrazilEndOfDayInUTC(today);
       break;
     case "last_30_days":
-      fromDate = getStartOfDayUTC(subtractDaysUTC(todayUTC, 29));
-      toDate = getEndOfDayUTC(todayUTC);
+      fromDate = getBrazilStartOfDayInUTC(subtractDays(today, 29));
+      toDate = getBrazilEndOfDayInUTC(today);
       break;
     case "this_month":
-      fromDate = getStartOfMonthUTC(todayUTC);
-      toDate = getEndOfMonthUTC(todayUTC);
+      fromDate = getBrazilStartOfMonthInUTC(today);
+      toDate = getBrazilEndOfMonthInUTC(today);
       break;
     case "this_year":
-      fromDate = getStartOfYearUTC(todayUTC);
-      toDate = getEndOfYearUTC(todayUTC);
+      fromDate = getBrazilStartOfYearInUTC(today);
+      toDate = getBrazilEndOfYearInUTC(today);
       break;
     case "custom":
       if (customRangeInput?.from) {
-        fromDate = getStartOfDayUTC(customRangeInput.from);
+        // No custom, assumimos que o DatePicker retorna meia-noite local
+        fromDate = getBrazilStartOfDayInUTC(customRangeInput.from);
         toDate = customRangeInput.to
-          ? getEndOfDayUTC(customRangeInput.to)
-          : getEndOfDayUTC(customRangeInput.from);
+          ? getBrazilEndOfDayInUTC(customRangeInput.to)
+          : getBrazilEndOfDayInUTC(customRangeInput.from);
       } else {
-        fromDate = getStartOfDayUTC(todayUTC);
-        toDate = getEndOfDayUTC(todayUTC);
+        fromDate = getBrazilStartOfDayInUTC(today);
+        toDate = getBrazilEndOfDayInUTC(today);
       }
       break;
     default:
-      fromDate = getStartOfDayUTC(subtractDaysUTC(todayUTC, 6));
-      toDate = getEndOfDayUTC(todayUTC);
+      fromDate = getBrazilStartOfDayInUTC(subtractDays(today, 6));
+      toDate = getBrazilEndOfDayInUTC(today);
       break;
   }
   return { from: fromDate, to: toDate };

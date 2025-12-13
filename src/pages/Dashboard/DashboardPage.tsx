@@ -24,26 +24,6 @@ export default function DashboardPage() {
 
   const isCombinedLoading = isLoadingData || isDateRangeLoading;
 
-  // async function debugTransactionsCount() {
-  //   const start = new Date();
-  //   start.setHours(0, 0, 0, 0); // Meia noite local
-
-  //   // Ajuste manual de fuso se necessário, ou use o ISO direto pra testar
-  //   const isoStart = start.toISOString();
-
-  //   console.log("🔍 Debugando data inicial:", isoStart);
-
-  //   // 1. Count Puro (Sem trazer dados pesados, sem joins)
-  //   const { count, error } = await supabase
-  //     .from("transactions")
-  //     .select("*", { count: "exact", head: true }); // head: true não traz dados, só metadata
-
-  //   if (error) console.error("Erro count:", error);
-  //   console.log("📊 Total no Banco (Segundo o Supabase):", count);
-  // }
-
-  // debugTransactionsCount();
-
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
       <div className="p-4 rounded-none shadow bg-card/50 border-[1px] border-white/30">
