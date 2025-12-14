@@ -221,31 +221,13 @@ export function HealthMonitor({
             </g>
 
             {/* Markers */}
-            <text
-              x="30"
-              y="135"
-              fill="#94a3b8"
-              fontSize="10"
-              textAnchor="middle"
-            >
+            <text x="0" y="145" fill="#FFF" fontSize="10" textAnchor="middle">
               0%
             </text>
-            <text
-              x="120"
-              y="20"
-              fill="#94a3b8"
-              fontSize="10"
-              textAnchor="middle"
-            >
+            <text x="120" y="0" fill="#FFF" fontSize="10" textAnchor="middle">
               1.5%
             </text>
-            <text
-              x="210"
-              y="135"
-              fill="#94a3b8"
-              fontSize="10"
-              textAnchor="middle"
-            >
+            <text x="230" y="145" fill="#FFF" fontSize="10" textAnchor="middle">
               3%
             </text>
           </svg>
@@ -280,7 +262,7 @@ export function HealthMonitor({
           )}
         >
           <p
-            className="font-semibold text-sm"
+            className="text-sm font-semibold"
             style={{ color: healthData.statusColor }}
           >
             {t("performance.health.status")}: {healthData.statusText}
