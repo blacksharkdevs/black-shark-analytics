@@ -405,10 +405,10 @@ export function DashboardDataProvider({
         // Extrai nome base (ex: "Free Sugar Pro" de "Free Sugar Pro 3 bottles")
         const baseName =
           product.name
+            // Primeiro: Remove tudo após "+" (bônus, free, etc)
+            .replace(/\+.*/gi, "")
             // Remove padrões de quantidade com números
             .replace(/\d+\s*(bottle|bottles|unit|units|pack|packs)s?/gi, "")
-            // Remove "+ X free" ou similar
-            .replace(/\+\s*\d+\s*(free|bonus|extra)s?.*/gi, "")
             // Remove variações "Pro", "Plus", "Premium" no final
             .replace(/\s+(pro|plus|premium)\s*$/gi, "")
             // Remove "s" sozinho que pode ter sobrado
