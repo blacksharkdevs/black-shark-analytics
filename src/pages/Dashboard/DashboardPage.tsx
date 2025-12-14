@@ -26,20 +26,18 @@ export default function DashboardPage() {
 
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
-      <div className="p-4 rounded-none shadow bg-card/50 border-[1px] border-white/30">
-        <Filters
-          products={availableProducts}
-          selectedProduct={selectedProduct}
-          onProductChange={setSelectedProduct}
-          offerTypes={availableOfferTypes}
-          selectedOfferType={selectedOfferType}
-          onOfferTypeChange={setSelectedOfferType}
-          platforms={availablePlatforms}
-          selectedPlatform={selectedPlatform}
-          onPlatformChange={setSelectedPlatform}
-          isLoading={isCombinedLoading}
-        />
-      </div>
+      <Filters
+        products={availableProducts}
+        selectedProduct={selectedProduct}
+        onProductChange={setSelectedProduct}
+        offerTypes={availableOfferTypes}
+        selectedOfferType={selectedOfferType}
+        onOfferTypeChange={setSelectedOfferType}
+        platforms={availablePlatforms}
+        selectedPlatform={selectedPlatform}
+        onPlatformChange={setSelectedPlatform}
+        isLoading={isCombinedLoading}
+      />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">

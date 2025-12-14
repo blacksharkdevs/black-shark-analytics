@@ -70,7 +70,7 @@ export function Filters({
   return (
     <div
       className={cn(
-        "grid grid-cols-1 gap-4",
+        "grid grid-cols-1 gap-4 shark-card",
         !hasSearchFilter && "md:grid-cols-2 lg:grid-cols-3",
         hasSearchFilter && "md:grid-cols-2 lg:grid-cols-4"
       )}

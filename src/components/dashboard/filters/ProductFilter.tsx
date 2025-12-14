@@ -23,22 +23,18 @@ export function ProductFilter({
   const { t } = useTranslation();
   return (
     <div className="flex items-center gap-2">
-      <Package className="hidden text-blue-600 dark:text-white sm:block" />
+      <Package className="hidden sm:block" />
       <Select
         value={selectedProduct}
         onValueChange={onProductChange}
         disabled={products.length <= 1}
       >
-        <SelectTrigger className="w-full transition-colors border rounded-none bg-card hover:bg-accent/20 border-input text-foreground">
+        <SelectTrigger className="w-full transition-colors">
           <SelectValue placeholder={t("filters.product")} />
         </SelectTrigger>
-        <SelectContent className="border rounded-none bg-card border-border">
+        <SelectContent className="">
           {products.map((product) => (
-            <SelectItem
-              key={product.id}
-              value={product.id}
-              className="rounded-none text-foreground"
-            >
+            <SelectItem key={product.id} value={product.id} className="">
               {product.name === "All Products"
                 ? t("filters.allProducts")
                 : ` ${product.name} (${product.platform}) `}
