@@ -331,8 +331,8 @@ export function DashboardDataProvider({
   const [selectedProduct, setSelectedProduct] = useState<string>("all");
   const [selectedOfferType, setSelectedOfferType] = useState<string>("all");
   const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
-  const [selectedAffiliate, setSelectedAffiliate] = useState<string>("all"); // 🆕
-  const [isProductsGrouped, setIsProductsGrouped] = useState<boolean>(false); // 🆕 Agrupamento
+  const [selectedAffiliate, setSelectedAffiliate] = useState<string>("all");
+  const [isProductsGrouped, setIsProductsGrouped] = useState<boolean>(true);
 
   const [isLoadingData, setIsLoadingData] = useState(true);
 

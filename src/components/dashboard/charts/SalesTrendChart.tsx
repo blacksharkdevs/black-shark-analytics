@@ -228,7 +228,7 @@ export function SalesTrendChart() {
         </CardDescription>
       </CardHeader>
       <CardContent className="h-full pb-6 pl-2 pr-6">
-        <ChartContainer config={chartConfig} className="h-[450px] w-full">
+        <ChartContainer config={chartConfig} className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
