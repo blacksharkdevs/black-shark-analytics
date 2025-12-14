@@ -61,7 +61,9 @@ export function SharkInsights({
 
     selectedProductIds.forEach((productId) => {
       if (productId.startsWith("group:")) {
-        const groupedProduct = availableProducts.find((p) => p.id === productId);
+        const groupedProduct = availableProducts.find(
+          (p) => p.id === productId
+        );
         if (groupedProduct && groupedProduct.groupedProducts) {
           groupedProduct.groupedProducts.forEach((p) => {
             expandedProductIds.push(p.id);
@@ -175,8 +177,7 @@ export function SharkInsights({
       current.recentRevenue > max.recentRevenue ? current : max
     );
 
-    const trendPercentage =
-      (trend.recentRevenue / trend.totalRevenue) * 100;
+    const trendPercentage = (trend.recentRevenue / trend.totalRevenue) * 100;
 
     return {
       predator: {
