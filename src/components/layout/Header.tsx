@@ -1,10 +1,9 @@
 import { useLocation } from "react-router-dom";
-import { Sun, Moon, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useSidebar } from "@/hooks/useSidebar";
-import { useThemeToggle } from "@/hooks/useThemeToggle";
 
 import { Button } from "@/components/common/ui/button";
 import {
@@ -32,7 +31,6 @@ export function Header() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const { toggleSidebar } = useSidebar();
-  const { toggleTheme } = useThemeToggle();
 
   const {
     selectedDateRangeOptionId,
@@ -64,8 +62,8 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 h-16 border-b-[1px] bg-background/95 backdrop-blur border-b-gray-500/30">
-      <div className="container flex items-center justify-between h-16 px-4 max-w-screen-2xl md:px-8">
+    <header className="sticky top-0 z-40 h-16 backdrop-blur-xl bg-black/40">
+      <div className="container flex items-center justify-between h-16 px-4 mx-auto max-w-screen-2xl md:px-8 ">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -76,7 +74,7 @@ export function Header() {
             <SharkSwim />
           </Button>
 
-          <h1 className="text-2xl font-bold tracking-tight font-headline text-foreground">
+          <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">
             {headerTitle}
           </h1>
         </div>
@@ -97,18 +95,6 @@ export function Header() {
             />
           )}
 
-          {/* Botão Toggle Theme */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            className="w-10 h-10 rounded-full text-foreground hover:dark:bg-blue-700"
-          >
-            <Sun className="w-5 h-5 transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute w-5 h-5 transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" />
-          </Button>
-
           {/* Seletor de Idioma */}
           <LanguageSelector />
 
@@ -126,14 +112,14 @@ export function Header() {
                         .toUpperCase()}`}
                       alt={user.email}
                     />
-                    <AvatarFallback className="bg-accent/20 text-foreground">
+                    <AvatarFallback className="">
                       {user.email.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-64 border rounded-none bg-card border-border"
+                className="w-64 shark-card"
                 align="end"
                 forceMount
               >
