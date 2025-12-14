@@ -81,57 +81,89 @@ export function StatsCards() {
     // --- EXPLICAÇÕES DETALHADAS PARA CADA CARD ---
 
     // 1. GROSS SALES - Receita após taxas de plataforma
-    const grossSalesExplanation = `Total Revenue: ${formatCurrency(
-      safeStats.totalRevenue || 0
+    const grossSalesExplanation = `${t(
+      "dashboard.stats.explanations.grossSales.totalRevenue"
+    )} ${formatCurrency(safeStats.totalRevenue || 0)}
+${t("dashboard.stats.explanations.grossSales.platformFee")} -${formatCurrency(
+      safeStats.totalPlatformFees || 0
     )}
-Platform Fee (%): -${formatCurrency(safeStats.totalPlatformFees || 0)}
-Taxes: -${formatCurrency(safeStats.totalTaxes || 0)}
---------------------
-Gross Sales: ${formatCurrency(safeStats.grossSales || 0)}
-Formula: Total Revenue - Platform Fees - Taxes`;
-
-    // 2. NET SALES - Receita líquida final
-    const netSalesExplanation = `Gross Sales: ${formatCurrency(
+${t("dashboard.stats.explanations.grossSales.taxes")} -${formatCurrency(
+      safeStats.totalTaxes || 0
+    )}
+${t("dashboard.stats.explanations.grossSales.separator")}
+${t("dashboard.stats.explanations.grossSales.grossSales")} ${formatCurrency(
       safeStats.grossSales || 0
     )}
-(-) Taxes: -${formatCurrency(safeStats.totalTaxes || 0)}
-(-) Platform Fees: -${formatCurrency(safeStats.totalPlatformFees || 0)}
-(-) Affiliate Comm.: -${formatCurrency(
+${t("dashboard.stats.explanations.grossSales.formula")}`;
+
+    // 2. NET SALES - Receita líquida final
+    const netSalesExplanation = `${t(
+      "dashboard.stats.explanations.netSales.grossSales"
+    )} ${formatCurrency(safeStats.grossSales || 0)}
+${t("dashboard.stats.explanations.netSales.taxes")} -${formatCurrency(
+      safeStats.totalTaxes || 0
+    )}
+${t("dashboard.stats.explanations.netSales.platformFees")} -${formatCurrency(
+      safeStats.totalPlatformFees || 0
+    )}
+${t("dashboard.stats.explanations.netSales.affiliateComm")} -${formatCurrency(
       safeStats.totalAffiliateCommissions || 0
     )}
---------------------
-Net Payout: ${formatCurrency(safeStats.netSales || 0)}
-Formula: Gross - Taxes - Platform Fees - Commissions`;
+${t("dashboard.stats.explanations.netSales.separator")}
+${t("dashboard.stats.explanations.netSales.netPayout")} ${formatCurrency(
+      safeStats.netSales || 0
+    )}
+${t("dashboard.stats.explanations.netSales.formula")}`;
 
     // 3. TOTAL SALES - Número de transações
-    const totalSalesExplanation = `Total completed sales transactions in the selected period, calculated after all filters are applied.
+    const totalSalesExplanation = `${t(
+      "dashboard.stats.explanations.totalSales.description"
+    )}
 
-Sales Transactions: ${safeStats.totalSalesTransactions || 0}
-Front Sales: ${safeStats.frontSalesCount || 0}
-Back Sales: ${safeStats.backSalesCount || 0}`;
+${t("dashboard.stats.explanations.totalSales.salesTransactions")} ${
+      safeStats.totalSalesTransactions || 0
+    }
+${t("dashboard.stats.explanations.totalSales.frontSales")} ${
+      safeStats.frontSalesCount || 0
+    }
+${t("dashboard.stats.explanations.totalSales.backSales")} ${
+      safeStats.backSalesCount || 0
+    }`;
 
     // 4. TOTAL LOSSES - Perdas (reembolsos + chargebacks em valor monetário)
-    // Precisamos calcular o valor total perdido
-    // Como não temos o valor exato, vamos usar uma aproximação
-    const totalLossesExplanation = `Total monetary losses from refunds and chargebacks in the selected period.
+    const totalLossesExplanation = `${t(
+      "dashboard.stats.explanations.totalLosses.description"
+    )}
 
-Refunds: ${safeStats.totalRefundsCount || 0} transactions
-Chargebacks: ${safeStats.totalChargebacksCount || 0} transactions
-Total Loss Events: ${
+${t("dashboard.stats.explanations.totalLosses.refunds")} ${
+      safeStats.totalRefundsCount || 0
+    } ${t("dashboard.stats.explanations.totalLosses.transactions")}
+${t("dashboard.stats.explanations.totalLosses.chargebacks")} ${
+      safeStats.totalChargebacksCount || 0
+    } ${t("dashboard.stats.explanations.totalLosses.transactions")}
+${t("dashboard.stats.explanations.totalLosses.totalLossEvents")} ${
       (safeStats.totalRefundsCount || 0) +
       (safeStats.totalChargebacksCount || 0)
     }
 
-Note: Losses include all negative transactions (refunds, chargebacks, etc.)`;
+${t("dashboard.stats.explanations.totalLosses.note")}`;
 
     // 5. AVERAGE ORDER VALUE - Ticket médio
-    const aovExplanation = `The average gross sales generated per front sale transaction, calculated after all filters are applied.
+    const aovExplanation = `${t(
+      "dashboard.stats.explanations.averageOrderValue.description"
+    )}
 
-Gross Sales: ${formatCurrency(safeStats.grossSales || 0)}
-Front Sales: ${safeStats.frontSalesCount || 0}
---------------------
-Average Order Value: ${formatCurrency(safeStats.averageOrderValue || 0)}
-Formula: Gross Sales / Front Sales`;
+${t(
+  "dashboard.stats.explanations.averageOrderValue.grossSales"
+)} ${formatCurrency(safeStats.grossSales || 0)}
+${t("dashboard.stats.explanations.averageOrderValue.frontSales")} ${
+      safeStats.frontSalesCount || 0
+    }
+${t("dashboard.stats.explanations.averageOrderValue.separator")}
+${t(
+  "dashboard.stats.explanations.averageOrderValue.averageOrderValue"
+)} ${formatCurrency(safeStats.averageOrderValue || 0)}
+${t("dashboard.stats.explanations.averageOrderValue.formula")}`;
 
     // --- DEFINIÇÃO DOS CARDS ---
     const baseCards = [

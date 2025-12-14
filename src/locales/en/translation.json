@@ -146,6 +146,47 @@
       "totalLossesDesc": "Total value lost from refunds & chargebacks",
       "averageOrderValue": "Average Order Value",
       "averageOrderValueDesc": "Avg. gross sales per front sale",
+      "explanations": {
+        "grossSales": {
+          "totalRevenue": "Total Revenue:",
+          "platformFee": "Platform Fee (%):",
+          "taxes": "Taxes:",
+          "separator": "--------------------",
+          "grossSales": "Gross Sales:",
+          "formula": "Formula: Total Revenue - Platform Fees - Taxes"
+        },
+        "netSales": {
+          "grossSales": "Gross Sales:",
+          "taxes": "(-) Taxes:",
+          "platformFees": "(-) Platform Fees:",
+          "affiliateComm": "(-) Affiliate Comm.:",
+          "separator": "--------------------",
+          "netPayout": "Net Payout:",
+          "formula": "Formula: Gross - Taxes - Platform Fees - Commissions"
+        },
+        "totalSales": {
+          "description": "Total completed sales transactions in the selected period, calculated after all filters are applied.",
+          "salesTransactions": "Sales Transactions:",
+          "frontSales": "Front Sales:",
+          "backSales": "Back Sales:"
+        },
+        "totalLosses": {
+          "description": "Total monetary losses from refunds and chargebacks in the selected period.",
+          "refunds": "Refunds:",
+          "chargebacks": "Chargebacks:",
+          "totalLossEvents": "Total Loss Events:",
+          "transactions": "transactions",
+          "note": "Note: Losses include all negative transactions (refunds, chargebacks, etc.)"
+        },
+        "averageOrderValue": {
+          "description": "The average gross sales generated per front sale transaction, calculated after all filters are applied.",
+          "grossSales": "Gross Sales:",
+          "frontSales": "Front Sales:",
+          "separator": "--------------------",
+          "averageOrderValue": "Average Order Value:",
+          "formula": "Formula: Gross Sales / Front Sales"
+        }
+      },
       "frontSales": "Front Sales",
       "frontSalesDesc": "Number of initial sales (non-upsell new orders)",
       "backSales": "Back Sales",

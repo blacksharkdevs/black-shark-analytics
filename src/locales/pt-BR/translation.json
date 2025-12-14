@@ -146,6 +146,47 @@
       "totalLossesDesc": "Valor total perdido com reembolsos e chargebacks",
       "averageOrderValue": "Valor Médio do Pedido",
       "averageOrderValueDesc": "Média de vendas brutas por venda front",
+      "explanations": {
+        "grossSales": {
+          "totalRevenue": "Receita Total:",
+          "platformFee": "Taxa da Plataforma (%):",
+          "taxes": "Impostos:",
+          "separator": "--------------------",
+          "grossSales": "Vendas Brutas:",
+          "formula": "Fórmula: Receita Total - Taxas da Plataforma - Impostos"
+        },
+        "netSales": {
+          "grossSales": "Vendas Brutas:",
+          "taxes": "(-) Impostos:",
+          "platformFees": "(-) Taxas da Plataforma:",
+          "affiliateComm": "(-) Comissões de Afiliados:",
+          "separator": "--------------------",
+          "netPayout": "Pagamento Líquido:",
+          "formula": "Fórmula: Brutas - Impostos - Taxas - Comissões"
+        },
+        "totalSales": {
+          "description": "Total de transações de vendas completadas no período selecionado, calculado após a aplicação de todos os filtros.",
+          "salesTransactions": "Transações de Vendas:",
+          "frontSales": "Vendas Front:",
+          "backSales": "Vendas Back:"
+        },
+        "totalLosses": {
+          "description": "Perdas monetárias totais de reembolsos e chargebacks no período selecionado.",
+          "refunds": "Reembolsos:",
+          "chargebacks": "Chargebacks:",
+          "totalLossEvents": "Total de Eventos de Perda:",
+          "transactions": "transações",
+          "note": "Nota: As perdas incluem todas as transações negativas (reembolsos, chargebacks, etc.)"
+        },
+        "averageOrderValue": {
+          "description": "A média de vendas brutas gerada por transação de venda front, calculada após a aplicação de todos os filtros.",
+          "grossSales": "Vendas Brutas:",
+          "frontSales": "Vendas Front:",
+          "separator": "--------------------",
+          "averageOrderValue": "Valor Médio do Pedido:",
+          "formula": "Fórmula: Vendas Brutas / Vendas Front"
+        }
+      },
       "frontSales": "Vendas Front",
       "frontSalesDesc": "Número de vendas iniciais (novos pedidos não-upsell)",
       "backSales": "Vendas Back",
