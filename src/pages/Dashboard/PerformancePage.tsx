@@ -18,7 +18,8 @@ interface Product {
 export default function PerformancePage() {
   const { t } = useTranslation();
   const { filteredSalesData, isLoadingData } = useDashboardData();
-  const { isLoading: isDateRangeLoading } = useDashboardConfig();
+  const { isLoading: isDateRangeLoading, currentDateRange } =
+    useDashboardConfig();
 
   const isLoading = isLoadingData || isDateRangeLoading;
 
@@ -177,6 +178,7 @@ export default function PerformancePage() {
         selectedProductIds={selectedProductIds}
         availableProducts={availableProducts}
         filteredSalesData={filteredSalesData}
+        dateRange={currentDateRange}
       />
     </div>
   );

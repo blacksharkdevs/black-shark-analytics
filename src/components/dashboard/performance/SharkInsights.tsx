@@ -1,6 +1,11 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { parseISO, subDays, isAfter } from "date-fns";
+import {
+  parseISO,
+  differenceInDays,
+  differenceInHours,
+  isAfter,
+} from "date-fns";
 import {
   Card,
   CardContent,
@@ -21,10 +26,16 @@ interface Product {
   groupedProducts?: Array<{ id: string; name: string }>;
 }
 
+interface DateRange {
+  from: Date;
+  to: Date;
+}
+
 interface SharkInsightsProps {
   selectedProductIds: string[];
   availableProducts: Product[];
   filteredSalesData: Transaction[];
+  dateRange: DateRange | null;
 }
 
 // Cores neon para os produtos (mesmas do gráfico)
@@ -40,6 +51,7 @@ export function SharkInsights({
   selectedProductIds,
   availableProducts,
   filteredSalesData,
+  dateRange,
 }: SharkInsightsProps) {
   const { t } = useTranslation();
 
@@ -51,7 +63,8 @@ export function SharkInsights({
       if (index === -1) return NEON_COLORS[0];
       return NEON_COLORS[index % NEON_COLORS.length];
     };
-    if (selectedProductIds.length < 2) {
+
+    if (selectedProductIds.length < 2 || !dateRange) {
       return null;
     }
 
@@ -88,6 +101,44 @@ export function SharkInsights({
       return null;
     }
 
+    // Calcular duração do período e definir estratégia de tendência
+    const periodDays = differenceInDays(dateRange.to, dateRange.from);
+    const periodHours = differenceInHours(dateRange.to, dateRange.from);
+
+    // Determinar ponto de corte para "período recente"
+    // Se é 1 dia (24h): usar segunda metade (últimas 12h)
+    // Se é até 7 dias: usar segunda metade do período
+    // Se é mais de 7 dias: usar últimos 30% do período
+    let trendCutoffDate: Date;
+    let trendLabel: string;
+
+    if (periodHours <= 24) {
+      // Período de 1 dia: comparar últimas 12h
+      const halfPeriod = Math.floor(periodHours / 2);
+      trendCutoffDate = new Date(
+        dateRange.to.getTime() - halfPeriod * 60 * 60 * 1000
+      );
+      trendLabel = t("performance.insights.trend.last12Hours");
+    } else if (periodDays <= 7) {
+      // Período de até 7 dias: comparar segunda metade
+      const halfPeriod = Math.floor(periodDays / 2);
+      trendCutoffDate = new Date(
+        dateRange.to.getTime() - halfPeriod * 24 * 60 * 60 * 1000
+      );
+      trendLabel = t("performance.insights.trend.recentPeriod", {
+        days: halfPeriod,
+      });
+    } else {
+      // Período longo: comparar últimos 30%
+      const recentDays = Math.floor(periodDays * 0.3);
+      trendCutoffDate = new Date(
+        dateRange.to.getTime() - recentDays * 24 * 60 * 60 * 1000
+      );
+      trendLabel = t("performance.insights.trend.recentPeriod", {
+        days: recentDays,
+      });
+    }
+
     // Agrupar por produto de exibição
     const productStats: Record<
       string,
@@ -97,13 +148,11 @@ export function SharkInsights({
         totalRevenue: number;
         transactionCount: number;
         avgRevenue: number;
-        recentRevenue: number; // últimos 3 dias
+        recentRevenue: number;
+        earlyRevenue: number;
         color: string;
       }
     > = {};
-
-    const now = new Date();
-    const threeDaysAgo = subDays(now, 3);
 
     relevantTransactions.forEach((transaction) => {
       const productId = transaction.product?.id || "";
@@ -118,6 +167,7 @@ export function SharkInsights({
           transactionCount: 0,
           avgRevenue: 0,
           recentRevenue: 0,
+          earlyRevenue: 0,
           color: getProductColor(displayId),
         };
       }
@@ -126,10 +176,12 @@ export function SharkInsights({
       productStats[displayId].totalRevenue += revenue;
       productStats[displayId].transactionCount += 1;
 
-      // Verificar se é dos últimos 3 dias
+      // Classificar entre período recente e período inicial
       const transactionDate = parseISO(transaction.createdAt);
-      if (isAfter(transactionDate, threeDaysAgo)) {
+      if (isAfter(transactionDate, trendCutoffDate)) {
         productStats[displayId].recentRevenue += revenue;
+      } else {
+        productStats[displayId].earlyRevenue += revenue;
       }
     });
 
@@ -172,12 +224,25 @@ export function SharkInsights({
         secondBestEfficiency.avgRevenue) *
       100;
 
-    // 3. A TENDÊNCIA - Crescimento recente (últimos 3 dias)
-    const trend = statsArray.reduce((max, current) =>
-      current.recentRevenue > max.recentRevenue ? current : max
-    );
+    // 3. A TENDÊNCIA - Produto com melhor momento atual
+    // Calcula qual produto está performando melhor no período recente vs período inicial
+    const trendStats = statsArray.map((stat) => {
+      // Evitar divisão por zero
+      if (stat.earlyRevenue === 0) {
+        return {
+          ...stat,
+          growthRate: stat.recentRevenue > 0 ? Infinity : 0,
+        };
+      }
+      // Calcular taxa de crescimento: (recente - inicial) / inicial * 100
+      const growthRate =
+        ((stat.recentRevenue - stat.earlyRevenue) / stat.earlyRevenue) * 100;
+      return { ...stat, growthRate };
+    });
 
-    const trendPercentage = (trend.recentRevenue / trend.totalRevenue) * 100;
+    const trend = trendStats.reduce((max, current) =>
+      current.growthRate > max.growthRate ? current : max
+    );
 
     return {
       predator: {
@@ -192,11 +257,12 @@ export function SharkInsights({
       },
       trend: {
         product: trend,
-        percentage: trendPercentage,
+        growthRate: trend.growthRate,
         recentRevenue: trend.recentRevenue,
+        label: trendLabel,
       },
     };
-  }, [selectedProductIds, availableProducts, filteredSalesData]);
+  }, [selectedProductIds, availableProducts, filteredSalesData, dateRange, t]);
 
   // Não renderizar se não houver insights
   if (!insights) {
@@ -218,7 +284,7 @@ export function SharkInsights({
     <div className="space-y-4">
       {/* Header */}
       <div>
-        <h2 className="text-lg md:text-xl font-bold text-foreground">
+        <h2 className="text-lg font-bold md:text-xl text-foreground">
           {t("performance.insights.title")}
         </h2>
         <p className="text-xs md:text-sm text-muted-foreground">
@@ -227,7 +293,7 @@ export function SharkInsights({
       </div>
 
       {/* Grid de Insights */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {/* Card 1: O PREDADOR */}
         <Card
           className={cn(
@@ -264,16 +330,16 @@ export function SharkInsights({
           <CardContent className="space-y-3">
             <div>
               <p
-                className="text-2xl md:text-3xl font-bold tabular-nums"
+                className="text-2xl font-bold md:text-3xl tabular-nums"
                 style={{ color: insights.predator.product.color }}
               >
                 {insights.predator.product.name}
               </p>
-              <p className="text-lg md:text-xl font-semibold text-foreground mt-1">
+              <p className="mt-1 text-lg font-semibold md:text-xl text-foreground">
                 {formatCurrency(insights.predator.product.totalRevenue)}
               </p>
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               {t("performance.insights.predator.description", {
                 product: insights.predator.product.name,
                 percentage: insights.predator.advantage.toFixed(0),
@@ -319,19 +385,19 @@ export function SharkInsights({
           <CardContent className="space-y-3">
             <div>
               <p
-                className="text-2xl md:text-3xl font-bold tabular-nums"
+                className="text-2xl font-bold md:text-3xl tabular-nums"
                 style={{ color: insights.strategist.product.color }}
               >
                 {insights.strategist.product.name}
               </p>
-              <p className="text-lg md:text-xl font-semibold text-foreground mt-1">
+              <p className="mt-1 text-lg font-semibold md:text-xl text-foreground">
                 {formatCurrency(insights.strategist.avgRevenue)}
-                <span className="text-xs text-muted-foreground ml-1">
+                <span className="ml-1 text-xs text-muted-foreground">
                   /{t("performance.insights.strategist.perSale")}
                 </span>
               </p>
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               {t("performance.insights.strategist.description", {
                 product: insights.strategist.product.name,
                 percentage: insights.strategist.advantage.toFixed(0),
@@ -376,23 +442,53 @@ export function SharkInsights({
           <CardContent className="space-y-3">
             <div>
               <p
-                className="text-2xl md:text-3xl font-bold tabular-nums"
+                className="text-2xl font-bold md:text-3xl tabular-nums"
                 style={{ color: insights.trend.product.color }}
               >
                 {insights.trend.product.name}
               </p>
-              <p className="text-lg md:text-xl font-semibold text-foreground mt-1">
-                {formatCurrency(insights.trend.recentRevenue)}
-                <span className="text-xs text-muted-foreground ml-1">
-                  {t("performance.insights.trend.recentDays")}
-                </span>
+              <p className="mt-1 text-lg font-semibold md:text-xl text-foreground">
+                {insights.trend.growthRate === Infinity ? (
+                  <>
+                    <span className="text-green-400">↑ Novo</span>
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      {insights.trend.label}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span
+                      className={cn(
+                        insights.trend.growthRate >= 0
+                          ? "text-green-400"
+                          : "text-red-400"
+                      )}
+                    >
+                      {insights.trend.growthRate >= 0 ? "↑" : "↓"}{" "}
+                      {Math.abs(insights.trend.growthRate).toFixed(0)}%
+                    </span>
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      {insights.trend.label}
+                    </span>
+                  </>
+                )}
               </p>
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {t("performance.insights.trend.description", {
-                product: insights.trend.product.name,
-                percentage: insights.trend.percentage.toFixed(0),
-              })}
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              {insights.trend.growthRate === Infinity
+                ? t("performance.insights.trend.descriptionNew", {
+                    product: insights.trend.product.name,
+                    revenue: formatCurrency(insights.trend.recentRevenue),
+                  })
+                : insights.trend.growthRate >= 0
+                ? t("performance.insights.trend.descriptionGrowth", {
+                    product: insights.trend.product.name,
+                    percentage: Math.abs(insights.trend.growthRate).toFixed(0),
+                  })
+                : t("performance.insights.trend.descriptionDecline", {
+                    product: insights.trend.product.name,
+                    percentage: Math.abs(insights.trend.growthRate).toFixed(0),
+                  })}
             </p>
           </CardContent>
         </Card>

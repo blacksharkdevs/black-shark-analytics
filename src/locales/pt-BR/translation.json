@@ -89,8 +89,11 @@
       "trend": {
         "title": "A Tendência",
         "subtitle": "Momento Atual",
-        "recentDays": "últimos 3 dias",
-        "description": "{{product}} concentrou {{percentage}}% de sua receita nos últimos dias"
+        "last12Hours": "últimas 12h",
+        "recentPeriod": "últimos {{days}} dias",
+        "descriptionGrowth": "{{product}} está em crescimento acelerado, com alta de {{percentage}}% no período recente",
+        "descriptionDecline": "{{product}} apresentou queda de {{percentage}}% no período recente",
+        "descriptionNew": "{{product}} iniciou vendas no período recente com {{revenue}}"
       }
     }
   },

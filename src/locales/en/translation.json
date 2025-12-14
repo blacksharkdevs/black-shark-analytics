@@ -89,8 +89,11 @@
       "trend": {
         "title": "The Trend",
         "subtitle": "Current Momentum",
-        "recentDays": "last 3 days",
-        "description": "{{product}} concentrated {{percentage}}% of its revenue in recent days"
+        "last12Hours": "last 12h",
+        "recentPeriod": "last {{days}} days",
+        "descriptionGrowth": "{{product}} is experiencing accelerated growth, up {{percentage}}% in the recent period",
+        "descriptionDecline": "{{product}} showed a {{percentage}}% decline in the recent period",
+        "descriptionNew": "{{product}} started sales in the recent period with {{revenue}}"
       }
     }
   },
