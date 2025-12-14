@@ -52,6 +52,21 @@
     "logout": "Logout",
     "menu": "Menu"
   },
+  "performance": {
+    "title": "Product Performance",
+    "description": "Track individual performance of top-selling products in the selected period",
+    "chartTitle": "Performance by Product",
+    "chartDescription": "Daily/hourly revenue by product",
+    "noProductsSelected": "Select at least one product to view performance",
+    "noData": "No data available for the selected period",
+    "productSelector": {
+      "title": "Available Products",
+      "description": "Select the products you want to view in the chart",
+      "topProduct": "top selling",
+      "of": "of",
+      "productsSelected": "products selected"
+    }
+  },
   "header": {
     "dateColumns": "DATE COLUMNS",
     "timezone": "TIMEZONE",
@@ -68,6 +83,9 @@
     "dateRange": "Date Range",
     "period": "Period",
     "status": "Status",
+    "viewPerformanceInPeriod": "View performance in period",
+    "viewAllAffiliates": "View all affiliates",
+    "viewAllProducts": "View all products",
     "searchPlaceholder": "Search...",
     "groupProducts": "Group Products",
     "groupProductsDesc": "Groups products with similar names into a single category. For example: 'Free Sugar Pro 3 bottles', 'Free Sugar Pro 6 bottles' will be grouped as 'Free Sugar'. Hover over grouped products to see included items.",

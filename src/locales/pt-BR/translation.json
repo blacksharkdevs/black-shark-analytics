@@ -52,6 +52,21 @@
     "logout": "Sair",
     "menu": "Menu"
   },
+  "performance": {
+    "title": "Performance de Produtos",
+    "description": "Acompanhe a performance individual dos produtos mais vendidos no período selecionado",
+    "chartTitle": "Performance por Produto",
+    "chartDescription": "Receita diária/horária por produto",
+    "noProductsSelected": "Selecione pelo menos um produto para visualizar a performance",
+    "noData": "Sem dados disponíveis para o período selecionado",
+    "productSelector": {
+      "title": "Produtos Disponíveis",
+      "description": "Selecione os produtos que deseja visualizar no gráfico",
+      "topProduct": "mais vendido",
+      "of": "de",
+      "productsSelected": "produtos selecionados"
+    }
+  },
   "header": {
     "dateColumns": "COLUNAS DE DATA",
     "timezone": "FUSO HORÁRIO",
@@ -68,6 +83,9 @@
     "dateRange": "Período",
     "period": "Período",
     "status": "Status",
+    "viewPerformanceInPeriod": "Visualizar performance no período",
+    "viewAllAffiliates": "Ver todos os afiliados",
+    "viewAllProducts": "Ver todos os produtos",
     "searchPlaceholder": "Buscar...",
     "groupProducts": "Agrupar Produtos",
     "groupProductsDesc": "Agrupa produtos com nomes semelhantes em uma única categoria. Por exemplo: 'Free Sugar Pro 3 bottles', 'Free Sugar Pro 6 bottles' serão agrupados como 'Free Sugar'. Passe o mouse sobre produtos agrupados para ver os itens incluídos.",

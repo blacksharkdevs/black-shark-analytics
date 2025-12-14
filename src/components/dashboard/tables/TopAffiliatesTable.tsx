@@ -185,7 +185,7 @@ export function TopAffiliatesTable() {
               to="/dashboard/affiliates"
               className="flex items-center gap-1 md:gap-2"
             >
-              {t("common.view")} {t("common.all")}
+              {t("filters.viewAllAffiliates")}
               <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
             </Link>
           </Button>

@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "@/pages/Auth/Login";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
+import PerformancePage from "./pages/Dashboard/PerformancePage";
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/common/ui/toaster";
@@ -36,6 +37,7 @@ export default function App() {
           }
         >
           <Route index element={<DashboardPage />} />
+          <Route path="performance" element={<PerformancePage />} />
         </Route>
 
         <Route path="*" element={<div>404 | Página Não Encontrada</div>} />

@@ -113,22 +113,24 @@ export function TopProductsTable() {
       className="relative h-full border rounded-none shadow-lg border-white/30 backdrop-blur-sm"
       style={{ zIndex: 1 }}
     >
-      <CardHeader>
-        <CardTitle className="flex items-center text-foreground">
+      <CardHeader className="px-4 py-3 md:px-6 md:py-4">
+        <CardTitle className="flex items-center text-base md:text-lg text-foreground">
           {/* Mantido o seu estilo de ícone original */}
-          <Package className="w-6 h-6 mr-2 text-blue-600 dark:text-white" />{" "}
+          <Package className="w-4 h-4 mr-2 text-blue-600 md:w-6 md:h-6 dark:text-white" />{" "}
           {t("dashboard.charts.topProducts")}
         </CardTitle>
-        <CardDescription className="text-muted-foreground">
+        <CardDescription className="text-xs md:text-sm text-muted-foreground">
           {t("dashboard.charts.topProductsDesc")}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-2 md:px-6">
         <Table>
           <TableHeader className="text-muted-foreground">
             <TableRow className="hover:bg-transparent border-border/50">
-              <TableHead>{t("dashboard.charts.product")}</TableHead>
-              <TableHead className="text-right">
+              <TableHead className="py-2 text-xs md:text-sm">
+                {t("dashboard.charts.product")}
+              </TableHead>
+              <TableHead className="py-2 text-xs text-right md:text-sm">
                 {t("dashboard.charts.totalRevenue")}
               </TableHead>
             </TableRow>
@@ -139,10 +141,10 @@ export function TopProductsTable() {
                 key={product.productName}
                 className="transition-colors hover:bg-accent/10 border-border/50"
               >
-                <TableCell className="text-foreground">
+                <TableCell className="text-foreground text-xs md:text-sm py-2 px-2 md:px-4 truncate max-w-[180px] md:max-w-none">
                   {product.productName}
                 </TableCell>
-                <TableCell className="font-semibold text-right text-primary tabular-nums">
+                <TableCell className="px-2 py-2 text-xs font-semibold text-right text-primary tabular-nums md:text-sm md:px-4">
                   <CountUp
                     start={0}
                     end={product.totalRevenue}
@@ -158,16 +160,19 @@ export function TopProductsTable() {
             ))}
           </TableBody>
         </Table>
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-2 md:mt-4">
           <Button
             variant="ghost"
             size="sm"
             asChild
-            className="text-foreground hover:text-primary hover:bg-[rgba(6,182,212,0.1)] transition-all"
+            className="text-xs md:text-sm text-foreground hover:text-primary hover:bg-[rgba(6,182,212,0.1)] transition-all h-8 md:h-9"
           >
-            <Link to="/dashboard/reports" className="flex items-center gap-2">
-              {t("common.view")} {t("common.all")}
-              <ArrowRight className="w-4 h-4" />
+            <Link
+              to="/dashboard/reports"
+              className="flex items-center gap-1 md:gap-2"
+            >
+              {t("filters.viewAllProducts")}
+              <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
             </Link>
           </Button>
         </div>
