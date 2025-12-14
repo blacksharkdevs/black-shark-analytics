@@ -65,7 +65,10 @@
     "allPlatforms": "All Platforms",
     "dateRange": "Date Range",
     "status": "Status",
-    "searchPlaceholder": "Search..."
+    "searchPlaceholder": "Search...",
+    "groupProducts": "Group Products",
+    "groupProductsDesc": "Groups products with similar names into a single category. For example: 'Free Sugar Pro 3 bottles', 'Free Sugar Pro 6 bottles' will be grouped as 'Free Sugar'. Hover over grouped products to see included items.",
+    "groupedProducts": "Grouped Products"
   },
   "offerTypes": {
     "all": "All Types",

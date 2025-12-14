@@ -17,6 +17,8 @@ export default function DashboardPage() {
     setSelectedOfferType,
     selectedPlatform,
     setSelectedPlatform,
+    isProductsGrouped,
+    setIsProductsGrouped,
     isLoadingData,
   } = useDashboardData();
 
@@ -36,6 +38,8 @@ export default function DashboardPage() {
         platforms={availablePlatforms}
         selectedPlatform={selectedPlatform}
         onPlatformChange={setSelectedPlatform}
+        isProductsGrouped={isProductsGrouped}
+        onProductsGroupChange={setIsProductsGrouped}
         isLoading={isCombinedLoading}
       />
 

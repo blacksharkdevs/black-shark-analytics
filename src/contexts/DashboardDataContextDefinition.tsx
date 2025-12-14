@@ -30,6 +30,8 @@ interface DashboardDataContextType {
   setSelectedOfferType: React.Dispatch<React.SetStateAction<string>>;
   selectedPlatform: string;
   setSelectedPlatform: React.Dispatch<React.SetStateAction<string>>;
+  isProductsGrouped: boolean;
+  setIsProductsGrouped: React.Dispatch<React.SetStateAction<boolean>>;
   stats: any;
   isLoadingData: boolean;
 }

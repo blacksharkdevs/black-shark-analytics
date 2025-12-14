@@ -6,6 +6,7 @@ import { ProductFilter } from "./ProductFilter";
 import { OfferTypeFilter } from "./OfferTypeFilter";
 import { PlatformFilter } from "./PlatformFilter";
 import { SearchFilter } from "./SearchFilter";
+import { GroupProductsSwitch } from "./GroupProductsSwitch";
 import { FiltersSkeleton } from "./FiltersSkeleton";
 
 interface OfferTypeConfig {
@@ -39,6 +40,10 @@ interface FiltersProps {
   searchPlaceholder?: string;
   onSearchChange?: (value: string) => void;
   searchDefaultValue?: string;
+
+  // Agrupamento de Produtos
+  isProductsGrouped?: boolean;
+  onProductsGroupChange?: (grouped: boolean) => void;
 }
 
 export function Filters({
@@ -55,8 +60,11 @@ export function Filters({
   searchPlaceholder,
   onSearchChange,
   searchDefaultValue,
+  isProductsGrouped = false,
+  onProductsGroupChange,
 }: FiltersProps) {
   const hasSearchFilter = onSearchChange !== undefined;
+  const hasGroupSwitch = onProductsGroupChange !== undefined;
 
   if (isLoading) {
     return (
@@ -71,8 +79,10 @@ export function Filters({
     <div
       className={cn(
         "grid grid-cols-1 gap-4 shark-card",
-        !hasSearchFilter && "md:grid-cols-2 lg:grid-cols-3",
-        hasSearchFilter && "md:grid-cols-2 lg:grid-cols-4"
+        !hasSearchFilter && !hasGroupSwitch && "md:grid-cols-2 lg:grid-cols-3",
+        hasSearchFilter && !hasGroupSwitch && "md:grid-cols-2 lg:grid-cols-4",
+        !hasSearchFilter && hasGroupSwitch && "md:grid-cols-2 lg:grid-cols-4",
+        hasSearchFilter && hasGroupSwitch && "md:grid-cols-2 lg:grid-cols-5"
       )}
     >
       {/* Filtro 0: Busca (Condicional) */}
@@ -81,6 +91,14 @@ export function Filters({
           placeholder={searchPlaceholder}
           onSearchChange={onSearchChange!}
           defaultValue={searchDefaultValue}
+        />
+      )}
+
+      {/* Switch de Agrupamento (Condicional) */}
+      {hasGroupSwitch && (
+        <GroupProductsSwitch
+          isGrouped={isProductsGrouped}
+          onGroupChange={onProductsGroupChange!}
         />
       )}
 

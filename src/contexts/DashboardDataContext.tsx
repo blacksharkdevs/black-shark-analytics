@@ -299,6 +299,9 @@ interface DashboardDataContextType {
   selectedAffiliate: string; // 🆕 Novo filtro
   setSelectedAffiliate: (affiliateId: string) => void; // 🆕 Novo setter
 
+  isProductsGrouped: boolean; // 🆕 Agrupamento de produtos
+  setIsProductsGrouped: (grouped: boolean) => void; // 🆕 Setter
+
   stats: DashboardStats;
   isLoadingData: boolean;
 }
@@ -329,6 +332,7 @@ export function DashboardDataProvider({
   const [selectedOfferType, setSelectedOfferType] = useState<string>("all");
   const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
   const [selectedAffiliate, setSelectedAffiliate] = useState<string>("all"); // 🆕
+  const [isProductsGrouped, setIsProductsGrouped] = useState<boolean>(false); // 🆕 Agrupamento
 
   const [isLoadingData, setIsLoadingData] = useState(true);
 
@@ -388,13 +392,51 @@ export function DashboardDataProvider({
       createdAt: new Date().toISOString(),
     };
 
-    return [
-      allProductsOption,
-      ...Array.from(productsMap.values()).sort((a, b) =>
-        a.name.localeCompare(b.name)
-      ),
-    ];
-  }, [allTransactions]);
+    let productsList = Array.from(productsMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+
+    // 🆕 Aplicar agrupamento se habilitado
+    if (isProductsGrouped) {
+      const groupMap = new Map<string, Product[]>();
+
+      // Agrupar produtos por nome base (primeiras 2-3 palavras)
+      productsList.forEach((product) => {
+        // Extrai nome base (ex: "Free Sugar Pro" de "Free Sugar Pro 3 bottles")
+        const baseName =
+          product.name
+            .replace(/\d+\s*(bottle|bottles|unit|units|pack|packs)/gi, "")
+            .replace(/\+\s*\d+\s*(free|bonus|extra).*/gi, "")
+            .replace(/\s+(pro|plus|premium)\s*$/gi, "")
+            .replace(/\s+/g, " ")
+            .trim() || product.name;
+
+        const existing = groupMap.get(baseName) || [];
+        groupMap.set(baseName, [...existing, product]);
+      });
+
+      // Criar lista de produtos agrupados
+      const grouped: any[] = [];
+      groupMap.forEach((products, baseName) => {
+        if (products.length === 1) {
+          grouped.push(products[0]);
+        } else {
+          // Criar produto representando o grupo
+          grouped.push({
+            ...products[0],
+            id: `group:${baseName}`,
+            name: baseName,
+            isGrouped: true,
+            groupedProducts: products,
+          });
+        }
+      });
+
+      productsList = grouped.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    return [allProductsOption, ...productsList];
+  }, [allTransactions, isProductsGrouped]);
 
   const availableOfferTypes = useMemo(() => {
     const offerTypesSet = new Set<string>();
@@ -465,7 +507,26 @@ export function DashboardDataProvider({
     let filtered = allTransactions;
 
     if (selectedProduct !== "all") {
-      filtered = filtered.filter((t) => t.productId === selectedProduct);
+      // 🆕 Se o produto for agrupado, filtrar por múltiplos IDs
+      if (selectedProduct.startsWith("group:")) {
+        const selectedGroupedProduct = availableProducts.find(
+          (p) => p.id === selectedProduct
+        ) as any;
+
+        if (
+          selectedGroupedProduct?.isGrouped &&
+          selectedGroupedProduct?.groupedProducts
+        ) {
+          const productIds = selectedGroupedProduct.groupedProducts.map(
+            (p: Product) => p.id
+          );
+          filtered = filtered.filter(
+            (t) => t.productId && productIds.includes(t.productId)
+          );
+        }
+      } else {
+        filtered = filtered.filter((t) => t.productId === selectedProduct);
+      }
     }
 
     if (selectedOfferType !== "all") {
@@ -488,6 +549,7 @@ export function DashboardDataProvider({
     selectedOfferType,
     selectedPlatform,
     selectedAffiliate,
+    availableProducts,
   ]);
 
   const stats = useMemo(() => {
@@ -509,6 +571,8 @@ export function DashboardDataProvider({
     setSelectedPlatform,
     selectedAffiliate, // Exportando novo estado
     setSelectedAffiliate, // Exportando novo setter
+    isProductsGrouped, // 🆕 Exportando estado de agrupamento
+    setIsProductsGrouped, // 🆕 Exportando setter
 
     stats,
     isLoadingData,
