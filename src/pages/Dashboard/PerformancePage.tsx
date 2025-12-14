@@ -3,6 +3,9 @@ import { useTranslation } from "react-i18next";
 import { ProductPerformanceChart } from "@/components/dashboard/charts/ProductPerformanceChart";
 import { ProductSelector } from "@/components/dashboard/performance/ProductSelector";
 import { SharkInsights } from "@/components/dashboard/performance/SharkInsights";
+import { ProfitWaterfall } from "@/components/dashboard/performance/ProfitWaterfall";
+import { BundleIntelligence } from "@/components/dashboard/performance/BundleIntelligence";
+import { HealthMonitor } from "@/components/dashboard/performance/HealthMonitor";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { cn } from "@/lib/utils";
@@ -180,6 +183,33 @@ export default function PerformancePage() {
         filteredSalesData={filteredSalesData}
         dateRange={currentDateRange}
       />
+
+      {/* Grid de Análise Técnica */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Coluna 1: Profit Waterfall */}
+        <div className="lg:col-span-1">
+          <ProfitWaterfall
+            filteredSalesData={filteredSalesData}
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* Coluna 2: Bundle Intelligence */}
+        <div className="lg:col-span-1">
+          <BundleIntelligence
+            filteredSalesData={filteredSalesData}
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* Coluna 3: Health Monitor */}
+        <div className="lg:col-span-1">
+          <HealthMonitor
+            filteredSalesData={filteredSalesData}
+            isLoading={isLoading}
+          />
+        </div>
+      </div>
     </div>
   );
 }

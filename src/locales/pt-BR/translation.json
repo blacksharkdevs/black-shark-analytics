@@ -95,6 +95,48 @@
         "descriptionDecline": "{{product}} apresentou queda de {{percentage}}% no período recente",
         "descriptionNew": "{{product}} iniciou vendas no período recente com {{revenue}}"
       }
+    },
+    "waterfall": {
+      "title": "Fluxo de Caixa Real",
+      "description": "De onde vem e para onde vai cada centavo",
+      "grossRevenue": "Receita Bruta",
+      "platformFees": "Taxas da Plataforma",
+      "taxes": "Impostos",
+      "affiliateCommissions": "Comissões de Afiliados",
+      "shipping": "Frete",
+      "cogs": "Custo dos Produtos",
+      "netProfit": "Lucro Líquido",
+      "totalDeductions": "Total de Deduções",
+      "profitMargin": "Margem de Lucro",
+      "noData": "Sem dados disponíveis para análise de fluxo de caixa",
+      "deduction": "Dedução",
+      "revenue": "Receita"
+    },
+    "bundle": {
+      "title": "Batalha de Ofertas",
+      "description": "Qual kit está ganhando a guerra?",
+      "units": "unidades",
+      "sales": "vendas",
+      "ofRevenue": "da receita",
+      "margin": "margem",
+      "averageTicket": "Ticket Médio",
+      "mostProfitable": "Kit Mais Lucrativo",
+      "noData": "Sem dados disponíveis para análise de kits"
+    },
+    "health": {
+      "title": "Radar de Risco",
+      "description": "Monitor de saúde das transações",
+      "chargebackRate": "Taxa de Chargeback",
+      "status": "Status",
+      "statusHealthy": "Saudável",
+      "statusWarning": "Atenção",
+      "statusCritical": "Risco de Bloqueio",
+      "totalSales": "Total de Vendas",
+      "refunds": "Reembolsos",
+      "chargebacks": "Chargebacks",
+      "noData": "Sem dados disponíveis para análise de risco",
+      "warningMessage": "Taxa de chargeback entre 1-2%. Monitore de perto para evitar bloqueios.",
+      "criticalMessage": "⚠️ ALERTA CRÍTICO: Taxa acima de 2%! Risco iminente de bloqueio pelos processadores de pagamento (Visa/Mastercard)."
     }
   },
   "header": {

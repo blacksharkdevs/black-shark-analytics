@@ -95,6 +95,48 @@
         "descriptionDecline": "{{product}} showed a {{percentage}}% decline in the recent period",
         "descriptionNew": "{{product}} started sales in the recent period with {{revenue}}"
       }
+    },
+    "waterfall": {
+      "title": "Real Cash Flow",
+      "description": "Where every penny comes from and goes to",
+      "grossRevenue": "Gross Revenue",
+      "platformFees": "Platform Fees",
+      "taxes": "Taxes",
+      "affiliateCommissions": "Affiliate Commissions",
+      "shipping": "Shipping",
+      "cogs": "Product Costs",
+      "netProfit": "Net Profit",
+      "totalDeductions": "Total Deductions",
+      "profitMargin": "Profit Margin",
+      "noData": "No data available for cash flow analysis",
+      "deduction": "Deduction",
+      "revenue": "Revenue"
+    },
+    "bundle": {
+      "title": "Offer Battle",
+      "description": "Which kit is winning the war?",
+      "units": "units",
+      "sales": "sales",
+      "ofRevenue": "of revenue",
+      "margin": "margin",
+      "averageTicket": "Average Ticket",
+      "mostProfitable": "Most Profitable Kit",
+      "noData": "No data available for bundle analysis"
+    },
+    "health": {
+      "title": "Risk Radar",
+      "description": "Transaction health monitor",
+      "chargebackRate": "Chargeback Rate",
+      "status": "Status",
+      "statusHealthy": "Healthy",
+      "statusWarning": "Warning",
+      "statusCritical": "Block Risk",
+      "totalSales": "Total Sales",
+      "refunds": "Refunds",
+      "chargebacks": "Chargebacks",
+      "noData": "No data available for risk analysis",
+      "warningMessage": "Chargeback rate between 1-2%. Monitor closely to avoid blocks.",
+      "criticalMessage": "⚠️ CRITICAL ALERT: Rate above 2%! Imminent risk of blocking by payment processors (Visa/Mastercard)."
     }
   },
   "header": {
