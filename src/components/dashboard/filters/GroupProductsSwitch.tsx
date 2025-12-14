@@ -38,7 +38,7 @@ export function GroupProductsSwitch({
             </Label>
           </div>
         </HoverCardTrigger>
-        <HoverCardContent side="bottom" align="start" className="w-80 p-4">
+        <HoverCardContent side="bottom" align="start" className="p-4 w-80">
           <p className="text-sm text-foreground">
             {t("filters.groupProductsDesc")}
           </p>

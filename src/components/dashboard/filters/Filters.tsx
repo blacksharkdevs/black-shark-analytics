@@ -64,7 +64,6 @@ export function Filters({
   onProductsGroupChange,
 }: FiltersProps) {
   const hasSearchFilter = onSearchChange !== undefined;
-  const hasGroupSwitch = onProductsGroupChange !== undefined;
 
   if (isLoading) {
     return (
@@ -78,11 +77,7 @@ export function Filters({
   return (
     <div
       className={cn(
-        "grid grid-cols-1 gap-4 shark-card",
-        !hasSearchFilter && !hasGroupSwitch && "md:grid-cols-2 lg:grid-cols-3",
-        hasSearchFilter && !hasGroupSwitch && "md:grid-cols-2 lg:grid-cols-4",
-        !hasSearchFilter && hasGroupSwitch && "md:grid-cols-2 lg:grid-cols-4",
-        hasSearchFilter && hasGroupSwitch && "md:grid-cols-2 lg:grid-cols-5"
+        "grid grid-cols-1 gap-4 shark-card md:grid-cols-2 lg:grid-cols-3"
       )}
     >
       {/* Filtro 0: Busca (Condicional) */}
@@ -91,14 +86,6 @@ export function Filters({
           placeholder={searchPlaceholder}
           onSearchChange={onSearchChange!}
           defaultValue={searchDefaultValue}
-        />
-      )}
-
-      {/* Switch de Agrupamento (Condicional) */}
-      {hasGroupSwitch && (
-        <GroupProductsSwitch
-          isGrouped={isProductsGrouped}
-          onGroupChange={onProductsGroupChange!}
         />
       )}
 
@@ -121,6 +108,11 @@ export function Filters({
         platforms={platforms}
         selectedPlatform={selectedPlatform}
         onPlatformChange={onPlatformChange}
+      />
+
+      <GroupProductsSwitch
+        isGrouped={isProductsGrouped}
+        onGroupChange={onProductsGroupChange!}
       />
     </div>
   );
