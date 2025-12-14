@@ -2,7 +2,11 @@
 import React, { useMemo } from "react";
 import CountUp from "react-countup";
 import { Skeleton } from "@/components/common/ui/skeleton";
-import { Card, CardContent } from "@/components/common/ui/card";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/common/ui/hover-card";
 
 interface StatsCardProps {
   title: string;
@@ -69,36 +73,41 @@ export function StatsCard({
     [rawValue, duration, countUpProps]
   );
 
-  return (
-    <div className="relative group">
-      <div className="flex items-center justify-between p-4 transition-colors cursor-pointer rounded-xl hover:bg-accent/50">
-        <div className="flex items-center flex-1 gap-4">
-          <div className="flex items-center justify-center w-10 h-10">
-            <Icon className="w-6 h-6 text-primary" />
-          </div>
-          <div className="space-y-1 max-w-[180px]">
-            <h3 className="font-semibold text-foreground">{title}</h3>
-            <p className="text-sm text-muted-foreground">{description}</p>
-          </div>
+  const cardContent = (
+    <div className="flex items-center justify-between p-4 transition-colors cursor-pointer rounded-xl hover:bg-accent/50">
+      <div className="flex items-center flex-1 gap-4">
+        <div className="flex items-center justify-center w-10 h-10">
+          <Icon className="w-6 h-6 text-primary" />
         </div>
-        <div className="text-2xl font-bold text-foreground">
-          {isMonetary && "$"}
-          {countUpComponent}
+        <div className="space-y-1 max-w-[180px]">
+          <h3 className="font-semibold text-foreground">{title}</h3>
+          <p className="text-sm text-muted-foreground">{description}</p>
         </div>
       </div>
-
-      {explanation && (
-        <Card
-          className="absolute top-0 invisible ml-4 transition-opacity duration-200 shadow-lg opacity-0 left-full w-96 group-hover:opacity-100 group-hover:visible"
-          style={{ zIndex: 9999 }}
-        >
-          <CardContent className="p-4">
-            <pre className="font-sans text-sm whitespace-pre-wrap text-foreground">
-              {explanation}
-            </pre>
-          </CardContent>
-        </Card>
-      )}
+      <div className="text-2xl font-bold text-foreground">
+        {isMonetary && "$"}
+        {countUpComponent}
+      </div>
     </div>
+  );
+
+  if (!explanation) {
+    return <div>{cardContent}</div>;
+  }
+
+  return (
+    <HoverCard openDelay={200} closeDelay={100}>
+      <HoverCardTrigger asChild>{cardContent}</HoverCardTrigger>
+      <HoverCardContent
+        side="right"
+        align="start"
+        className="p-4 w-96"
+        sideOffset={8}
+      >
+        <pre className="font-sans text-sm whitespace-pre-wrap text-foreground">
+          {explanation}
+        </pre>
+      </HoverCardContent>
+    </HoverCard>
   );
 }
