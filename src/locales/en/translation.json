@@ -59,12 +59,17 @@
     "chartDescription": "Daily/hourly revenue by product",
     "noProductsSelected": "Select at least one product to view performance",
     "noData": "No data available for the selected period",
+    "layoutFullWidth": "Full Width",
+    "layoutSideBySide": "Side by Side",
+    "groupExample": "Example",
     "productSelector": {
       "title": "Available Products",
       "description": "Select the products you want to view in the chart",
       "topProduct": "top selling",
       "of": "of",
-      "productsSelected": "products selected"
+      "productsSelected": "products selected",
+      "productsGrouped": "grouped products",
+      "ranking": "in ranking"
     }
   },
   "header": {

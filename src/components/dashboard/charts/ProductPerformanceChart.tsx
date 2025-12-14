@@ -18,19 +18,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/common/ui/card";
+import { Button } from "@/components/common/ui/button";
 import { Skeleton } from "@/components/common/ui/skeleton";
 import {
   ChartContainer,
   ChartTooltipContent,
 } from "@/components/common/ui/chart";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, Maximize2, Minimize2 } from "lucide-react";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import type { Transaction } from "@/types/index";
 
+interface Product {
+  id: string;
+  name: string;
+  totalRevenue: number;
+  isGrouped?: boolean;
+  groupedProducts?: Array<{ id: string; name: string }>;
+}
+
 interface ProductPerformanceChartProps {
   selectedProductIds: string[];
   isLoading: boolean;
+  availableProducts: Product[];
+  isFullWidth: boolean;
+  onToggleFullWidth: () => void;
 }
 
 // Cores neon para os produtos
@@ -56,6 +68,9 @@ const formatYAxisValue = (value: number): string => {
 export function ProductPerformanceChart({
   selectedProductIds,
   isLoading,
+  availableProducts,
+  isFullWidth,
+  onToggleFullWidth,
 }: ProductPerformanceChartProps) {
   const { t } = useTranslation();
   const { filteredSalesData: data } = useDashboardData();
@@ -91,17 +106,41 @@ export function ProductPerformanceChart({
     const productNamesMap: Record<string, string> = {};
     const config: Record<string, { label: string; color: string }> = {};
 
-    // Filtrar transações dos produtos selecionados
+    // Expandir produtos agrupados para suas IDs individuais
+    const expandedProductIds: string[] = [];
+    const productIdToChartKey: Record<string, string> = {};
+
+    selectedProductIds.forEach((productId) => {
+      if (productId.startsWith("group:")) {
+        // É um produto agrupado
+        const groupedProduct = availableProducts.find(
+          (p) => p.id === productId
+        );
+        if (groupedProduct && groupedProduct.groupedProducts) {
+          // Adicionar todas as IDs dos produtos no grupo
+          groupedProduct.groupedProducts.forEach((p) => {
+            expandedProductIds.push(p.id);
+            productIdToChartKey[p.id] = productId; // Mapear ID individual para a chave do grupo
+          });
+        }
+      } else {
+        // É um produto normal
+        expandedProductIds.push(productId);
+        productIdToChartKey[productId] = productId;
+      }
+    });
+
+    // Filtrar transações dos produtos selecionados (incluindo produtos agrupados expandidos)
     const filteredData = data.filter(
       (record: Transaction) =>
-        selectedProductIds.includes(record.product?.id || "") &&
+        expandedProductIds.includes(record.product?.id || "") &&
         record.type === "SALE" &&
         record.status === "COMPLETED"
     );
 
     // Mapear nomes de produtos e criar config
     selectedProductIds.forEach((productId, index) => {
-      const product = data.find((r) => r.product?.id === productId)?.product;
+      const product = availableProducts.find((p) => p.id === productId);
       if (product) {
         productNamesMap[productId] = product.name;
         config[productId] = {
@@ -130,13 +169,14 @@ export function ProductPerformanceChart({
         const transactionDateObject = parseISO(record.createdAt);
         const hourInUTC = transactionDateObject.getUTCHours();
         const productId = record.product?.id || "";
+        const chartKey = productIdToChartKey[productId]; // Usar a chave do gráfico (pode ser "group:X" ou ID normal)
 
         const targetHourEntry = hourlyData.find(
           (h) => h.hourIndex === hourInUTC
         );
-        if (targetHourEntry && selectedProductIds.includes(productId)) {
-          targetHourEntry[productId] =
-            Number(targetHourEntry[productId]) + Number(record.grossAmount);
+        if (targetHourEntry && chartKey) {
+          targetHourEntry[chartKey] =
+            Number(targetHourEntry[chartKey]) + Number(record.grossAmount);
         }
       });
 
@@ -157,6 +197,7 @@ export function ProductPerformanceChart({
         const transactionDateObject = parseISO(record.createdAt);
         const dateKey = dateFnsFormat(transactionDateObject, "yyyy-MM-dd");
         const productId = record.product?.id || "";
+        const chartKey = productIdToChartKey[productId]; // Usar a chave do gráfico
 
         if (!dailyData[dateKey]) {
           const dataPoint: Record<string, number | string> = {
@@ -169,9 +210,9 @@ export function ProductPerformanceChart({
           dailyData[dateKey] = dataPoint;
         }
 
-        if (selectedProductIds.includes(productId)) {
-          dailyData[dateKey][productId] =
-            Number(dailyData[dateKey][productId]) + Number(record.grossAmount);
+        if (chartKey) {
+          dailyData[dateKey][chartKey] =
+            Number(dailyData[dateKey][chartKey]) + Number(record.grossAmount);
         }
       });
 
@@ -195,7 +236,14 @@ export function ProductPerformanceChart({
       productNames: productNamesMap,
       chartConfig: config,
     };
-  }, [data, dateRange, selectedProductIds, timeFormatter, shortDateFormatter]);
+  }, [
+    data,
+    dateRange,
+    selectedProductIds,
+    timeFormatter,
+    shortDateFormatter,
+    availableProducts,
+  ]);
 
   if (isLoading) {
     return (
@@ -216,7 +264,7 @@ export function ProductPerformanceChart({
       <Card className="shark-card">
         <CardHeader className="px-4 py-3 md:px-6 md:py-4">
           <CardTitle className="flex items-center text-base md:text-lg text-foreground">
-            <TrendingUp className="w-4 h-4 md:w-6 md:h-6 mr-2" />
+            <TrendingUp className="w-4 h-4 mr-2 md:w-6 md:h-6" />
             {t("performance.chartTitle")}
           </CardTitle>
           <CardDescription className="text-xs md:text-sm">
@@ -224,7 +272,7 @@ export function ProductPerformanceChart({
           </CardDescription>
         </CardHeader>
         <CardContent className="h-[400px] md:h-[500px] flex items-center justify-center">
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             {selectedProductIds.length === 0
               ? t("performance.noProductsSelected")
               : t("performance.noData")}
@@ -235,17 +283,45 @@ export function ProductPerformanceChart({
   }
 
   return (
-    <Card className="shark-card">
+    <Card className="h-full shark-card">
       <CardHeader className="px-4 py-3 md:px-6 md:py-4">
-        <CardTitle className="flex items-center text-base md:text-lg text-foreground">
-          <TrendingUp className="w-4 h-4 md:w-6 md:h-6 mr-2" />
-          {t("performance.chartTitle")}
-        </CardTitle>
-        <CardDescription className="text-xs md:text-sm">
-          {t("performance.chartDescription")}
-        </CardDescription>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <CardTitle className="flex items-center text-base md:text-lg text-foreground">
+              <TrendingUp className="w-4 h-4 mr-2 md:w-6 md:h-6" />
+              {t("performance.chartTitle")}
+            </CardTitle>
+            <CardDescription className="text-xs md:text-sm">
+              {t("performance.chartDescription")}
+            </CardDescription>
+          </div>
+
+          {/* Botão de Toggle Layout */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleFullWidth}
+            className="flex items-center gap-2 text-muted-foreground hover:text-primary"
+            title={
+              isFullWidth
+                ? t("performance.layoutSideBySide")
+                : t("performance.layoutFullWidth")
+            }
+          >
+            {isFullWidth ? (
+              <Minimize2 className="w-4 h-4" />
+            ) : (
+              <Maximize2 className="w-4 h-4" />
+            )}
+            <span className="hidden text-xs md:inline">
+              {isFullWidth
+                ? t("performance.layoutSideBySide")
+                : t("performance.layoutFullWidth")}
+            </span>
+          </Button>
+        </div>
       </CardHeader>
-      <CardContent className="pb-4 md:pb-6 pl-1 md:pl-2 pr-2 md:pr-6">
+      <CardContent className="pb-4 pl-1 pr-2 md:pb-6 md:pl-2 md:pr-6">
         <ChartContainer
           config={chartConfig}
           className="h-[350px] md:h-[450px] lg:h-[500px] w-full"

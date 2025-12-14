@@ -59,12 +59,17 @@
     "chartDescription": "Receita diária/horária por produto",
     "noProductsSelected": "Selecione pelo menos um produto para visualizar a performance",
     "noData": "Sem dados disponíveis para o período selecionado",
+    "layoutFullWidth": "Largura Total",
+    "layoutSideBySide": "Lado a Lado",
+    "groupExample": "Exemplo",
     "productSelector": {
       "title": "Produtos Disponíveis",
       "description": "Selecione os produtos que deseja visualizar no gráfico",
       "topProduct": "mais vendido",
       "of": "de",
-      "productsSelected": "produtos selecionados"
+      "productsSelected": "produtos selecionados",
+      "productsGrouped": "produtos agrupados",
+      "ranking": "no ranking"
     }
   },
   "header": {

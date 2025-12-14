@@ -1,9 +1,18 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ProductPerformanceChart } from "@/components/dashboard/charts/ProductPerformanceChart";
 import { ProductSelector } from "@/components/dashboard/performance/ProductSelector";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
+import { cn } from "@/lib/utils";
+
+interface Product {
+  id: string;
+  name: string;
+  totalRevenue: number;
+  isGrouped?: boolean;
+  groupedProducts?: Array<{ id: string; name: string }>;
+}
 
 export default function PerformancePage() {
   const { t } = useTranslation();
@@ -12,8 +21,14 @@ export default function PerformancePage() {
 
   const isLoading = isLoadingData || isDateRangeLoading;
 
-  // Calcular os 5 produtos mais vendidos do período
-  const topProducts = useMemo(() => {
+  // Estado para agrupamento de produtos
+  const [isProductsGrouped, setIsProductsGrouped] = useState(true);
+
+  // Estado para layout do gráfico (full width ou lado a lado)
+  const [isFullWidth, setIsFullWidth] = useState(false);
+
+  // Calcular produtos disponíveis (com ou sem agrupamento)
+  const availableProducts = useMemo(() => {
     const productRevenueMap = filteredSalesData.reduce((acc, record) => {
       if (record.type !== "SALE" || record.status !== "COMPLETED") return acc;
 
@@ -29,24 +44,81 @@ export default function PerformancePage() {
       }
       acc[productId].totalRevenue += Number(record.grossAmount);
       return acc;
-    }, {} as Record<string, { id: string; name: string; totalRevenue: number }>);
+    }, {} as Record<string, Product>);
 
-    return Object.values(productRevenueMap)
-      .sort((a, b) => b.totalRevenue - a.totalRevenue)
-      .slice(0, 5);
-  }, [filteredSalesData]);
+    let productsList = Object.values(productRevenueMap).sort(
+      (a, b) => b.totalRevenue - a.totalRevenue
+    );
+
+    // Aplicar agrupamento se habilitado
+    if (isProductsGrouped) {
+      const groupMap = new Map<string, Product[]>();
+
+      productsList.forEach((product) => {
+        const baseName =
+          product.name
+            .replace(/\+.*/gi, "")
+            .replace(/\d+\s*(bottle|bottles|unit|units|pack|packs)s?/gi, "")
+            .replace(/\s+(pro|plus|premium)\s*$/gi, "")
+            .replace(/\s+s\s+/gi, " ")
+            .replace(/\s+s$/gi, "")
+            .replace(/\s+/g, " ")
+            .trim() || product.name;
+
+        const existing = groupMap.get(baseName) || [];
+        groupMap.set(baseName, [...existing, product]);
+      });
+
+      const grouped: Product[] = [];
+      const ungrouped: Product[] = [];
+
+      groupMap.forEach((products, baseName) => {
+        if (products.length === 1) {
+          ungrouped.push(products[0]);
+        } else {
+          const totalRevenue = products.reduce(
+            (sum, p) => sum + p.totalRevenue,
+            0
+          );
+          grouped.push({
+            id: `group:${baseName}`,
+            name: baseName,
+            totalRevenue,
+            isGrouped: true,
+            groupedProducts: products.map((p) => ({ id: p.id, name: p.name })),
+          });
+        }
+      });
+
+      productsList = [
+        ...grouped.sort((a, b) => b.totalRevenue - a.totalRevenue),
+        ...ungrouped.sort((a, b) => b.totalRevenue - a.totalRevenue),
+      ];
+    }
+
+    return productsList;
+  }, [filteredSalesData, isProductsGrouped]);
+
+  // Top 5 produtos para seleção inicial
+  const topProducts = useMemo(() => {
+    return availableProducts.slice(0, 5);
+  }, [availableProducts]);
 
   // Estado para produtos selecionados (inicialmente os top 5)
-  const [selectedProductIds, setSelectedProductIds] = useState<string[]>(
-    topProducts.map((p) => p.id)
-  );
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
 
   // Atualizar produtos selecionados quando os top products mudarem
-  useMemo(() => {
+  useEffect(() => {
     if (topProducts.length > 0 && selectedProductIds.length === 0) {
       setSelectedProductIds(topProducts.map((p) => p.id));
     }
   }, [topProducts, selectedProductIds.length]);
+
+  // Limpar o gráfico quando o agrupamento mudar
+  const handleProductsGroupChange = (value: boolean) => {
+    setIsProductsGrouped(value);
+    setSelectedProductIds([]); // Limpa todos os produtos selecionados
+  };
 
   const handleToggleProduct = (productId: string) => {
     setSelectedProductIds((prev) =>
@@ -68,19 +140,36 @@ export default function PerformancePage() {
         </p>
       </div>
 
-      {/* Gráfico de Performance */}
-      <ProductPerformanceChart
-        selectedProductIds={selectedProductIds}
-        isLoading={isLoading}
-      />
+      {/* Gráfico e Produtos - Layout Dinâmico */}
+      <div
+        className={cn(
+          "flex gap-6",
+          isFullWidth ? "flex-col" : "flex-col lg:flex-row"
+        )}
+      >
+        {/* Gráfico de Performance */}
+        <div className={cn(isFullWidth ? "w-full" : "w-full lg:w-2/3")}>
+          <ProductPerformanceChart
+            selectedProductIds={selectedProductIds}
+            isLoading={isLoading}
+            availableProducts={availableProducts}
+            isFullWidth={isFullWidth}
+            onToggleFullWidth={() => setIsFullWidth(!isFullWidth)}
+          />
+        </div>
 
-      {/* Seletor de Produtos */}
-      <ProductSelector
-        topProducts={topProducts}
-        selectedProductIds={selectedProductIds}
-        onToggleProduct={handleToggleProduct}
-        isLoading={isLoading}
-      />
+        {/* Seletor de Produtos */}
+        <div className={cn(isFullWidth ? "w-full" : "w-full lg:w-1/3")}>
+          <ProductSelector
+            availableProducts={availableProducts}
+            selectedProductIds={selectedProductIds}
+            onToggleProduct={handleToggleProduct}
+            isLoading={isLoading}
+            isProductsGrouped={isProductsGrouped}
+            onProductsGroupChange={handleProductsGroupChange}
+          />
+        </div>
+      </div>
     </div>
   );
 }
