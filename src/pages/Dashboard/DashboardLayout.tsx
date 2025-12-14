@@ -22,7 +22,7 @@ function DashboardLayoutContent() {
   const currentSidebarWidth = isSidebarOpen ? SIDEBAR_WIDTH : "72px";
 
   return (
-    <div className="flex w-full min-h-screen bg-background">
+    <div className="flex w-full min-h-screen">
       <AppSidebar width={SIDEBAR_WIDTH} />
       <div
         className="relative flex flex-col flex-1 transition-all duration-300"

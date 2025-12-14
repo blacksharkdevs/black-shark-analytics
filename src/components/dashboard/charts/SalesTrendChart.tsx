@@ -180,13 +180,13 @@ export function SalesTrendChart() {
   if (isLoading) {
     return (
       // 🚨 CORES DINÂMICAS E DESIGN RETO
-      <Card className="col-span-1 border rounded-none shadow-lg lg:col-span-3 border-white/30">
+      <Card className="col-span-1 lg:col-span-3">
         <CardHeader>
-          <Skeleton className="w-48 mb-1 rounded-none h-7 bg-accent/20" />
-          <Skeleton className="w-64 h-4 rounded-none bg-accent/20" />
+          <Skeleton className="w-48 mb-1 h-7" />
+          <Skeleton className="w-64 h-4" />
         </CardHeader>
         <CardContent className="pb-6 pl-2 pr-6">
-          <Skeleton className="h-[350px] w-full bg-accent/30 rounded-none" />
+          <Skeleton className="h-[350px] w-full" />
         </CardContent>
       </Card>
     );
@@ -194,7 +194,7 @@ export function SalesTrendChart() {
 
   if (chartData.length === 0) {
     return (
-      <Card className="col-span-1 border rounded-none shadow-lg lg:col-span-3 border-white/30">
+      <Card className="col-span-1 lg:col-span-3">
         <CardHeader>
           <CardTitle>{t("dashboard.charts.salesTrend")}</CardTitle>
           <CardDescription>
@@ -211,7 +211,7 @@ export function SalesTrendChart() {
   }
 
   return (
-    <Card className="col-span-1 border rounded-none shadow-lg lg:col-span-3 border-white/30 backdrop-blur-sm">
+    <Card className="col-span-1 lg:col-span-3 shark-card">
       <CardHeader>
         <CardTitle className="text-foreground">
           {t("dashboard.charts.salesTrend")}
