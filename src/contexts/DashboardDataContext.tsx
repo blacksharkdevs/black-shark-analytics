@@ -425,7 +425,7 @@ export function DashboardDataProvider({
       // Criar lista de produtos agrupados
       const grouped: any[] = [];
       const ungrouped: any[] = [];
-      
+
       groupMap.forEach((products, baseName) => {
         if (products.length === 1) {
           // Produto único, não agrupado

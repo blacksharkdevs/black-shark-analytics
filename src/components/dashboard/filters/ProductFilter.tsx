@@ -70,7 +70,10 @@ export function ProductFilter({
                     <div className="text-xs text-foreground">
                       {productAny.groupedProducts.map((p: any) => (
                         <div key={p.id} className="py-1">
-                          • {p.name} <span className="text-muted-foreground">( {p.platform} )</span>
+                          • {p.name}{" "}
+                          <span className="text-muted-foreground">
+                            ( {p.platform} )
+                          </span>
                         </div>
                       ))}
                     </div>
