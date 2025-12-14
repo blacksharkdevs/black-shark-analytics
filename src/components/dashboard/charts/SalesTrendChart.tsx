@@ -28,7 +28,9 @@ import {
 import { type ChartConfig } from "@/components/common/ui/chart";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
-import { ChartNoAxesColumnIncreasing } from "lucide-react";
+import { ChartNoAxesColumnIncreasing, ArrowRight } from "lucide-react";
+import { Button } from "@/components/common/ui/button";
+import { Link } from "react-router-dom";
 
 // --- FORMATADORES UTC ---
 // Formata o valor do YAxis (eixo vertical)
@@ -218,7 +220,7 @@ export function SalesTrendChart() {
     >
       <CardHeader>
         <CardTitle className="flex items-center text-foreground">
-          <ChartNoAxesColumnIncreasing className="w-6 h-6 mr-2 text-blue-600 dark:text-white" />{" "}
+          <ChartNoAxesColumnIncreasing className="w-6 h-6 mr-2" />{" "}
           {t("dashboard.charts.salesTrend")}
         </CardTitle>
         <CardDescription>
@@ -305,6 +307,22 @@ export function SalesTrendChart() {
             </LineChart>
           </ResponsiveContainer>
         </ChartContainer>
+        <div className="flex justify-center mt-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="text-foreground hover:text-primary hover:bg-[rgba(6,182,212,0.1)] transition-all"
+          >
+            <Link
+              to="/dashboard/transactions"
+              className="flex items-center gap-2"
+            >
+              {t("common.view")} {t("common.all")}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

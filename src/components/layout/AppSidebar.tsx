@@ -4,8 +4,8 @@ import {
   LayoutDashboard,
   ChevronLeft,
   ChevronRight,
-  List,
   CircleDollarSign,
+  List,
   Settings,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -38,14 +38,14 @@ export function AppSidebar({ width }: { width: string }) {
       isRoot: true,
     },
     {
-      href: "/dashboard/transactions",
-      label: t("navigation.transactions"),
-      icon: CircleDollarSign,
-    },
-    {
       href: "/dashboard/affiliates",
       label: t("navigation.affiliates"),
       icon: Users,
+    },
+    {
+      href: "/dashboard/transactions",
+      label: t("navigation.transactions"),
+      icon: CircleDollarSign,
     },
     {
       href: "/dashboard/reports",

@@ -17,8 +17,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/common/ui/card";
-import { Package } from "lucide-react";
+import { Package, ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/common/ui/skeleton";
+import { Button } from "@/components/common/ui/button";
+import { Link } from "react-router-dom";
 import { formatCurrency } from "@/utils/index";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
@@ -108,7 +110,7 @@ export function TopProductsTable() {
 
   return (
     <Card
-      className="h-full border rounded-none shadow-lg border-white/30 backdrop-blur-sm relative"
+      className="relative h-full border rounded-none shadow-lg border-white/30 backdrop-blur-sm"
       style={{ zIndex: 1 }}
     >
       <CardHeader>
@@ -156,6 +158,19 @@ export function TopProductsTable() {
             ))}
           </TableBody>
         </Table>
+        <div className="flex justify-center mt-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="text-foreground hover:text-primary hover:bg-[rgba(6,182,212,0.1)] transition-all"
+          >
+            <Link to="/dashboard/reports" className="flex items-center gap-2">
+              {t("common.view")} {t("common.all")}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
