@@ -74,7 +74,7 @@ export function StatsCard({
   );
 
   const cardContent = (
-    <div className="flex items-center justify-between p-4 transition-colors cursor-pointer rounded-xl hover:bg-accent/50">
+    <div className="flex items-center justify-between p-4 transition-colors cursor-pointer rounded-xl hover:bg-accent/10">
       <div className="flex items-center flex-1 gap-4">
         <div className="flex items-center justify-center w-10 h-10">
           <Icon className="w-6 h-6 text-primary" />
@@ -84,7 +84,7 @@ export function StatsCard({
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
       </div>
-      <div className="text-2xl font-bold text-foreground">
+      <div className="text-2xl font-bold text-blue-700">
         {isMonetary && "$"}
         {countUpComponent}
       </div>
@@ -101,7 +101,7 @@ export function StatsCard({
       <HoverCardContent
         side="right"
         align="start"
-        className="p-4 w-96"
+        className="p-4 w-96 shark-card"
         sideOffset={8}
       >
         <pre className="font-sans text-sm whitespace-pre-wrap text-foreground">
