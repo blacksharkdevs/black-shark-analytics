@@ -62,7 +62,7 @@ export function ProductFilter({
                   <HoverCardContent
                     side="right"
                     align="start"
-                    className="w-80 p-4"
+                    className="w-96 p-4"
                   >
                     <p className="mb-2 text-xs font-semibold text-muted-foreground">
                       {t("filters.groupedProducts")}:
@@ -70,7 +70,7 @@ export function ProductFilter({
                     <div className="text-xs text-foreground">
                       {productAny.groupedProducts.map((p: any) => (
                         <div key={p.id} className="py-1">
-                          • {p.name}
+                          • {p.name} <span className="text-muted-foreground">( {p.platform} )</span>
                         </div>
                       ))}
                     </div>

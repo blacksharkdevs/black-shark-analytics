@@ -405,9 +405,16 @@ export function DashboardDataProvider({
         // Extrai nome base (ex: "Free Sugar Pro" de "Free Sugar Pro 3 bottles")
         const baseName =
           product.name
-            .replace(/\d+\s*(bottle|bottles|unit|units|pack|packs)/gi, "")
-            .replace(/\+\s*\d+\s*(free|bonus|extra).*/gi, "")
+            // Remove padrões de quantidade com números
+            .replace(/\d+\s*(bottle|bottles|unit|units|pack|packs)s?/gi, "")
+            // Remove "+ X free" ou similar
+            .replace(/\+\s*\d+\s*(free|bonus|extra)s?.*/gi, "")
+            // Remove variações "Pro", "Plus", "Premium" no final
             .replace(/\s+(pro|plus|premium)\s*$/gi, "")
+            // Remove "s" sozinho que pode ter sobrado
+            .replace(/\s+s\s+/gi, " ")
+            .replace(/\s+s$/gi, "")
+            // Remove espaços múltiplos
             .replace(/\s+/g, " ")
             .trim() || product.name;
 
@@ -417,9 +424,12 @@ export function DashboardDataProvider({
 
       // Criar lista de produtos agrupados
       const grouped: any[] = [];
+      const ungrouped: any[] = [];
+      
       groupMap.forEach((products, baseName) => {
         if (products.length === 1) {
-          grouped.push(products[0]);
+          // Produto único, não agrupado
+          ungrouped.push(products[0]);
         } else {
           // Criar produto representando o grupo
           grouped.push({
@@ -432,7 +442,11 @@ export function DashboardDataProvider({
         }
       });
 
-      productsList = grouped.sort((a, b) => a.name.localeCompare(b.name));
+      // Produtos agrupados primeiro, depois os não agrupados
+      productsList = [
+        ...grouped.sort((a, b) => a.name.localeCompare(b.name)),
+        ...ungrouped.sort((a, b) => a.name.localeCompare(b.name)),
+      ];
     }
 
     return [allProductsOption, ...productsList];
