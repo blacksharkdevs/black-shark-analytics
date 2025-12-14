@@ -107,7 +107,10 @@ export function TopProductsTable() {
   }
 
   return (
-    <Card className="h-full border rounded-none shadow-lg border-white/30 backdrop-blur-sm">
+    <Card
+      className="h-full border rounded-none shadow-lg border-white/30 backdrop-blur-sm relative"
+      style={{ zIndex: 1 }}
+    >
       <CardHeader>
         <CardTitle className="flex items-center text-foreground">
           {/* Mantido o seu estilo de ícone original */}

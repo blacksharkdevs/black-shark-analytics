@@ -28,6 +28,7 @@ import {
 import { type ChartConfig } from "@/components/common/ui/chart";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
+import { ChartNoAxesColumnIncreasing } from "lucide-react";
 
 // --- FORMATADORES UTC ---
 // Formata o valor do YAxis (eixo vertical)
@@ -211,17 +212,21 @@ export function SalesTrendChart() {
   }
 
   return (
-    <Card className="col-span-1 lg:col-span-2 shark-card">
+    <Card
+      className="relative h-full col-span-1 lg:col-span-2 shark-card"
+      style={{ zIndex: 1 }}
+    >
       <CardHeader>
-        <CardTitle className="text-foreground">
+        <CardTitle className="flex items-center text-foreground">
+          <ChartNoAxesColumnIncreasing className="w-6 h-6 mr-2 text-blue-600 dark:text-white" />{" "}
           {t("dashboard.charts.salesTrend")}
         </CardTitle>
         <CardDescription>
-          {t("dashboard.charts.salesTrendDesc")}
+          {t("dashboard.charts.topAffiliatesDesc")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="pb-6 pl-2 pr-6">
-        <ChartContainer config={chartConfig} className="h-[350px] w-full">
+      <CardContent className="h-full pb-6 pl-2 pr-6">
+        <ChartContainer config={chartConfig} className="h-[450px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}

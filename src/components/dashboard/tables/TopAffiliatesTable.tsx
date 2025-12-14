@@ -112,7 +112,10 @@ export function TopAffiliatesTable() {
   }
 
   return (
-    <Card className="h-full border rounded-none shadow-lg border-white/30 backdrop-blur-sm">
+    <Card
+      className="h-full border rounded-none shadow-lg border-white/30 backdrop-blur-sm relative"
+      style={{ zIndex: 1 }}
+    >
       <CardHeader>
         <CardTitle className="flex items-center text-foreground">
           <Users className="w-6 h-6 mr-2 text-blue-600 dark:text-white" />{" "}

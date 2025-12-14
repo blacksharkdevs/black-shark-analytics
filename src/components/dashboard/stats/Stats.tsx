@@ -7,10 +7,16 @@ import {
   Wallet,
   ShoppingCart,
   TrendingDown,
+  ChartArea,
 } from "lucide-react";
 import { formatCurrency } from "@/utils/index";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
+import {
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/common/ui/card";
 
 // 1. Adicionei as novas chaves aqui
 type StatKey =
@@ -191,10 +197,16 @@ Formula: Gross Sales / Front Sales`;
 
   return (
     <div className="shark-card">
-      <h2 className="text-2xl font-bold text-foreground">
-        {t("dashboard.stats.mainMetrics")}
-      </h2>
-      <div className="space-y-2">
+      <CardHeader>
+        <CardTitle className="flex items-center text-foreground">
+          <ChartArea className="w-6 h-6 mr-2 text-blue-600 dark:text-white" />{" "}
+          {t("dashboard.stats.mainMetrics")}
+        </CardTitle>
+        <CardDescription className="text-muted-foreground">
+          {t("dashboard.charts.topAffiliatesDesc")}
+        </CardDescription>
+      </CardHeader>
+      <div className="">
         {cardProps.map((props) => (
           <StatsCard key={props.id} {...props} />
         ))}

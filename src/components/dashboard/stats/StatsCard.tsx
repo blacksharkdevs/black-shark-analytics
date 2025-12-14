@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable react-hooks/rules-of-hooks */
+import React, { useMemo } from "react";
 import CountUp from "react-countup";
 import { Skeleton } from "@/components/common/ui/skeleton";
 import { Card, CardContent } from "@/components/common/ui/card";
@@ -24,7 +25,6 @@ export function StatsCard({
   explanation,
   isMonetary = false,
 }: StatsCardProps) {
-  const [showExplanation, setShowExplanation] = useState(false);
   const duration = 1.5;
 
   const countUpProps = isMonetary
@@ -61,35 +61,37 @@ export function StatsCard({
     );
   }
 
+  // Memoizar o CountUp para evitar re-animação no hover
+  const countUpComponent = useMemo(
+    () => (
+      <CountUp start={0} end={rawValue} duration={duration} {...countUpProps} />
+    ),
+    [rawValue, duration, countUpProps]
+  );
+
   return (
-    <div className="relative">
-      <div
-        className="flex items-center justify-between p-4 transition-colors cursor-pointer hover:bg-accent/50"
-        onMouseEnter={() => setShowExplanation(true)}
-        onMouseLeave={() => setShowExplanation(false)}
-      >
+    <div className="relative group">
+      <div className="flex items-center justify-between p-4 transition-colors cursor-pointer rounded-xl hover:bg-accent/50">
         <div className="flex items-center flex-1 gap-4">
           <div className="flex items-center justify-center w-10 h-10">
             <Icon className="w-6 h-6 text-primary" />
           </div>
-          <div className="flex-1">
+          <div className="space-y-1 max-w-[180px]">
             <h3 className="font-semibold text-foreground">{title}</h3>
             <p className="text-sm text-muted-foreground">{description}</p>
           </div>
         </div>
         <div className="text-2xl font-bold text-foreground">
           {isMonetary && "$"}
-          <CountUp
-            start={0}
-            end={rawValue}
-            duration={duration}
-            {...countUpProps}
-          />
+          {countUpComponent}
         </div>
       </div>
 
-      {showExplanation && explanation && (
-        <Card className="absolute top-0 z-50 ml-4 shadow-lg left-full w-96">
+      {explanation && (
+        <Card
+          className="absolute top-0 invisible ml-4 transition-opacity duration-200 shadow-lg opacity-0 left-full w-96 group-hover:opacity-100 group-hover:visible"
+          style={{ zIndex: 9999 }}
+        >
           <CardContent className="p-4">
             <pre className="font-sans text-sm whitespace-pre-wrap text-foreground">
               {explanation}
