@@ -81,7 +81,7 @@ export function AppSidebar({ width }: { width: string }) {
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className={cn(
-        "fixed top-0 left-0 h-full border-r border-gray-400 dark:bg-[#1a2342]  transition-transform duration-300 z-50 flex flex-col",
+        "fixed top-0 left-0 h-full border-r border-gray-400/10  transition-transform duration-300 z-50 flex flex-col",
         {
           "transform -translate-x-full": !isSidebarOpen && isMobile,
           "w-[280px]": isSidebarOpen && isMobile,
@@ -108,11 +108,11 @@ export function AppSidebar({ width }: { width: string }) {
               }}
               transition={{ duration: 0.2 }}
               className={cn(
-                "text-xl font-black text-foreground whitespace-nowrap overflow-hidden",
+                "text-xl text-center font-black text-foreground whitespace-nowrap overflow-hidden",
                 !isSidebarOpen && "hidden md:flex"
               )}
             >
-              BlackShark
+              Black Shark <br /> Analytics
             </motion.h1>
           )}
         </Link>
