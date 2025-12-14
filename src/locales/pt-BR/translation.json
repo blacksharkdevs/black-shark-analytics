@@ -125,6 +125,7 @@
     "title": "Dashboard",
     "overview": "Visão Geral",
     "stats": {
+      "mainMetrics": "Principais métricas",
       "totalRevenue": "Receita Total",
       "totalSales": "Total de Vendas",
       "averageTicket": "Ticket Médio",

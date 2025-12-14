@@ -125,6 +125,7 @@
     "title": "Dashboard",
     "overview": "Overview",
     "stats": {
+      "mainMetrics": "Main Metrics",
       "totalRevenue": "Total Revenue",
       "totalSales": "Total Sales",
       "averageTicket": "Average Ticket",

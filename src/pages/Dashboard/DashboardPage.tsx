@@ -41,16 +41,16 @@ export default function DashboardPage() {
         />
       </div>
 
-      <div className="container p-0 mx-auto space-y-6">
-        <StatsCards />
-      </div>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          <StatsCards />
+        </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="lg:col-span-2">
           <SalesTrendChart />
         </div>
 
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 lg:col-start-2">
           <TopAffiliatesTable />
         </div>
 

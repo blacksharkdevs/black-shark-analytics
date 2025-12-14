@@ -189,12 +189,16 @@ Formula: Gross Sales / Front Sales`;
     });
   }, [STATS_MAP, safeStats, isLoading]);
 
-  // Ajustar grid para comportar mais cards (ex: grid-cols-4 ou grid-cols-5 com wrap)
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-      {cardProps.map((props) => (
-        <StatsCard key={props.id} {...props} />
-      ))}
+    <div className="shark-card">
+      <h2 className="text-2xl font-bold text-foreground">
+        {t("dashboard.stats.mainMetrics")}
+      </h2>
+      <div className="space-y-2">
+        {cardProps.map((props) => (
+          <StatsCard key={props.id} {...props} />
+        ))}
+      </div>
     </div>
   );
 }

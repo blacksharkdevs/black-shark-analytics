@@ -211,7 +211,7 @@ export function SalesTrendChart() {
   }
 
   return (
-    <Card className="col-span-1 lg:col-span-3 shark-card">
+    <Card className="col-span-1 lg:col-span-2 shark-card">
       <CardHeader>
         <CardTitle className="text-foreground">
           {t("dashboard.charts.salesTrend")}
