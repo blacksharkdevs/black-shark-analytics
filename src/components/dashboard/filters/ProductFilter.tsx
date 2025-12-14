@@ -29,12 +29,12 @@ export function ProductFilter({
         onValueChange={onProductChange}
         disabled={products.length <= 1}
       >
-        <SelectTrigger className="w-full transition-colors">
+        <SelectTrigger className="w-full">
           <SelectValue placeholder={t("filters.product")} />
         </SelectTrigger>
-        <SelectContent className="">
+        <SelectContent>
           {products.map((product) => (
-            <SelectItem key={product.id} value={product.id} className="">
+            <SelectItem key={product.id} value={product.id}>
               {product.name === "All Products"
                 ? t("filters.allProducts")
                 : ` ${product.name} (${product.platform}) `}

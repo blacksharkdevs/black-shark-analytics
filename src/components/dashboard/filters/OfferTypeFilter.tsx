@@ -27,22 +27,18 @@ export function OfferTypeFilter({
   const { t } = useTranslation();
   return (
     <div className="flex items-center gap-2">
-      <Tag className="hidden text-blue-600 dark:text-white sm:block" />
+      <Tag className="hidden sm:block" />
       <Select
         value={selectedOfferType}
         onValueChange={onOfferTypeChange}
         disabled={offerTypes.length <= 1}
       >
-        <SelectTrigger className="w-full transition-colors border rounded-none bg-card hover:bg-accent/20 border-input text-foreground">
+        <SelectTrigger className="w-full">
           <SelectValue placeholder={t("filters.offerType")} />
         </SelectTrigger>
-        <SelectContent className="border rounded-none bg-card border-border">
+        <SelectContent>
           {offerTypes.map((offer) => (
-            <SelectItem
-              key={offer.id}
-              value={offer.id}
-              className="rounded-none text-foreground"
-            >
+            <SelectItem key={offer.id} value={offer.id}>
               {offer.name}
             </SelectItem>
           ))}

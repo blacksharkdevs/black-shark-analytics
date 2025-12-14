@@ -27,22 +27,18 @@ export function PlatformFilter({
   const { t } = useTranslation();
   return (
     <div className="flex items-center gap-2">
-      <Network className="hidden text-blue-600 dark:text-white sm:block" />
+      <Network className="hidden sm:block" />
       <Select
         value={selectedPlatform}
         onValueChange={onPlatformChange}
         disabled={platforms.length <= 1}
       >
-        <SelectTrigger className="w-full transition-colors border rounded-none bg-card hover:bg-accent/20 border-input text-foreground">
+        <SelectTrigger className="w-full">
           <SelectValue placeholder={t("filters.platform")} />
         </SelectTrigger>
-        <SelectContent className="border rounded-none bg-card border-border">
+        <SelectContent>
           {platforms.map((platform) => (
-            <SelectItem
-              key={platform.id}
-              value={platform.id}
-              className="rounded-none text-foreground"
-            >
+            <SelectItem key={platform.id} value={platform.id}>
               {platform.name}
             </SelectItem>
           ))}

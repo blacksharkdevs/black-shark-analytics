@@ -14,11 +14,11 @@ export function SearchFilter({
 }: SearchFilterProps) {
   return (
     <div className="flex items-center gap-2">
-      <Search className="hidden w-5 h-5 text-blue-600 dark:text-white sm:block" />
+      <Search className="hidden w-5 h-5 sm:block" />
       <Input
         type="text"
         placeholder={placeholder}
-        className="w-full transition-colors border rounded-none bg-card hover:bg-accent/20 border-input text-foreground"
+        className="w-full"
         onChange={(e) => onSearchChange(e.target.value)}
         defaultValue={defaultValue}
       />
