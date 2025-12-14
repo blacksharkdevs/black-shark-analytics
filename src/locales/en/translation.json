@@ -70,6 +70,28 @@
       "productsSelected": "products selected",
       "productsGrouped": "grouped products",
       "ranking": "in ranking"
+    },
+    "insights": {
+      "title": "Shark AI Analysis",
+      "description": "Smart diagnostic of product comparison",
+      "needMoreProducts": "Select at least 2 products to view comparative analysis",
+      "predator": {
+        "title": "The Predator",
+        "subtitle": "Volume Dominance",
+        "description": "{{product}} dominated volume, earning {{percentage}}% more than {{secondPlace}}"
+      },
+      "strategist": {
+        "title": "The Strategist",
+        "subtitle": "Maximum Efficiency",
+        "perSale": "per sale",
+        "description": "{{product}} is the most efficient, generating {{percentage}}% more revenue per sale"
+      },
+      "trend": {
+        "title": "The Trend",
+        "subtitle": "Current Momentum",
+        "recentDays": "last 3 days",
+        "description": "{{product}} concentrated {{percentage}}% of its revenue in recent days"
+      }
     }
   },
   "header": {

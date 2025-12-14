@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ProductPerformanceChart } from "@/components/dashboard/charts/ProductPerformanceChart";
 import { ProductSelector } from "@/components/dashboard/performance/ProductSelector";
+import { SharkInsights } from "@/components/dashboard/performance/SharkInsights";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { cn } from "@/lib/utils";
@@ -170,6 +171,13 @@ export default function PerformancePage() {
           />
         </div>
       </div>
+
+      {/* Shark AI Analysis */}
+      <SharkInsights
+        selectedProductIds={selectedProductIds}
+        availableProducts={availableProducts}
+        filteredSalesData={filteredSalesData}
+      />
     </div>
   );
 }

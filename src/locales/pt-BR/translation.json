@@ -70,6 +70,28 @@
       "productsSelected": "produtos selecionados",
       "productsGrouped": "produtos agrupados",
       "ranking": "no ranking"
+    },
+    "insights": {
+      "title": "Shark AI Analysis",
+      "description": "Diagnóstico inteligente da comparação de produtos",
+      "needMoreProducts": "Selecione pelo menos 2 produtos para visualizar a análise comparativa",
+      "predator": {
+        "title": "O Predador",
+        "subtitle": "Dominância em Volume",
+        "description": "{{product}} dominou o volume, faturando {{percentage}}% a mais que {{secondPlace}}"
+      },
+      "strategist": {
+        "title": "O Estrategista",
+        "subtitle": "Eficiência Máxima",
+        "perSale": "por venda",
+        "description": "{{product}} é o mais eficiente, gerando {{percentage}}% mais receita por venda"
+      },
+      "trend": {
+        "title": "A Tendência",
+        "subtitle": "Momento Atual",
+        "recentDays": "últimos 3 dias",
+        "description": "{{product}} concentrou {{percentage}}% de sua receita nos últimos dias"
+      }
     }
   },
   "header": {
