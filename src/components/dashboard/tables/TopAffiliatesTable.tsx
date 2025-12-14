@@ -118,24 +118,26 @@ export function TopAffiliatesTable() {
       className="relative h-full border rounded-none shadow-lg border-white/30 backdrop-blur-sm"
       style={{ zIndex: 1 }}
     >
-      <CardHeader>
-        <CardTitle className="flex items-center text-foreground">
-          <Users className="w-6 h-6 mr-2 text-blue-600 dark:text-white" />{" "}
+      <CardHeader className="px-4 py-3 md:px-6 md:py-4">
+        <CardTitle className="flex items-center text-base md:text-lg text-foreground">
+          <Users className="w-4 h-4 mr-2 text-blue-600 md:w-6 md:h-6 dark:text-white" />{" "}
           {t("dashboard.charts.topAffiliates")}
         </CardTitle>
-        <CardDescription className="text-muted-foreground">
+        <CardDescription className="text-xs md:text-sm text-muted-foreground">
           {t("dashboard.charts.topAffiliatesDesc")}
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-2 md:px-6">
         <Table>
           <TableHeader className="text-muted-foreground">
             <TableRow className="hover:bg-transparent border-border/50">
-              <TableHead className="w-[50px]">
+              <TableHead className="w-[30px] md:w-[50px] text-xs md:text-sm py-2">
                 {t("dashboard.charts.rank")}
               </TableHead>
-              <TableHead>{t("dashboard.charts.affiliate")}</TableHead>
-              <TableHead className="text-right">
+              <TableHead className="py-2 text-xs md:text-sm">
+                {t("dashboard.charts.affiliate")}
+              </TableHead>
+              <TableHead className="py-2 text-xs text-right md:text-sm">
                 {t("dashboard.charts.totalRevenue")}
               </TableHead>
             </TableRow>
@@ -146,17 +148,17 @@ export function TopAffiliatesTable() {
                 key={affiliate.affiliateName}
                 className="transition-colors hover:bg-accent/10 border-border/50"
               >
-                <TableCell className="font-medium text-foreground">
+                <TableCell className="px-2 py-2 font-medium text-foreground md:px-4">
                   {index === 0 ? (
-                    <Crown className="w-5 h-5 text-yellow-500" />
+                    <Crown className="w-4 h-4 text-yellow-500 md:w-5 md:h-5" />
                   ) : (
-                    index + 1
+                    <span className="text-xs md:text-sm">{index + 1}</span>
                   )}
                 </TableCell>
-                <TableCell className="text-foreground">
+                <TableCell className="text-foreground text-xs md:text-sm py-2 px-2 md:px-4 truncate max-w-[120px] md:max-w-none">
                   {affiliate.affiliateName}
                 </TableCell>
-                <TableCell className="font-semibold text-right text-primary tabular-nums">
+                <TableCell className="px-2 py-2 text-xs font-semibold text-right text-primary tabular-nums md:text-sm md:px-4">
                   <CountUp
                     start={0}
                     end={affiliate.totalRevenue}
@@ -172,19 +174,19 @@ export function TopAffiliatesTable() {
             ))}
           </TableBody>
         </Table>
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-2 md:mt-4">
           <Button
             variant="ghost"
             size="sm"
             asChild
-            className="text-foreground hover:text-primary hover:bg-[rgba(6,182,212,0.1)] transition-all"
+            className="text-xs md:text-sm text-foreground hover:text-primary hover:bg-[rgba(6,182,212,0.1)] transition-all h-8 md:h-9"
           >
             <Link
               to="/dashboard/affiliates"
-              className="flex items-center gap-2"
+              className="flex items-center gap-1 md:gap-2"
             >
               {t("common.view")} {t("common.all")}
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
             </Link>
           </Button>
         </div>

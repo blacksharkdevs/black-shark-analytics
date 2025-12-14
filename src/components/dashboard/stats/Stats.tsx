@@ -229,16 +229,16 @@ ${t("dashboard.stats.explanations.averageOrderValue.formula")}`;
 
   return (
     <div className="shark-card">
-      <CardHeader>
-        <CardTitle className="flex items-center text-foreground">
-          <ChartArea className="w-6 h-6 mr-2 text-blue-600 dark:text-white" />{" "}
+      <CardHeader className="px-4 py-3 md:px-6 md:py-4">
+        <CardTitle className="flex items-center text-base md:text-lg text-foreground">
+          <ChartArea className="w-4 h-4 mr-2 text-blue-600 md:w-6 md:h-6 dark:text-white" />{" "}
           {t("dashboard.stats.mainMetrics")}
         </CardTitle>
-        <CardDescription className="text-muted-foreground">
+        <CardDescription className="text-xs md:text-sm text-muted-foreground">
           {t("dashboard.charts.topAffiliatesDesc")}
         </CardDescription>
       </CardHeader>
-      <div className="">
+      <div className="space-y-0">
         {cardProps.map((props) => (
           <StatsCard key={props.id} {...props} />
         ))}

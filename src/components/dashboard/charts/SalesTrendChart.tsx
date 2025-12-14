@@ -218,21 +218,24 @@ export function SalesTrendChart() {
       className="relative h-full col-span-1 lg:col-span-2 shark-card"
       style={{ zIndex: 1 }}
     >
-      <CardHeader>
-        <CardTitle className="flex items-center text-foreground">
-          <ChartNoAxesColumnIncreasing className="w-6 h-6 mr-2" />{" "}
+      <CardHeader className="px-4 py-3 md:px-6 md:py-4">
+        <CardTitle className="flex items-center text-base md:text-lg text-foreground">
+          <ChartNoAxesColumnIncreasing className="w-4 h-4 mr-2 md:w-6 md:h-6" />{" "}
           {t("dashboard.charts.salesTrend")}
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs md:text-sm">
           {t("dashboard.charts.topAffiliatesDesc")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="h-full pb-6 pl-2 pr-6">
-        <ChartContainer config={chartConfig} className="h-[400px] w-full">
+      <CardContent className="h-full pb-4 pl-1 pr-2 md:pb-6 md:pl-2 md:pr-6">
+        <ChartContainer
+          config={chartConfig}
+          className="h-[250px] md:h-[350px] lg:h-[400px] w-full"
+        >
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
-              margin={{ top: 5, right: 10, left: 20, bottom: 5 }}
+              margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
             >
               <CartesianGrid
                 strokeDasharray="3 3"
@@ -245,6 +248,8 @@ export function SalesTrendChart() {
                 tickLine={false}
                 axisLine={false}
                 dy={10}
+                tick={{ fontSize: 10 }}
+                interval="preserveStartEnd"
               />
               <YAxis
                 stroke="hsl(var(--muted-foreground))"
@@ -252,6 +257,8 @@ export function SalesTrendChart() {
                 tickLine={false}
                 axisLine={false}
                 dx={-5}
+                tick={{ fontSize: 10 }}
+                width={45}
               />
               <Tooltip
                 content={
@@ -284,7 +291,7 @@ export function SalesTrendChart() {
                   boxShadow: "hsl(var(--card-foreground))",
                 }}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: "11px" }} iconSize={10} />
               <Line
                 type="monotone"
                 dataKey="revenue"
@@ -292,13 +299,13 @@ export function SalesTrendChart() {
                 stroke="var(--color-revenue)"
                 strokeWidth={2}
                 dot={{
-                  r: 4,
+                  r: 3,
                   fill: "var(--color-revenue)",
                   stroke: "hsl(var(--background))",
-                  strokeWidth: 2,
+                  strokeWidth: 1.5,
                 }}
                 activeDot={{
-                  r: 6,
+                  r: 5,
                   fill: "var(--color-revenue)",
                   stroke: "hsl(var(--background))",
                   strokeWidth: 2,
@@ -307,19 +314,19 @@ export function SalesTrendChart() {
             </LineChart>
           </ResponsiveContainer>
         </ChartContainer>
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-2 md:mt-4">
           <Button
             variant="ghost"
             size="sm"
             asChild
-            className="text-foreground hover:text-primary hover:bg-[rgba(6,182,212,0.1)] transition-all"
+            className="text-xs md:text-sm text-foreground hover:text-primary hover:bg-[rgba(6,182,212,0.1)] transition-all h-8 md:h-9"
           >
             <Link
               to="/dashboard/transactions"
-              className="flex items-center gap-2"
+              className="flex items-center gap-1 md:gap-2"
             >
               {t("common.view")} {t("common.all")}
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3 h-3 md:w-4 md:h-4" />
             </Link>
           </Button>
         </div>
