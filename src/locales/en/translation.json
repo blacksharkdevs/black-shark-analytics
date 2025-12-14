@@ -49,12 +49,14 @@
     "configurations": "Configurations",
     "sales": "Sales",
     "customers": "Customers",
-    "logout": "Logout"
+    "logout": "Logout",
+    "menu": "Menu"
   },
   "header": {
     "dateColumns": "DATE COLUMNS",
     "timezone": "TIMEZONE",
-    "administratorAccess": "Administrator Access"
+    "administratorAccess": "Administrator Access",
+    "language": "Language"
   },
   "filters": {
     "product": "Product",

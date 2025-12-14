@@ -77,15 +77,13 @@ export function AppSidebar({ width }: { width: string }) {
     <motion.div
       initial={false}
       animate={{
-        width: isSidebarOpen && !isMobile ? width : isMobile ? "280px" : "72px",
+        width: isSidebarOpen && !isMobile ? width : "72px",
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className={cn(
-        "fixed top-0 left-0 h-full border-r border-gray-400/10  transition-transform duration-300 z-50 flex flex-col",
-        {
-          "transform -translate-x-full": !isSidebarOpen && isMobile,
-          "w-[280px]": isSidebarOpen && isMobile,
-        }
+        "fixed top-0 left-0 h-full border-r border-gray-400/10 transition-transform duration-300 z-50 flex flex-col bg-black/30 backdrop-blur-xl",
+        // Esconde completamente no mobile
+        "hidden md:flex"
       )}
     >
       <SidebarHeader className="p-3 py-10">

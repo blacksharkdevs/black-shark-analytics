@@ -3,7 +3,6 @@ import { LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { useSidebar } from "@/hooks/useSidebar";
 
 import { Button } from "@/components/common/ui/button";
 import {
@@ -23,14 +22,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/common/ui/dropdown-menu";
 
-import { SharkSwim } from "../common/SharkSwin";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
+import { MobileMenu } from "@/components/layout/MobileMenu";
 
 export function Header() {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const location = useLocation();
-  const { toggleSidebar } = useSidebar();
 
   const {
     selectedDateRangeOptionId,
@@ -65,22 +63,16 @@ export function Header() {
     <header className="sticky top-0 z-40 h-16 backdrop-blur-xl bg-black/40">
       <div className="container flex items-center justify-between h-16 px-4 mx-auto max-w-screen-2xl md:px-8 ">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSidebar}
-            className="md:hidden text-foreground hover:bg-accent/10"
-          >
-            <SharkSwim />
-          </Button>
+          {/* Menu Mobile */}
+          <MobileMenu />
 
-          <h1 className="text-3xl font-bold tracking-tight font-headline text-foreground">
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl font-headline text-foreground">
             {headerTitle}
           </h1>
         </div>
 
-        {/* --- Filtros e Configurações --- */}
-        <div className="flex items-center gap-2">
+        {/* --- Filtros e Configurações (Hidden on Mobile) --- */}
+        <div className="items-center hidden gap-2 md:flex">
           {isDateRangeLoading ? (
             <div className="flex items-center gap-2">
               <Skeleton className="h-10 w-[180px] bg-accent/20" />
@@ -95,9 +87,10 @@ export function Header() {
             />
           )}
 
-          {/* Seletor de Idioma */}
+          {/* Seletor de Idioma (Desktop only) */}
           <LanguageSelector />
 
+          {/* User Avatar (Desktop only) */}
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

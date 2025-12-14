@@ -49,12 +49,14 @@
     "configurations": "Configurações",
     "sales": "Vendas",
     "customers": "Clientes",
-    "logout": "Sair"
+    "logout": "Sair",
+    "menu": "Menu"
   },
   "header": {
     "dateColumns": "COLUNAS DE DATA",
     "timezone": "FUSO HORÁRIO",
-    "administratorAccess": "Acesso de Administrador"
+    "administratorAccess": "Acesso de Administrador",
+    "language": "Idioma"
   },
   "filters": {
     "product": "Produto",

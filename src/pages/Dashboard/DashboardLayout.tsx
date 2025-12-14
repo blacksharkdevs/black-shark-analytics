@@ -25,12 +25,22 @@ function DashboardLayoutContent() {
     <div className="flex w-full min-h-screen">
       <AppSidebar width={SIDEBAR_WIDTH} />
       <div
-        className="relative flex flex-col flex-1 transition-all duration-300"
+        className="relative flex flex-col flex-1 w-full transition-all duration-300 md:w-auto"
         style={{
-          marginLeft: currentSidebarWidth,
-          width: `calc(100% - ${currentSidebarWidth})`,
+          marginLeft: 0,
+          width: "100%",
         }}
       >
+        <style>
+          {`
+            @media (min-width: 768px) {
+              .relative.flex.flex-col.flex-1 {
+                margin-left: ${currentSidebarWidth};
+                width: calc(100% - ${currentSidebarWidth});
+              }
+            }
+          `}
+        </style>
         <Header />
         <main className="flex-1 overflow-y-auto">
           {isLoadingData ? (
