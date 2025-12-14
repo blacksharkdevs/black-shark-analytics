@@ -12,12 +12,14 @@ import {
   DashboardDataProvider,
   useDashboardData,
 } from "@/contexts/DashboardDataContext";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 const SIDEBAR_WIDTH = "280px";
 
 function DashboardLayoutContent() {
   const { isSidebarOpen } = useSidebar();
   const { isLoadingData } = useDashboardData();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const currentSidebarWidth = isSidebarOpen ? SIDEBAR_WIDTH : "72px";
 
@@ -25,22 +27,12 @@ function DashboardLayoutContent() {
     <div className="flex w-full min-h-screen">
       <AppSidebar width={SIDEBAR_WIDTH} />
       <div
-        className="relative flex flex-col flex-1 w-full transition-all duration-300 md:w-auto"
+        className="relative flex flex-col flex-1 transition-all duration-300"
         style={{
-          marginLeft: 0,
-          width: "100%",
+          marginLeft: isDesktop ? currentSidebarWidth : "0",
+          width: isDesktop ? `calc(100% - ${currentSidebarWidth})` : "100%",
         }}
       >
-        <style>
-          {`
-            @media (min-width: 768px) {
-              .relative.flex.flex-col.flex-1 {
-                margin-left: ${currentSidebarWidth};
-                width: calc(100% - ${currentSidebarWidth});
-              }
-            }
-          `}
-        </style>
         <Header />
         <main className="flex-1 overflow-y-auto">
           {isLoadingData ? (
