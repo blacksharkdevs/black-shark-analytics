@@ -7,6 +7,7 @@ import {
   CircleDollarSign,
   List,
   Settings,
+  TrendingUp,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
@@ -36,6 +37,11 @@ export function AppSidebar({ width }: { width: string }) {
       label: t("navigation.dashboard"),
       icon: LayoutDashboard,
       isRoot: true,
+    },
+    {
+      href: "/dashboard/performance",
+      label: t("navigation.performance"),
+      icon: TrendingUp,
     },
     {
       href: "/dashboard/affiliates",

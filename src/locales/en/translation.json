@@ -43,6 +43,7 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
+    "performance": "Performance",
     "transactions": "Transactions",
     "affiliates": "Affiliates",
     "reports": "Reports",
@@ -51,6 +52,43 @@
     "customers": "Customers",
     "logout": "Logout",
     "menu": "Menu"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "description": "View and manage all system transactions",
+    "searchPlaceholder": "Search by ID, product, customer, affiliate...",
+    "results": "results",
+    "noResults": "No transactions found",
+    "noResultsDescription": "Try adjusting your filters or search term",
+    "product": "Product",
+    "customer": "Customer",
+    "affiliate": "Affiliate",
+    "revenue": "Revenue",
+    "netSales": "Net",
+    "status": "Status",
+    "quantity": "Qty",
+    "unknownProduct": "Unknown Product",
+    "unknownCustomer": "Unknown Customer",
+    "noAffiliate": "No Affiliate",
+    "types": {
+      "SALE": "Sale",
+      "REFUND": "Refund",
+      "CHARGEBACK": "Chargeback",
+      "REBILL": "Rebill"
+    },
+    "statuses": {
+      "COMPLETED": "Completed",
+      "PENDING": "Pending",
+      "FAILED": "Failed",
+      "REFUNDED": "Refunded",
+      "CHARGEBACK": "Chargeback"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "items": "items"
+    }
   },
   "performance": {
     "title": "Product Performance",

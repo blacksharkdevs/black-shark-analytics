@@ -43,6 +43,7 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
+    "performance": "Performance",
     "transactions": "Transações",
     "affiliates": "Afiliados",
     "reports": "Relatórios",
@@ -51,6 +52,43 @@
     "customers": "Clientes",
     "logout": "Sair",
     "menu": "Menu"
+  },
+  "transactions": {
+    "title": "Transações",
+    "description": "Visualize e gerencie todas as transações do sistema",
+    "searchPlaceholder": "Buscar por ID, produto, cliente, afiliado...",
+    "results": "resultados",
+    "noResults": "Nenhuma transação encontrada",
+    "noResultsDescription": "Tente ajustar os filtros ou o termo de busca",
+    "product": "Produto",
+    "customer": "Cliente",
+    "affiliate": "Afiliado",
+    "revenue": "Receita",
+    "netSales": "Líquido",
+    "status": "Status",
+    "quantity": "Qtd",
+    "unknownProduct": "Produto Desconhecido",
+    "unknownCustomer": "Cliente Desconhecido",
+    "noAffiliate": "Sem Afiliado",
+    "types": {
+      "SALE": "Venda",
+      "REFUND": "Reembolso",
+      "CHARGEBACK": "Chargeback",
+      "REBILL": "Recorrência"
+    },
+    "statuses": {
+      "COMPLETED": "Completo",
+      "PENDING": "Pendente",
+      "FAILED": "Falhou",
+      "REFUNDED": "Reembolsado",
+      "CHARGEBACK": "Contestado"
+    },
+    "pagination": {
+      "showing": "Mostrando",
+      "to": "até",
+      "of": "de",
+      "items": "itens"
+    }
   },
   "performance": {
     "title": "Performance de Produtos",
