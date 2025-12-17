@@ -377,12 +377,20 @@
     "title": "Affiliates",
     "pageTitle": "Affiliate Performance",
     "pageDescription": "Aggregated performance data for affiliates, calculated based on the filters selected below.",
-    "searchPlaceholder": "Search by Affiliate Name...",
+    "searchPlaceholder": "Search by name, email, platform...",
     "noDataMessage": "No affiliates found.",
     "totalAffiliates": "Total Affiliates",
     "showing": "Showing",
     "to": "to",
     "of": "of",
+    "results": "results",
+    "noResults": "No affiliates found",
+    "noResultsDescription": "Try adjusting the filters or search term",
+    "unknownAffiliate": "Unknown Affiliate",
+    "viewMode": {
+      "list": "List",
+      "table": "Table"
+    },
     "table": {
       "name": "Name",
       "email": "Email",
@@ -413,7 +421,25 @@
       "net": "Net",
       "cogsColumn": "COGS",
       "profitColumn": "Profit",
-      "cashFlow": "Cash Flow"
+      "cashFlow": "Cash Flow",
+      "refundsChargebacks": "R+CB"
+    },
+    "tooltips": {
+      "customers": "Total unique customers",
+      "sales": "Total sales transactions",
+      "totalRevenue": "Total gross revenue before deductions",
+      "grossSales": "Total Revenue - Platform Fees - Taxes",
+      "refundsChargebacks": "Total cost of Refunds and Chargebacks",
+      "commission": "Total commissions paid to affiliate",
+      "taxes": "Total taxes on sales",
+      "platformFeePercent": "Average percentage fee charged by platform",
+      "platformFeeDollar": "Total dollar amount of platform fees",
+      "aov": "Gross Sales / Total Sales",
+      "netSales": "Gross Sales - Commission",
+      "net": "Net Sales + R+CB",
+      "cogs": "Cost of Goods Sold",
+      "profit": "Net - COGS",
+      "cashFlow": "Profit - (Gross Sales × 10%)"
     },
     "tableTooltips": {
       "grossSales": "Total Revenue - Platform Fees - Taxes",

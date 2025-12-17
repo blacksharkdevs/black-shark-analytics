@@ -376,12 +376,20 @@
     "title": "Afiliados",
     "pageTitle": "Desempenho de Afiliados",
     "pageDescription": "Dados de desempenho agregados dos afiliados, calculados com base nos filtros selecionados abaixo.",
-    "searchPlaceholder": "Buscar por Nome do Afiliado...",
+    "searchPlaceholder": "Buscar por nome, email, plataforma...",
     "noDataMessage": "Nenhum afiliado encontrado.",
     "totalAffiliates": "Total de Afiliados",
     "showing": "Mostrando",
     "to": "até",
     "of": "de",
+    "results": "resultados",
+    "noResults": "Nenhum afiliado encontrado",
+    "noResultsDescription": "Tente ajustar os filtros ou o termo de busca",
+    "unknownAffiliate": "Afiliado Desconhecido",
+    "viewMode": {
+      "list": "Lista",
+      "table": "Tabela"
+    },
     "table": {
       "name": "Nome",
       "email": "E-mail",
@@ -412,7 +420,25 @@
       "net": "Líquido",
       "cogsColumn": "COGS",
       "profitColumn": "Lucro",
-      "cashFlow": "Fluxo de Caixa"
+      "cashFlow": "Fluxo de Caixa",
+      "refundsChargebacks": "R+CB"
+    },
+    "tooltips": {
+      "customers": "Total de clientes únicos",
+      "sales": "Total de transações de venda",
+      "totalRevenue": "Receita bruta total antes de deduções",
+      "grossSales": "Receita Total - Taxas da Plataforma - Impostos",
+      "refundsChargebacks": "Custo total de Reembolsos e Chargebacks",
+      "commission": "Total de comissões pagas ao afiliado",
+      "taxes": "Total de impostos sobre as vendas",
+      "platformFeePercent": "Percentual médio de taxa cobrada pela plataforma",
+      "platformFeeDollar": "Valor total em dólar de taxas da plataforma",
+      "aov": "Vendas Brutas / Vendas Totais",
+      "netSales": "Vendas Brutas - Comissão",
+      "net": "Vendas Líquidas + R+CB",
+      "cogs": "Custo dos Produtos Vendidos (Cost of Goods Sold)",
+      "profit": "Líquido - COGS",
+      "cashFlow": "Lucro - (Vendas Brutas × 10%)"
     },
     "tableTooltips": {
       "grossSales": "Receita Total - Taxas da Plataforma - Impostos",
