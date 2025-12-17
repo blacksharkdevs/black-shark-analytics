@@ -2,13 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/common/ui/card";
 import { Badge } from "@/components/common/ui/badge";
-import {
-  Users,
-  ShoppingCart,
-  DollarSign,
-  TrendingUp,
-  ExternalLink,
-} from "lucide-react";
+import { Users, ExternalLink } from "lucide-react";
 import { formatCurrency } from "@/utils/index";
 import type { Affiliate as AffiliateType } from "@/types/index";
 import {
@@ -115,48 +109,75 @@ export function AffiliateList({ affiliates }: AffiliateListProps) {
                   </Badge>
                 </div>
 
-                {/* Linha 2: Métricas principais em grid */}
+                {/* Linha 2: Métricas de volume */}
                 <div className="grid grid-cols-2 gap-2 text-xs md:grid-cols-4">
-                  {/* Clientes */}
-                  <div className="flex items-center gap-1.5 p-2 rounded-lg bg-white/5">
-                    <Users className="w-3.5 h-3.5 text-muted-foreground" />
-                    <div>
-                      <div className="text-[10px] text-muted-foreground">
-                        {t("affiliates.table.customers")}
-                      </div>
-                      <div className="font-semibold text-foreground">
-                        {item.totalCustomers}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Vendas */}
-                  <div className="flex items-center gap-1.5 p-2 rounded-lg bg-white/5">
-                    <ShoppingCart className="w-3.5 h-3.5 text-muted-foreground" />
-                    <div>
-                      <div className="text-[10px] text-muted-foreground">
-                        {t("affiliates.table.sales")}
-                      </div>
-                      <div className="font-semibold text-foreground">
-                        {item.totalSales}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Gross Sales */}
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div className="flex items-center gap-1.5 p-2 rounded-lg bg-white/5 cursor-help">
-                          <DollarSign className="w-3.5 h-3.5 text-green-400" />
-                          <div>
-                            <div className="text-[10px] text-muted-foreground flex items-center gap-1">
-                              {t("affiliates.table.grossSales")}
-                              <HelpCircle className="w-2.5 h-2.5" />
-                            </div>
-                            <div className="font-semibold text-green-400">
-                              {formatCurrency(item.grossSales)}
-                            </div>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.customers")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-foreground">
+                            {item.totalCustomers}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("affiliates.tooltips.customers")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.sales")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-foreground">
+                            {item.totalSales}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("affiliates.tooltips.sales")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.totalRevenue")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-foreground">
+                            {formatCurrency(item.totalRevenue)}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("affiliates.tooltips.totalRevenue")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.grossSales")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-green-400">
+                            {formatCurrency(item.grossSales)}
                           </div>
                         </div>
                       </TooltipTrigger>
@@ -165,21 +186,118 @@ export function AffiliateList({ affiliates }: AffiliateListProps) {
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
+                </div>
 
-                  {/* AOV */}
+                {/* Linha 3: Deduções e taxas */}
+                <div className="grid grid-cols-2 gap-2 text-xs md:grid-cols-4">
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div className="flex items-center gap-1.5 p-2 rounded-lg bg-white/5 cursor-help">
-                          <TrendingUp className="w-3.5 h-3.5 text-cyan-400" />
-                          <div>
-                            <div className="text-[10px] text-muted-foreground flex items-center gap-1">
-                              {t("affiliates.table.aov")}
-                              <HelpCircle className="w-2.5 h-2.5" />
-                            </div>
-                            <div className="font-semibold text-cyan-400">
-                              {formatCurrency(item.aov)}
-                            </div>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.refundsChargebacks")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-red-400">
+                            {formatCurrency(item.refundsAndChargebacks)}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("affiliates.tooltips.refundsChargebacks")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.commission")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-foreground">
+                            {formatCurrency(item.commission)}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("affiliates.tooltips.commission")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.taxes")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-foreground">
+                            {formatCurrency(item.taxes)}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("affiliates.tooltips.taxes")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.platformFeeDollar")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-foreground">
+                            {formatCurrency(item.platformFeeDollar)}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("affiliates.tooltips.platformFeeDollar")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+
+                {/* Linha 4: Métricas calculadas */}
+                <div className="grid grid-cols-2 gap-2 text-xs md:grid-cols-4">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.platformFeePercent")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-foreground">
+                            {item.platformFeePercent.toFixed(2)}%
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("affiliates.tooltips.platformFeePercent")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.aov")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-cyan-400">
+                            {formatCurrency(item.aov)}
                           </div>
                         </div>
                       </TooltipTrigger>
@@ -188,25 +306,22 @@ export function AffiliateList({ affiliates }: AffiliateListProps) {
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                </div>
 
-                {/* Linha 3: Métricas financeiras */}
-                <div className="grid grid-cols-3 gap-1.5 text-xs">
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div className="p-1.5 rounded bg-white/5 cursor-help">
                           <div className="text-[10px] text-muted-foreground flex items-center gap-1">
-                            {t("affiliates.table.profit")}
+                            {t("affiliates.table.netSales")}
                             <HelpCircle className="w-2.5 h-2.5" />
                           </div>
                           <div className="font-semibold text-foreground">
-                            {formatCurrency(item.profit)}
+                            {formatCurrency(item.netSales)}
                           </div>
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>{t("affiliates.tooltips.profit")}</p>
+                        <p>{t("affiliates.tooltips.netSales")}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -229,6 +344,47 @@ export function AffiliateList({ affiliates }: AffiliateListProps) {
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
+                </div>
+
+                {/* Linha 5: Métricas finais */}
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.cogs")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-foreground">
+                            {formatCurrency(item.cogs)}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("affiliates.tooltips.cogs")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.profit")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-cyan-400">
+                            {formatCurrency(item.profit)}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("affiliates.tooltips.profit")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
 
                   <TooltipProvider>
                     <Tooltip>
@@ -238,7 +394,7 @@ export function AffiliateList({ affiliates }: AffiliateListProps) {
                             {t("affiliates.table.cashFlow")}
                             <HelpCircle className="w-2.5 h-2.5" />
                           </div>
-                          <div className="font-semibold text-foreground">
+                          <div className="font-semibold text-green-400">
                             {formatCurrency(item.cashFlow)}
                           </div>
                         </div>
