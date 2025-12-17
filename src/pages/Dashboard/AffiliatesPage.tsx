@@ -4,7 +4,6 @@ import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { AffiliateList } from "@/components/affiliates/AffiliateList";
 import { AffiliateTable } from "@/components/affiliates/AffiliateTable";
 import { AffiliateSearch } from "@/components/affiliates/AffiliateSearch";
-import { AffiliateFilters } from "@/components/affiliates/AffiliateFilters";
 import { TransactionPagination } from "@/components/transactions/TransactionPagination";
 import { Skeleton } from "@/components/common/ui/skeleton";
 import type { Affiliate as AffiliateType } from "@/types/index";
@@ -361,8 +360,14 @@ export default function AffiliatesPage() {
 
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
-      {/* Filtros */}
-      <AffiliateFilters
+      {/* Barra de Pesquisa com Filtros */}
+      <AffiliateSearch
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
+        totalResults={searchedAffiliates.length}
+        isLoading={isLoading}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
         platforms={availablePlatforms}
         selectedPlatforms={selectedPlatforms}
         onPlatformsChange={setSelectedPlatforms}
@@ -395,16 +400,6 @@ export default function AffiliatesPage() {
         sortOrder={sortOrder}
         onSortOrderChange={setSortOrder}
         onClearFilters={handleClearFilters}
-      />
-
-      {/* Barra de Pesquisa */}
-      <AffiliateSearch
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-        totalResults={searchedAffiliates.length}
-        isLoading={isLoading}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
       />
 
       {/* Lista/Tabela de Afiliados */}
