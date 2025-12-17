@@ -4,6 +4,7 @@ import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { AffiliateList } from "@/components/affiliates/AffiliateList";
 import { AffiliateTable } from "@/components/affiliates/AffiliateTable";
 import { AffiliateSearch } from "@/components/affiliates/AffiliateSearch";
+import { AffiliateFilters } from "@/components/affiliates/AffiliateFilters";
 import { TransactionPagination } from "@/components/transactions/TransactionPagination";
 import { Skeleton } from "@/components/common/ui/skeleton";
 import type { Affiliate as AffiliateType } from "@/types/index";
@@ -39,6 +40,23 @@ export default function AffiliatesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<"list" | "table">("list");
   const [itemsPerPage, setItemsPerPage] = useState(20);
+
+  // Estados para filtros
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+  const [minSales, setMinSales] = useState("");
+  const [maxSales, setMaxSales] = useState("");
+  const [minRevenue, setMinRevenue] = useState("");
+  const [maxRevenue, setMaxRevenue] = useState("");
+  const [minCommission, setMinCommission] = useState("");
+  const [maxCommission, setMaxCommission] = useState("");
+  const [minProfit, setMinProfit] = useState("");
+  const [maxProfit, setMaxProfit] = useState("");
+  const [minCustomers, setMinCustomers] = useState("");
+  const [maxCustomers, setMaxCustomers] = useState("");
+  const [minAov, setMinAov] = useState("");
+  const [maxAov, setMaxAov] = useState("");
+  const [sortBy, setSortBy] = useState("sales");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   // Calcular métricas por afiliado
   const affiliatesData = useMemo(() => {
@@ -106,13 +124,6 @@ export default function AffiliatesPage() {
       if (transaction.type === "REFUND" || transaction.type === "CHARGEBACK") {
         metrics.refundsAndChargebacks += Number(transaction.grossAmount);
       }
-
-      // Contar clientes únicos
-      if (transaction.customerId) {
-        // Precisaria de uma estrutura diferente para contar unicos corretamente
-        // Por simplicidade, vou aproximar
-        metrics.totalCustomers += 0;
-      }
     });
 
     // Calcular métricas derivadas
@@ -131,7 +142,6 @@ export default function AffiliatesPage() {
       metrics.cashFlow = metrics.profit - allowance;
 
       // AOV = Gross Sales / Front Sales
-      // (aproximando com totalSales por falta de dados detalhados)
       metrics.aov =
         metrics.totalSales > 0 ? metrics.grossSales / metrics.totalSales : 0;
 
@@ -145,15 +155,161 @@ export default function AffiliatesPage() {
     return Array.from(affiliatesMap.values());
   }, [filteredSalesData]);
 
+  // Extrair plataformas únicas
+  const availablePlatforms = useMemo(() => {
+    const platforms = new Set<string>();
+    affiliatesData.forEach((item) => {
+      if (item.platform) platforms.add(item.platform);
+    });
+    return Array.from(platforms).sort();
+  }, [affiliatesData]);
+
+  // Aplicar filtros
+  const filteredAffiliates = useMemo(() => {
+    let filtered = [...affiliatesData];
+
+    // Filtro por plataforma
+    if (selectedPlatforms.length > 0) {
+      filtered = filtered.filter((item) =>
+        selectedPlatforms.includes(item.platform)
+      );
+    }
+
+    // Filtro por vendas
+    if (minSales) {
+      const min = parseFloat(minSales);
+      filtered = filtered.filter((item) => item.totalSales >= min);
+    }
+    if (maxSales) {
+      const max = parseFloat(maxSales);
+      filtered = filtered.filter((item) => item.totalSales <= max);
+    }
+
+    // Filtro por receita
+    if (minRevenue) {
+      const min = parseFloat(minRevenue);
+      filtered = filtered.filter((item) => item.totalRevenue >= min);
+    }
+    if (maxRevenue) {
+      const max = parseFloat(maxRevenue);
+      filtered = filtered.filter((item) => item.totalRevenue <= max);
+    }
+
+    // Filtro por comissão
+    if (minCommission) {
+      const min = parseFloat(minCommission);
+      filtered = filtered.filter((item) => item.commission >= min);
+    }
+    if (maxCommission) {
+      const max = parseFloat(maxCommission);
+      filtered = filtered.filter((item) => item.commission <= max);
+    }
+
+    // Filtro por profit
+    if (minProfit) {
+      const min = parseFloat(minProfit);
+      filtered = filtered.filter((item) => item.profit >= min);
+    }
+    if (maxProfit) {
+      const max = parseFloat(maxProfit);
+      filtered = filtered.filter((item) => item.profit <= max);
+    }
+
+    // Filtro por clientes
+    if (minCustomers) {
+      const min = parseFloat(minCustomers);
+      filtered = filtered.filter((item) => item.totalCustomers >= min);
+    }
+    if (maxCustomers) {
+      const max = parseFloat(maxCustomers);
+      filtered = filtered.filter((item) => item.totalCustomers <= max);
+    }
+
+    // Filtro por AOV
+    if (minAov) {
+      const min = parseFloat(minAov);
+      filtered = filtered.filter((item) => item.aov >= min);
+    }
+    if (maxAov) {
+      const max = parseFloat(maxAov);
+      filtered = filtered.filter((item) => item.aov <= max);
+    }
+
+    // Ordenação
+    filtered.sort((a, b) => {
+      let valueA: number;
+      let valueB: number;
+
+      switch (sortBy) {
+        case "sales":
+          valueA = a.totalSales;
+          valueB = b.totalSales;
+          break;
+        case "revenue":
+          valueA = a.totalRevenue;
+          valueB = b.totalRevenue;
+          break;
+        case "grossSales":
+          valueA = a.grossSales;
+          valueB = b.grossSales;
+          break;
+        case "commission":
+          valueA = a.commission;
+          valueB = b.commission;
+          break;
+        case "profit":
+          valueA = a.profit;
+          valueB = b.profit;
+          break;
+        case "cashFlow":
+          valueA = a.cashFlow;
+          valueB = b.cashFlow;
+          break;
+        case "customers":
+          valueA = a.totalCustomers;
+          valueB = b.totalCustomers;
+          break;
+        case "aov":
+          valueA = a.aov;
+          valueB = b.aov;
+          break;
+        default:
+          valueA = a.totalSales;
+          valueB = b.totalSales;
+      }
+
+      return sortOrder === "desc" ? valueB - valueA : valueA - valueB;
+    });
+
+    return filtered;
+  }, [
+    affiliatesData,
+    selectedPlatforms,
+    minSales,
+    maxSales,
+    minRevenue,
+    maxRevenue,
+    minCommission,
+    maxCommission,
+    minProfit,
+    maxProfit,
+    minCustomers,
+    maxCustomers,
+    minAov,
+    maxAov,
+    sortBy,
+    sortOrder,
+  ]);
+
   // Filtrar por busca
   const searchedAffiliates = useMemo(() => {
     if (!searchQuery.trim()) {
-      return affiliatesData;
+      return filteredAffiliates;
     }
 
     const query = searchQuery.toLowerCase();
 
-    return affiliatesData.filter((item) => {
+    return filteredAffiliates.filter((item) => {
       const searchFields = [
         item.affiliate.name,
         item.affiliate.email,
@@ -165,7 +321,7 @@ export default function AffiliatesPage() {
 
       return searchFields.some((field) => field?.toLowerCase().includes(query));
     });
-  }, [affiliatesData, searchQuery]);
+  }, [filteredAffiliates, searchQuery]);
 
   // Calcular paginação
   const totalPages = Math.ceil(searchedAffiliates.length / itemsPerPage);
@@ -185,8 +341,62 @@ export default function AffiliatesPage() {
     setCurrentPage(1);
   };
 
+  // Limpar todos os filtros
+  const handleClearFilters = () => {
+    setSelectedPlatforms([]);
+    setMinSales("");
+    setMaxSales("");
+    setMinRevenue("");
+    setMaxRevenue("");
+    setMinCommission("");
+    setMaxCommission("");
+    setMinProfit("");
+    setMaxProfit("");
+    setMinCustomers("");
+    setMaxCustomers("");
+    setMinAov("");
+    setMaxAov("");
+    setCurrentPage(1);
+  };
+
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
+      {/* Filtros */}
+      <AffiliateFilters
+        platforms={availablePlatforms}
+        selectedPlatforms={selectedPlatforms}
+        onPlatformsChange={setSelectedPlatforms}
+        minSales={minSales}
+        onMinSalesChange={setMinSales}
+        maxSales={maxSales}
+        onMaxSalesChange={setMaxSales}
+        minRevenue={minRevenue}
+        onMinRevenueChange={setMinRevenue}
+        maxRevenue={maxRevenue}
+        onMaxRevenueChange={setMaxRevenue}
+        minCommission={minCommission}
+        onMinCommissionChange={setMinCommission}
+        maxCommission={maxCommission}
+        onMaxCommissionChange={setMaxCommission}
+        minProfit={minProfit}
+        onMinProfitChange={setMinProfit}
+        maxProfit={maxProfit}
+        onMaxProfitChange={setMaxProfit}
+        minCustomers={minCustomers}
+        onMinCustomersChange={setMinCustomers}
+        maxCustomers={maxCustomers}
+        onMaxCustomersChange={setMaxCustomers}
+        minAov={minAov}
+        onMinAovChange={setMinAov}
+        maxAov={maxAov}
+        onMaxAovChange={setMaxAov}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+        sortOrder={sortOrder}
+        onSortOrderChange={setSortOrder}
+        onClearFilters={handleClearFilters}
+      />
+
       {/* Barra de Pesquisa */}
       <AffiliateSearch
         searchQuery={searchQuery}

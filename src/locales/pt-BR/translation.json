@@ -464,6 +464,24 @@
       "statistics": "Estatísticas",
       "overview": "Visão geral de desempenho e histórico de transações",
       "backToAffiliates": "Voltar para Afiliados"
+    },
+    "filters": {
+      "title": "Filtros Avançados",
+      "active": "Ativos",
+      "clear": "Limpar",
+      "platforms": "Plataformas",
+      "sales": "Vendas",
+      "revenue": "Receita Total",
+      "commission": "Comissão",
+      "profit": "Profit",
+      "customers": "Clientes",
+      "aov": "Ticket Médio (AOV)",
+      "min": "Mínimo",
+      "max": "Máximo",
+      "sortBy": "Ordenar Por",
+      "sortOrder": "Ordem",
+      "desc": "Maior para Menor",
+      "asc": "Menor para Maior"
     }
   },
   "customers": {

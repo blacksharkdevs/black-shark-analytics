@@ -465,6 +465,24 @@
       "statistics": "Statistics",
       "overview": "Performance overview and transaction history",
       "backToAffiliates": "Back to Affiliates"
+    },
+    "filters": {
+      "title": "Advanced Filters",
+      "active": "Active",
+      "clear": "Clear",
+      "platforms": "Platforms",
+      "sales": "Sales",
+      "revenue": "Total Revenue",
+      "commission": "Commission",
+      "profit": "Profit",
+      "customers": "Customers",
+      "aov": "Average Order Value (AOV)",
+      "min": "Minimum",
+      "max": "Maximum",
+      "sortBy": "Sort By",
+      "sortOrder": "Order",
+      "desc": "Highest to Lowest",
+      "asc": "Lowest to Highest"
     }
   },
   "customers": {
