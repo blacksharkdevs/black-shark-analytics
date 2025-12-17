@@ -88,6 +88,23 @@
       "to": "to",
       "of": "of",
       "items": "items"
+    },
+    "viewMode": {
+      "list": "List",
+      "table": "Table"
+    },
+    "itemsPerPage": "Items per page",
+    "table": {
+      "id": "ID",
+      "date": "Date",
+      "type": "Type",
+      "product": "Product",
+      "customer": "Customer",
+      "affiliate": "Affiliate",
+      "platform": "Platform",
+      "revenue": "Revenue",
+      "net": "Net",
+      "status": "Status"
     }
   },
   "performance": {

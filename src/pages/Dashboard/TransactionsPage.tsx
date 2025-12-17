@@ -2,11 +2,10 @@ import { useState, useMemo } from "react";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { TransactionList } from "@/components/transactions/TransactionList";
+import { TransactionTable } from "@/components/transactions/TransactionTable";
 import { TransactionSearch } from "@/components/transactions/TransactionSearch";
 import { TransactionPagination } from "@/components/transactions/TransactionPagination";
 import { Skeleton } from "@/components/common/ui/skeleton";
-
-const ITEMS_PER_PAGE = 20;
 
 export default function TransactionsPage() {
   const { filteredSalesData, isLoadingData } = useDashboardData();
@@ -14,9 +13,11 @@ export default function TransactionsPage() {
 
   const isLoading = isLoadingData || isDateRangeLoading;
 
-  // Estado para pesquisa e paginação
+  // Estado para pesquisa, paginação e view mode
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<"list" | "table">("table");
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   // Filtrar transações por pesquisa
   const searchedTransactions = useMemo(() => {
@@ -50,9 +51,9 @@ export default function TransactionsPage() {
   }, [filteredSalesData, searchQuery]);
 
   // Calcular paginação
-  const totalPages = Math.ceil(searchedTransactions.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const totalPages = Math.ceil(searchedTransactions.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
   const paginatedTransactions = searchedTransactions.slice(
     startIndex,
     endIndex
@@ -64,6 +65,12 @@ export default function TransactionsPage() {
     setCurrentPage(1);
   };
 
+  // Reset para página 1 quando items per page mudar
+  const handleItemsPerPageChange = (value: number) => {
+    setItemsPerPage(value);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
       {/* Barra de Pesquisa */}
@@ -72,9 +79,11 @@ export default function TransactionsPage() {
         onSearchChange={handleSearchChange}
         totalResults={searchedTransactions.length}
         isLoading={isLoading}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
-      {/* Lista de Transações */}
+      {/* Lista/Tabela de Transações */}
       {isLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 10 }).map((_, i) => (
@@ -83,7 +92,11 @@ export default function TransactionsPage() {
         </div>
       ) : (
         <>
-          <TransactionList transactions={paginatedTransactions} />
+          {viewMode === "list" ? (
+            <TransactionList transactions={paginatedTransactions} />
+          ) : (
+            <TransactionTable transactions={paginatedTransactions} />
+          )}
 
           {/* Paginação */}
           {totalPages > 1 && (
@@ -91,8 +104,9 @@ export default function TransactionsPage() {
               currentPage={currentPage}
               totalPages={totalPages}
               totalItems={searchedTransactions.length}
-              itemsPerPage={ITEMS_PER_PAGE}
+              itemsPerPage={itemsPerPage}
               onPageChange={setCurrentPage}
+              onItemsPerPageChange={handleItemsPerPageChange}
             />
           )}
         </>

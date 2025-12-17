@@ -88,6 +88,23 @@
       "to": "até",
       "of": "de",
       "items": "itens"
+    },
+    "viewMode": {
+      "list": "Lista",
+      "table": "Tabela"
+    },
+    "itemsPerPage": "Itens por página",
+    "table": {
+      "id": "ID",
+      "date": "Data",
+      "type": "Tipo",
+      "product": "Produto",
+      "customer": "Cliente",
+      "affiliate": "Afiliado",
+      "platform": "Plataforma",
+      "revenue": "Receita",
+      "net": "Líquido",
+      "status": "Status"
     }
   },
   "performance": {

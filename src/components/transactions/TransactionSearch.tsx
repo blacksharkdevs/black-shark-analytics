@@ -1,7 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { Search } from "lucide-react";
+import { Search, List, Table } from "lucide-react";
 import { Input } from "@/components/common/ui/input";
 import { Card, CardContent } from "@/components/common/ui/card";
+import { Button } from "@/components/common/ui/button";
 import { cn } from "@/lib/utils";
 
 interface TransactionSearchProps {
@@ -9,6 +10,8 @@ interface TransactionSearchProps {
   onSearchChange: (query: string) => void;
   totalResults: number;
   isLoading: boolean;
+  viewMode: "list" | "table";
+  onViewModeChange: (mode: "list" | "table") => void;
 }
 
 export function TransactionSearch({
@@ -16,6 +19,8 @@ export function TransactionSearch({
   onSearchChange,
   totalResults,
   isLoading,
+  viewMode,
+  onViewModeChange,
 }: TransactionSearchProps) {
   const { t } = useTranslation();
 
@@ -40,12 +45,50 @@ export function TransactionSearch({
             />
           </div>
 
-          {/* Contador de Resultados */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span className="font-semibold text-cyan-400 tabular-nums">
-              {totalResults.toLocaleString()}
-            </span>
-            <span>{t("transactions.results")}</span>
+          {/* Contador de Resultados e Toggle de View */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="font-semibold text-cyan-400 tabular-nums">
+                {totalResults.toLocaleString()}
+              </span>
+              <span>{t("transactions.results")}</span>
+            </div>
+
+            {/* Toggle View Mode */}
+            <div className="flex items-center gap-1 p-1 rounded-lg bg-white/5 border border-white/10">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onViewModeChange("list")}
+                className={cn(
+                  "h-8 px-3 gap-2",
+                  viewMode === "list"
+                    ? "bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 hover:text-cyan-400"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <List className="w-4 h-4" />
+                <span className="hidden sm:inline text-xs">
+                  {t("transactions.viewMode.list")}
+                </span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onViewModeChange("table")}
+                className={cn(
+                  "h-8 px-3 gap-2",
+                  viewMode === "table"
+                    ? "bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 hover:text-cyan-400"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Table className="w-4 h-4" />
+                <span className="hidden sm:inline text-xs">
+                  {t("transactions.viewMode.table")}
+                </span>
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>

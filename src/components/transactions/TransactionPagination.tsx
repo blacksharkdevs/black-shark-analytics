@@ -7,6 +7,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
 import { Card, CardContent } from "@/components/common/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/common/ui/select";
 import { cn } from "@/lib/utils";
 
 interface TransactionPaginationProps {
@@ -15,6 +22,7 @@ interface TransactionPaginationProps {
   totalItems: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
+  onItemsPerPageChange: (value: number) => void;
 }
 
 export function TransactionPagination({
@@ -23,6 +31,7 @@ export function TransactionPagination({
   totalItems,
   itemsPerPage,
   onPageChange,
+  onItemsPerPageChange,
 }: TransactionPaginationProps) {
   const { t } = useTranslation();
 
@@ -74,21 +83,50 @@ export function TransactionPagination({
     <Card className="shark-card">
       <CardContent className="p-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          {/* Info de Itens */}
-          <div className="text-sm text-muted-foreground">
-            {t("transactions.pagination.showing")}{" "}
-            <span className="font-semibold text-foreground tabular-nums">
-              {startItem}
-            </span>{" "}
-            {t("transactions.pagination.to")}{" "}
-            <span className="font-semibold text-foreground tabular-nums">
-              {endItem}
-            </span>{" "}
-            {t("transactions.pagination.of")}{" "}
-            <span className="font-semibold text-foreground tabular-nums">
-              {totalItems.toLocaleString()}
-            </span>{" "}
-            {t("transactions.pagination.items")}
+          {/* Info de Itens e Select */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="text-sm text-muted-foreground">
+              {t("transactions.pagination.showing")}{" "}
+              <span className="font-semibold text-foreground tabular-nums">
+                {startItem}
+              </span>{" "}
+              {t("transactions.pagination.to")}{" "}
+              <span className="font-semibold text-foreground tabular-nums">
+                {endItem}
+              </span>{" "}
+              {t("transactions.pagination.of")}{" "}
+              <span className="font-semibold text-foreground tabular-nums">
+                {totalItems.toLocaleString()}
+              </span>{" "}
+              {t("transactions.pagination.items")}
+            </div>
+
+            {/* Select de Itens por Página */}
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-muted-foreground whitespace-nowrap">
+                {t("transactions.itemsPerPage")}
+              </label>
+              <Select
+                value={itemsPerPage.toString()}
+                onValueChange={(value) => onItemsPerPageChange(Number(value))}
+              >
+                <SelectTrigger
+                  className={cn(
+                    "w-[80px] h-9",
+                    "bg-background/50 border-white/10",
+                    "focus:border-cyan-500/50 focus:ring-cyan-500/20"
+                  )}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                  <SelectItem value="200">200</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* Controles de Paginação */}
