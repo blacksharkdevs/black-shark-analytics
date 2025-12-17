@@ -116,7 +116,7 @@ export function AffiliateFilters({
     maxAov;
 
   return (
-    <div className="border-none shadow-none bg-none">
+    <div className="overflow-hidden transition-all duration-300 ease-in-out animate-in fade-in slide-in-from-top-2">
       <div className="p-5 space-y-6">
         <div className="flex flex-wrap items-start justify-between w-full gap-4">
           {/* Plataformas */}
