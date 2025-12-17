@@ -190,7 +190,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
                     <p className="text-xs text-muted-foreground">
                       {t("transactions.product")}
                     </p>
-                    <p className="text-sm font-medium text-foreground truncate">
+                    <p className="text-sm font-medium truncate text-foreground">
                       {transaction.product?.name ||
                         t("transactions.unknownProduct")}
                     </p>
@@ -220,7 +220,8 @@ export function TransactionList({ transactions }: TransactionListProps) {
                           "transition-colors text-left truncate w-full"
                         )}
                       >
-                        {transaction.customer.firstName ||
+                        {(transaction.customer.firstName &&
+                          `${transaction.customer.firstName} ${transaction.customer.lastName}`) ||
                           transaction.customer.email}
                       </button>
                     ) : (

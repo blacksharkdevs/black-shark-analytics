@@ -126,7 +126,7 @@ export function TransactionPagination({
             </Button>
 
             {/* Números de Página */}
-            <div className="hidden md:flex items-center gap-1">
+            <div className="items-center hidden gap-1 md:flex">
               {getPageNumbers().map((page, index) => (
                 <div key={index}>
                   {page === "..." ? (
@@ -152,7 +152,7 @@ export function TransactionPagination({
             </div>
 
             {/* Info de Página (Mobile) */}
-            <div className="flex md:hidden items-center px-3 text-sm text-foreground font-semibold tabular-nums">
+            <div className="flex items-center px-3 text-sm font-semibold md:hidden text-foreground tabular-nums">
               {currentPage} / {totalPages}
             </div>
 

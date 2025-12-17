@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { useTranslation } from "react-i18next";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { TransactionList } from "@/components/transactions/TransactionList";
@@ -10,7 +9,6 @@ import { Skeleton } from "@/components/common/ui/skeleton";
 const ITEMS_PER_PAGE = 20;
 
 export default function TransactionsPage() {
-  const { t } = useTranslation();
   const { filteredSalesData, isLoadingData } = useDashboardData();
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
 
@@ -67,17 +65,7 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="w-full mx-auto space-y-6 max-w-7xl">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold md:text-3xl text-foreground">
-          {t("transactions.title")}
-        </h1>
-        <p className="text-sm md:text-base text-muted-foreground">
-          {t("transactions.description")}
-        </p>
-      </div>
-
+    <div className="container p-4 mx-auto space-y-6 md:p-8">
       {/* Barra de Pesquisa */}
       <TransactionSearch
         searchQuery={searchQuery}

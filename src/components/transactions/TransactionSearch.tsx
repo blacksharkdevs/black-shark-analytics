@@ -20,12 +20,12 @@ export function TransactionSearch({
   const { t } = useTranslation();
 
   return (
-    <Card className="shark-card">
+    <Card className="mt-5 shark-card">
       <CardContent className="p-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           {/* Input de Pesquisa */}
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 w-4 h-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
             <Input
               type="text"
               placeholder={t("transactions.searchPlaceholder")}
