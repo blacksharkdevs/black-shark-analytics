@@ -105,6 +105,36 @@
       "revenue": "Revenue",
       "net": "Net",
       "status": "Status"
+    },
+    "filters": {
+      "title": "Advanced Filters",
+      "active": "Active",
+      "clear": "Clear",
+      "platforms": "Platforms",
+      "status": "Status",
+      "type": "Type",
+      "grossAmount": "Gross Revenue",
+      "netAmount": "Net Revenue",
+      "min": "Minimum",
+      "max": "Maximum",
+      "sortBy": "Sort By",
+      "sortOrder": "Order",
+      "date": "Date",
+      "desc": "Newest First",
+      "asc": "Oldest First"
+    },
+    "type": {
+      "sale": "Sale",
+      "refund": "Refund",
+      "chargeback": "Chargeback",
+      "rebill": "Rebill"
+    },
+    "status": {
+      "completed": "Completed",
+      "pending": "Pending",
+      "failed": "Failed",
+      "refunded": "Refunded",
+      "chargeback": "Chargeback"
     }
   },
   "performance": {

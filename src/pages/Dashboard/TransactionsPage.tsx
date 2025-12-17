@@ -19,15 +19,141 @@ export default function TransactionsPage() {
   const [viewMode, setViewMode] = useState<"list" | "table">("table");
   const [itemsPerPage, setItemsPerPage] = useState(20);
 
-  // Filtrar transações por pesquisa
+  // Estados para filtros avançados
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [minGrossAmount, setMinGrossAmount] = useState("");
+  const [maxGrossAmount, setMaxGrossAmount] = useState("");
+  const [minNetAmount, setMinNetAmount] = useState("");
+  const [maxNetAmount, setMaxNetAmount] = useState("");
+  const [sortBy, setSortBy] = useState("occurredAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  // Extrair plataformas, status e tipos únicos dos dados
+  const availablePlatforms = useMemo(() => {
+    const platforms = new Set(
+      filteredSalesData.map((t) => t.platform).filter(Boolean)
+    );
+    return Array.from(platforms).sort();
+  }, [filteredSalesData]);
+
+  const availableStatuses = useMemo(() => {
+    const statuses = new Set(
+      filteredSalesData.map((t) => t.status).filter(Boolean)
+    );
+    return Array.from(statuses).sort();
+  }, [filteredSalesData]);
+
+  const availableTypes = useMemo(() => {
+    const types = new Set(
+      filteredSalesData.map((t) => t.type).filter(Boolean)
+    );
+    return Array.from(types).sort();
+  }, [filteredSalesData]);
+
+  // Função para limpar todos os filtros
+  const handleClearFilters = () => {
+    setSelectedPlatforms([]);
+    setSelectedStatuses([]);
+    setSelectedTypes([]);
+    setMinGrossAmount("");
+    setMaxGrossAmount("");
+    setMinNetAmount("");
+    setMaxNetAmount("");
+  };
+
+  // Aplicar filtros avançados e ordenação
+  const filteredAndSortedTransactions = useMemo(() => {
+    let result = [...filteredSalesData];
+
+    // Filtrar por plataforma
+    if (selectedPlatforms.length > 0) {
+      result = result.filter((t) => selectedPlatforms.includes(t.platform));
+    }
+
+    // Filtrar por status
+    if (selectedStatuses.length > 0) {
+      result = result.filter((t) => selectedStatuses.includes(t.status));
+    }
+
+    // Filtrar por tipo
+    if (selectedTypes.length > 0) {
+      result = result.filter((t) => selectedTypes.includes(t.type));
+    }
+
+    // Filtrar por grossAmount
+    if (minGrossAmount) {
+      const min = parseFloat(minGrossAmount);
+      result = result.filter((t) => Number(t.grossAmount) >= min);
+    }
+    if (maxGrossAmount) {
+      const max = parseFloat(maxGrossAmount);
+      result = result.filter((t) => Number(t.grossAmount) <= max);
+    }
+
+    // Filtrar por netAmount
+    if (minNetAmount) {
+      const min = parseFloat(minNetAmount);
+      result = result.filter((t) => Number(t.netAmount) >= min);
+    }
+    if (maxNetAmount) {
+      const max = parseFloat(maxNetAmount);
+      result = result.filter((t) => Number(t.netAmount) <= max);
+    }
+
+    // Ordenar
+    result.sort((a, b) => {
+      let compareValue = 0;
+
+      switch (sortBy) {
+        case "occurredAt":
+          compareValue =
+            new Date(a.occurredAt).getTime() -
+            new Date(b.occurredAt).getTime();
+          break;
+        case "grossAmount":
+          compareValue = Number(a.grossAmount) - Number(b.grossAmount);
+          break;
+        case "netAmount":
+          compareValue = Number(a.netAmount) - Number(b.netAmount);
+          break;
+        case "status":
+          compareValue = a.status.localeCompare(b.status);
+          break;
+        case "platform":
+          compareValue = a.platform.localeCompare(b.platform);
+          break;
+        default:
+          compareValue = 0;
+      }
+
+      return sortOrder === "asc" ? compareValue : -compareValue;
+    });
+
+    return result;
+  }, [
+    filteredSalesData,
+    selectedPlatforms,
+    selectedStatuses,
+    selectedTypes,
+    minGrossAmount,
+    maxGrossAmount,
+    minNetAmount,
+    maxNetAmount,
+    sortBy,
+    sortOrder,
+  ]);
+
+  // Filtrar transações por pesquisa (após filtros avançados)
   const searchedTransactions = useMemo(() => {
     if (!searchQuery.trim()) {
-      return filteredSalesData;
+      return filteredAndSortedTransactions;
     }
 
     const query = searchQuery.toLowerCase();
 
-    return filteredSalesData.filter((transaction) => {
+    return filteredAndSortedTransactions.filter((transaction) => {
       // Buscar em todos os campos relevantes
       const searchFields = [
         transaction.externalId,
@@ -48,7 +174,7 @@ export default function TransactionsPage() {
 
       return searchFields.some((field) => field?.toLowerCase().includes(query));
     });
-  }, [filteredSalesData, searchQuery]);
+  }, [filteredAndSortedTransactions, searchQuery]);
 
   // Calcular paginação
   const totalPages = Math.ceil(searchedTransactions.length / itemsPerPage);
@@ -73,7 +199,7 @@ export default function TransactionsPage() {
 
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
-      {/* Barra de Pesquisa */}
+      {/* Barra de Pesquisa e Filtros */}
       <TransactionSearch
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
@@ -81,6 +207,28 @@ export default function TransactionsPage() {
         isLoading={isLoading}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        platforms={availablePlatforms}
+        selectedPlatforms={selectedPlatforms}
+        onPlatformsChange={setSelectedPlatforms}
+        statuses={availableStatuses}
+        selectedStatuses={selectedStatuses}
+        onStatusesChange={setSelectedStatuses}
+        types={availableTypes}
+        selectedTypes={selectedTypes}
+        onTypesChange={setSelectedTypes}
+        minGrossAmount={minGrossAmount}
+        onMinGrossAmountChange={setMinGrossAmount}
+        maxGrossAmount={maxGrossAmount}
+        onMaxGrossAmountChange={setMaxGrossAmount}
+        minNetAmount={minNetAmount}
+        onMinNetAmountChange={setMinNetAmount}
+        maxNetAmount={maxNetAmount}
+        onMaxNetAmountChange={setMaxNetAmount}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+        sortOrder={sortOrder}
+        onSortOrderChange={setSortOrder}
+        onClearFilters={handleClearFilters}
       />
 
       {/* Lista/Tabela de Transações */}

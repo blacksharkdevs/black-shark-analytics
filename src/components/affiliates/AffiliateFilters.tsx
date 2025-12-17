@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { Card, CardContent } from "@/components/common/ui/card";
 import { Label } from "@/components/common/ui/label";
 import { Input } from "@/components/common/ui/input";
 import {

@@ -105,6 +105,36 @@
       "revenue": "Receita",
       "net": "Líquido",
       "status": "Status"
+    },
+    "filters": {
+      "title": "Filtros Avançados",
+      "active": "Ativos",
+      "clear": "Limpar",
+      "platforms": "Plataformas",
+      "status": "Status",
+      "type": "Tipo",
+      "grossAmount": "Receita Bruta",
+      "netAmount": "Receita Líquida",
+      "min": "Mínimo",
+      "max": "Máximo",
+      "sortBy": "Ordenar Por",
+      "sortOrder": "Ordem",
+      "date": "Data",
+      "desc": "Mais Recente Primeiro",
+      "asc": "Mais Antiga Primeiro"
+    },
+    "type": {
+      "sale": "Venda",
+      "refund": "Reembolso",
+      "chargeback": "Chargeback",
+      "rebill": "Recorrência"
+    },
+    "status": {
+      "completed": "Completo",
+      "pending": "Pendente",
+      "failed": "Falhou",
+      "refunded": "Reembolsado",
+      "chargeback": "Contestado"
     }
   },
   "performance": {
