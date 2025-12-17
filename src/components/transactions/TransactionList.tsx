@@ -117,7 +117,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {transactions.map((transaction) => (
         <Card
           key={transaction.id}
@@ -126,8 +126,8 @@ export function TransactionList({ transactions }: TransactionListProps) {
             "hover:border-cyan-500/30 transition-all duration-200"
           )}
         >
-          <CardContent className="p-4">
-            <div className="flex flex-col gap-4">
+          <CardContent className="p-3">
+            <div className="flex flex-col gap-2.5">
               {/* Linha 1: ID, Data, Badges de Status */}
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 {/* ID da Venda (Clicável) */}
@@ -182,7 +182,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
               </div>
 
               {/* Linha 3: Produto, Customer, Afiliado */}
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                 {/* Produto */}
                 <div className="flex items-start gap-2">
                   <Package className="w-4 h-4 mt-0.5 text-purple-400 flex-shrink-0" />
@@ -263,7 +263,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
               </div>
 
               {/* Linha 4: Métricas Financeiras */}
-              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/10">
+              <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-white/10">
                 {/* Revenue */}
                 <div className="flex items-center gap-2">
                   <div className="p-1.5 rounded bg-green-500/10">
