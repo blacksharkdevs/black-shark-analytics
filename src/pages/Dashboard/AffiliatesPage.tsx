@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { AffiliateList } from "@/components/affiliates/AffiliateList";
@@ -12,6 +12,7 @@ interface AffiliateMetrics {
   affiliate: AffiliateType;
   platform: string;
   totalCustomers: number;
+  customerIds: Set<string>; // Para rastrear clientes únicos
   totalSales: number;
   totalRevenue: number;
   grossSales: number;
@@ -37,8 +38,8 @@ export default function AffiliatesPage() {
   // Estados para pesquisa, paginação e view mode
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState<"list" | "table">("list");
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [viewMode, setViewMode] = useState<"list" | "table">("table");
+  const [itemsPerPage, setItemsPerPage] = useState(50);
 
   // Estados para filtros
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
@@ -56,6 +57,27 @@ export default function AffiliatesPage() {
   const [maxAov, setMaxAov] = useState("");
   const [sortBy, setSortBy] = useState("sales");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  // Resetar para página 1 quando qualquer filtro mudar
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    selectedPlatforms,
+    minSales,
+    maxSales,
+    minRevenue,
+    maxRevenue,
+    minCommission,
+    maxCommission,
+    minProfit,
+    maxProfit,
+    minCustomers,
+    maxCustomers,
+    minAov,
+    maxAov,
+    sortBy,
+    sortOrder,
+  ]);
 
   // Calcular métricas por afiliado
   const affiliatesData = useMemo(() => {
@@ -78,7 +100,8 @@ export default function AffiliatesPage() {
             email: null,
           },
           platform: transaction.platform,
-          totalCustomers: new Set([transaction.customerId]).size,
+          totalCustomers: 0,
+          customerIds: new Set<string>(),
           totalSales: 0,
           totalRevenue: 0,
           grossSales: 0,
@@ -97,6 +120,11 @@ export default function AffiliatesPage() {
       }
 
       const metrics = affiliatesMap.get(affiliateId)!;
+
+      // Adicionar cliente único ao Set
+      if (transaction.customerId) {
+        metrics.customerIds.add(transaction.customerId);
+      }
 
       // Acumular métricas
       if (transaction.type === "SALE" && transaction.status === "COMPLETED") {
@@ -127,6 +155,9 @@ export default function AffiliatesPage() {
 
     // Calcular métricas derivadas
     affiliatesMap.forEach((metrics) => {
+      // Total de clientes únicos
+      metrics.totalCustomers = metrics.customerIds.size;
+
       // Net Sales = Gross Sales - Commission
       metrics.netSales = metrics.grossSales - metrics.commission;
 

@@ -73,6 +73,7 @@ export function LoginForm() {
   }, [controls]);
 
   const onSubmit = async (data: LoginFormValues) => {
+    console.log("Submitting login form with data:", data);
     const success = await login(data.email, data.password);
 
     if (success) {

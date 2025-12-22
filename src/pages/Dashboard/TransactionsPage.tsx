@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { TransactionList } from "@/components/transactions/TransactionList";
@@ -29,6 +29,21 @@ export default function TransactionsPage() {
   const [maxNetAmount, setMaxNetAmount] = useState("");
   const [sortBy, setSortBy] = useState("occurredAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  // Resetar para página 1 quando qualquer filtro mudar
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    selectedPlatforms,
+    selectedStatuses,
+    selectedTypes,
+    minGrossAmount,
+    maxGrossAmount,
+    minNetAmount,
+    maxNetAmount,
+    sortBy,
+    sortOrder,
+  ]);
 
   // Extrair plataformas, status e tipos únicos dos dados
   const availablePlatforms = useMemo(() => {
