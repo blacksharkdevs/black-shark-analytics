@@ -1,215 +1,130 @@
-import { useState, useMemo, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { ProductPerformanceChart } from "@/components/dashboard/charts/ProductPerformanceChart";
-import { ProductSelector } from "@/components/dashboard/performance/ProductSelector";
-import { SharkInsights } from "@/components/dashboard/performance/SharkInsights";
-import { ProfitWaterfall } from "@/components/dashboard/performance/ProfitWaterfall";
-import { BundleIntelligence } from "@/components/dashboard/performance/BundleIntelligence";
-import { HealthMonitor } from "@/components/dashboard/performance/HealthMonitor";
-import { useDashboardData } from "@/contexts/DashboardDataContext";
-import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
-import { cn } from "@/lib/utils";
-
-interface Product {
-  id: string;
-  name: string;
-  totalRevenue: number;
-  isGrouped?: boolean;
-  groupedProducts?: Array<{ id: string; name: string }>;
-}
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent } from "@/components/common/ui/card";
+import { Button } from "@/components/common/ui/button";
+import { Package, Users, TrendingUp, BarChart3 } from "lucide-react";
 
 export default function PerformancePage() {
-  const { t } = useTranslation();
-  const { filteredSalesData, isLoadingData } = useDashboardData();
-  const { isLoading: isDateRangeLoading, currentDateRange } =
-    useDashboardConfig();
-
-  const isLoading = isLoadingData || isDateRangeLoading;
-
-  // Estado para agrupamento de produtos
-  const [isProductsGrouped, setIsProductsGrouped] = useState(true);
-
-  // Estado para layout do gráfico (full width ou lado a lado)
-  const [isFullWidth, setIsFullWidth] = useState(false);
-
-  // Calcular produtos disponíveis (com ou sem agrupamento)
-  const availableProducts = useMemo(() => {
-    const productRevenueMap = filteredSalesData.reduce((acc, record) => {
-      if (record.type !== "SALE" || record.status !== "COMPLETED") return acc;
-
-      const productId = record.product?.id || "unknown";
-      const productName = record.product?.name || "Unknown Product";
-
-      if (!acc[productId]) {
-        acc[productId] = {
-          id: productId,
-          name: productName,
-          totalRevenue: 0,
-        };
-      }
-      acc[productId].totalRevenue += Number(record.grossAmount);
-      return acc;
-    }, {} as Record<string, Product>);
-
-    let productsList = Object.values(productRevenueMap).sort(
-      (a, b) => b.totalRevenue - a.totalRevenue
-    );
-
-    // Aplicar agrupamento se habilitado
-    if (isProductsGrouped) {
-      const groupMap = new Map<string, Product[]>();
-
-      productsList.forEach((product) => {
-        const baseName =
-          product.name
-            .replace(/\+.*/gi, "")
-            .replace(/\d+\s*(bottle|bottles|unit|units|pack|packs)s?/gi, "")
-            .replace(/\s+(pro|plus|premium)\s*$/gi, "")
-            .replace(/\s+s\s+/gi, " ")
-            .replace(/\s+s$/gi, "")
-            .replace(/\s+/g, " ")
-            .trim() || product.name;
-
-        const existing = groupMap.get(baseName) || [];
-        groupMap.set(baseName, [...existing, product]);
-      });
-
-      const grouped: Product[] = [];
-      const ungrouped: Product[] = [];
-
-      groupMap.forEach((products, baseName) => {
-        if (products.length === 1) {
-          ungrouped.push(products[0]);
-        } else {
-          const totalRevenue = products.reduce(
-            (sum, p) => sum + p.totalRevenue,
-            0
-          );
-          grouped.push({
-            id: `group:${baseName}`,
-            name: baseName,
-            totalRevenue,
-            isGrouped: true,
-            groupedProducts: products.map((p) => ({ id: p.id, name: p.name })),
-          });
-        }
-      });
-
-      productsList = [
-        ...grouped.sort((a, b) => b.totalRevenue - a.totalRevenue),
-        ...ungrouped.sort((a, b) => b.totalRevenue - a.totalRevenue),
-      ];
-    }
-
-    return productsList;
-  }, [filteredSalesData, isProductsGrouped]);
-
-  // Top 5 produtos para seleção inicial
-  const topProducts = useMemo(() => {
-    return availableProducts.slice(0, 5);
-  }, [availableProducts]);
-
-  // Estado para produtos selecionados (inicialmente os top 5)
-  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
-
-  // Atualizar produtos selecionados quando os top products mudarem
-  useEffect(() => {
-    if (topProducts.length > 0 && selectedProductIds.length === 0) {
-      setSelectedProductIds(topProducts.map((p) => p.id));
-    }
-  }, [topProducts, selectedProductIds.length]);
-
-  // Limpar o gráfico quando o agrupamento mudar
-  const handleProductsGroupChange = (value: boolean) => {
-    setIsProductsGrouped(value);
-    setSelectedProductIds([]); // Limpa todos os produtos selecionados
-  };
-
-  const handleToggleProduct = (productId: string) => {
-    setSelectedProductIds((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId]
-    );
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-2xl font-bold md:text-3xl text-foreground">
-          {t("performance.title")}
+          Central de Performance
         </h1>
         <p className="text-sm md:text-base text-muted-foreground">
-          {t("performance.description")}
+          Escolha o tipo de análise de performance que deseja visualizar
         </p>
       </div>
 
-      {/* Gráfico e Produtos - Layout Dinâmico */}
-      <div
-        className={cn(
-          "flex gap-6",
-          isFullWidth ? "flex-col" : "flex-col lg:flex-row"
-        )}
-      >
-        {/* Gráfico de Performance */}
-        <div className={cn(isFullWidth ? "w-full" : "w-full lg:w-2/3")}>
-          <ProductPerformanceChart
-            selectedProductIds={selectedProductIds}
-            isLoading={isLoading}
-            availableProducts={availableProducts}
-            isFullWidth={isFullWidth}
-            onToggleFullWidth={() => setIsFullWidth(!isFullWidth)}
-          />
-        </div>
+      {/* Performance Options Grid */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Products Performance Card */}
+        <Card className="shark-card group hover:border-cyan-500/50 transition-all">
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center space-y-4 text-center">
+              <div className="p-4 rounded-full bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
+                <Package className="w-12 h-12 text-purple-400" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-foreground">
+                  Performance de Produtos
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Analise o desempenho dos seus produtos, visualize gráficos de
+                  vendas, lucro e insights detalhados por produto.
+                </p>
+              </div>
+              <div className="flex flex-wrap justify-center gap-2 pt-2">
+                <div className="flex items-center gap-1 px-2 py-1 text-xs rounded bg-white/5">
+                  <BarChart3 className="w-3 h-3" />
+                  <span>Gráficos</span>
+                </div>
+                <div className="flex items-center gap-1 px-2 py-1 text-xs rounded bg-white/5">
+                  <TrendingUp className="w-3 h-3" />
+                  <span>Insights AI</span>
+                </div>
+                <div className="flex items-center gap-1 px-2 py-1 text-xs rounded bg-white/5">
+                  <Package className="w-3 h-3" />
+                  <span>Agrupamento</span>
+                </div>
+              </div>
+              <Button
+                onClick={() => navigate("/dashboard/performance/products")}
+                className="w-full mt-4"
+                size="lg"
+              >
+                Ver Performance de Produtos
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Seletor de Produtos */}
-        <div className={cn(isFullWidth ? "w-full" : "w-full lg:w-1/3")}>
-          <ProductSelector
-            availableProducts={availableProducts}
-            selectedProductIds={selectedProductIds}
-            onToggleProduct={handleToggleProduct}
-            isLoading={isLoading}
-            isProductsGrouped={isProductsGrouped}
-            onProductsGroupChange={handleProductsGroupChange}
-          />
-        </div>
+        {/* Affiliates Performance Card */}
+        <Card className="shark-card group hover:border-yellow-500/50 transition-all">
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center space-y-4 text-center">
+              <div className="p-4 rounded-full bg-yellow-500/10 group-hover:bg-yellow-500/20 transition-colors">
+                <Users className="w-12 h-12 text-yellow-400" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-foreground">
+                  Performance de Afiliados
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Monitore o desempenho dos seus afiliados, analise comissões,
+                  conversões e identifique seus melhores parceiros.
+                </p>
+              </div>
+              <div className="flex flex-wrap justify-center gap-2 pt-2">
+                <div className="flex items-center gap-1 px-2 py-1 text-xs rounded bg-white/5">
+                  <Users className="w-3 h-3" />
+                  <span>Comparação</span>
+                </div>
+                <div className="flex items-center gap-1 px-2 py-1 text-xs rounded bg-white/5">
+                  <TrendingUp className="w-3 h-3" />
+                  <span>Métricas</span>
+                </div>
+                <div className="flex items-center gap-1 px-2 py-1 text-xs rounded bg-white/5">
+                  <BarChart3 className="w-3 h-3" />
+                  <span>Rankings</span>
+                </div>
+              </div>
+              <Button
+                onClick={() => navigate("/dashboard/performance/affiliates")}
+                className="w-full mt-4"
+                size="lg"
+                variant="outline"
+              >
+                Ver Performance de Afiliados
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Shark AI Analysis */}
-      <SharkInsights
-        selectedProductIds={selectedProductIds}
-        availableProducts={availableProducts}
-        filteredSalesData={filteredSalesData}
-        dateRange={currentDateRange}
-      />
-
-      {/* Grid de Análise Técnica */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Coluna 1: Profit Waterfall */}
-        <div className="lg:col-span-1">
-          <ProfitWaterfall
-            filteredSalesData={filteredSalesData}
-            isLoading={isLoading}
-          />
-        </div>
-
-        {/* Coluna 2: Bundle Intelligence */}
-        <div className="lg:col-span-1">
-          <BundleIntelligence
-            filteredSalesData={filteredSalesData}
-            isLoading={isLoading}
-          />
-        </div>
-
-        {/* Coluna 3: Health Monitor */}
-        <div className="lg:col-span-1">
-          <HealthMonitor
-            filteredSalesData={filteredSalesData}
-            isLoading={isLoading}
-          />
-        </div>
-      </div>
+      {/* Info Section */}
+      <Card className="shark-card border-cyan-500/30">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="p-2 rounded bg-cyan-500/10">
+              <TrendingUp className="w-6 h-6 text-cyan-400" />
+            </div>
+            <div className="flex-1 space-y-2">
+              <h3 className="font-semibold text-foreground">
+                Análise de Performance Avançada
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Utilize as ferramentas de análise de performance para tomar
+                decisões baseadas em dados. Compare diferentes períodos,
+                identifique tendências e otimize suas estratégias de vendas e
+                marketing.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

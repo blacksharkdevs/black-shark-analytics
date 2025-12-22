@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "@/pages/Auth/Login";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import PerformancePage from "./pages/Dashboard/PerformancePage";
+import ProductsPerformancePage from "./pages/Dashboard/Performance/ProductsPerformancePage";
+import AffiliatesPerformancePage from "./pages/Dashboard/Performance/AffiliatesPerformancePage";
 import TransactionsPage from "./pages/Dashboard/TransactionsPage";
 import TransactionDetailPage from "./pages/Dashboard/Transactions/TransactionDetailPage";
 import AffiliatesPage from "./pages/Dashboard/AffiliatesPage";
@@ -42,6 +44,14 @@ export default function App() {
         >
           <Route index element={<DashboardPage />} />
           <Route path="performance" element={<PerformancePage />} />
+          <Route
+            path="performance/products"
+            element={<ProductsPerformancePage />}
+          />
+          <Route
+            path="performance/affiliates"
+            element={<AffiliatesPerformancePage />}
+          />
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="transactions/:id" element={<TransactionDetailPage />} />
           <Route path="affiliates" element={<AffiliatesPage />} />
