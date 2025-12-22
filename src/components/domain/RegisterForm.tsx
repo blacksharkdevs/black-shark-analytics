@@ -36,6 +36,12 @@ const registerSchema = z.object({
     .string()
     .min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
   role: z.enum(["ADMIN", "USER"]),
+  adminToken: z
+    .string()
+    .min(1, { message: "O token de administrador é obrigatório" })
+    .refine((token) => token === "123asdFF", {
+      message: "Token de administrador inválido",
+    }),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -67,7 +73,13 @@ export function RegisterForm() {
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: "", email: "", password: "", role: "ADMIN" },
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      role: "ADMIN",
+      adminToken: "",
+    },
   });
 
   useEffect(() => {
@@ -219,6 +231,26 @@ export function RegisterForm() {
             {form.formState.errors.role && (
               <p className="text-sm text-destructive">
                 {form.formState.errors.role.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="adminToken" className="text-white">
+              Token de Administrador
+            </Label>
+            <Input
+              id="adminToken"
+              type="password"
+              placeholder="Digite o token de administrador"
+              {...form.register("adminToken")}
+              disabled={isLoading}
+              className="border rounded-none border-border text-foreground focus:ring-accent"
+              aria-invalid={form.formState.errors.adminToken ? "true" : "false"}
+            />
+            {form.formState.errors.adminToken && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.adminToken.message}
               </p>
             )}
           </div>

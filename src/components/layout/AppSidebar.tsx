@@ -5,8 +5,8 @@ import {
   ChevronLeft,
   ChevronRight,
   CircleDollarSign,
-  List,
-  Settings,
+  // List,
+  // Settings,
   TrendingUp,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -53,16 +53,16 @@ export function AppSidebar({ width }: { width: string }) {
       label: t("navigation.transactions"),
       icon: CircleDollarSign,
     },
-    {
-      href: "/dashboard/reports",
-      label: t("navigation.reports"),
-      icon: List,
-    },
-    {
-      href: "/dashboard/configurations",
-      label: t("navigation.configurations"),
-      icon: Settings,
-    },
+    // {
+    //   href: "/dashboard/reports",
+    //   label: t("navigation.reports"),
+    //   icon: List,
+    // },
+    // {
+    //   href: "/dashboard/configurations",
+    //   label: t("navigation.configurations"),
+    //   icon: Settings,
+    // },
   ];
 
   const isActive = (href: string) => {

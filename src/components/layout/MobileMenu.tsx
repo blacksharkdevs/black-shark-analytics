@@ -4,10 +4,11 @@ import {
   Users,
   LayoutDashboard,
   CircleDollarSign,
-  List,
-  Settings,
+  // List,
+  // Settings,
   Menu,
   LogOut,
+  TrendingUp,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -49,6 +50,11 @@ export function MobileMenu() {
       isRoot: true,
     },
     {
+      href: "/dashboard/performance",
+      label: t("navigation.performance"),
+      icon: TrendingUp,
+    },
+    {
       href: "/dashboard/affiliates",
       label: t("navigation.affiliates"),
       icon: Users,
@@ -58,16 +64,16 @@ export function MobileMenu() {
       label: t("navigation.transactions"),
       icon: CircleDollarSign,
     },
-    {
-      href: "/dashboard/reports",
-      label: t("navigation.reports"),
-      icon: List,
-    },
-    {
-      href: "/dashboard/configurations",
-      label: t("navigation.configurations"),
-      icon: Settings,
-    },
+    // {
+    //   href: "/dashboard/reports",
+    //   label: t("navigation.reports"),
+    //   icon: List,
+    // },
+    // {
+    //   href: "/dashboard/configurations",
+    //   label: t("navigation.configurations"),
+    //   icon: Settings,
+    // },
   ];
 
   const isActive = (href: string) => {
