@@ -101,18 +101,15 @@ export function TransactionList({ transactions }: TransactionListProps) {
     return format(date, "dd MMM yyyy • HH:mm", { locale });
   };
 
-  const handleNavigateToSale = (saleId: string) => {
-    // TODO: Implementar navegação para detalhes da venda
-    console.log("Navigate to sale:", saleId);
+  const handleNavigateToSale = (transactionId: string) => {
+    navigate(`/dashboard/transactions/${transactionId}`);
   };
 
   const handleNavigateToCustomer = (customerId: string) => {
-    // TODO: Implementar navegação para detalhes do cliente
     navigate(`/dashboard/customers/${customerId}`);
   };
 
   const handleNavigateToAffiliate = (affiliateId: string) => {
-    // TODO: Implementar navegação para detalhes do afiliado
     navigate(`/dashboard/affiliates/${affiliateId}`);
   };
 

@@ -3,6 +3,7 @@ import LoginPage from "@/pages/Auth/Login";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import PerformancePage from "./pages/Dashboard/PerformancePage";
 import TransactionsPage from "./pages/Dashboard/TransactionsPage";
+import TransactionDetailPage from "./pages/Dashboard/Transactions/TransactionDetailPage";
 import AffiliatesPage from "./pages/Dashboard/AffiliatesPage";
 import AffiliateDetailPage from "./pages/Dashboard/Affiliates/AffiliateDetailPage";
 
@@ -42,6 +43,7 @@ export default function App() {
           <Route index element={<DashboardPage />} />
           <Route path="performance" element={<PerformancePage />} />
           <Route path="transactions" element={<TransactionsPage />} />
+          <Route path="transactions/:id" element={<TransactionDetailPage />} />
           <Route path="affiliates" element={<AffiliatesPage />} />
           <Route path="affiliates/:name" element={<AffiliateDetailPage />} />
         </Route>

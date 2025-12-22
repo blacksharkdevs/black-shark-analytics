@@ -69,8 +69,8 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
     return format(date, "dd/MM/yy HH:mm", { locale });
   };
 
-  const handleNavigateToSale = (saleId: string) => {
-    console.log("Navigate to sale:", saleId);
+  const handleNavigateToSale = (transactionId: string) => {
+    navigate(`/dashboard/transactions/${transactionId}`);
   };
 
   const handleNavigateToCustomer = (customerId: string) => {
