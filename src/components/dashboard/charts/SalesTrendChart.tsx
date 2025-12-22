@@ -1,188 +1,34 @@
-import { useMemo } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { parseISO, format as dateFnsFormat, isSameDay } from "date-fns";
-import type { Transaction } from "@/types/index";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
-
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/common/ui/card"; // Migrado
-import { Skeleton } from "@/components/common/ui/skeleton"; // Migrado
-import {
-  ChartContainer,
-  ChartTooltipContent,
-} from "@/components/common/ui/chart"; // Assumindo que este wrapper existe
-import { type ChartConfig } from "@/components/common/ui/chart";
+} from "@/components/common/ui/card";
+import { Skeleton } from "@/components/common/ui/skeleton";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { ChartNoAxesColumnIncreasing, ArrowRight } from "lucide-react";
 import { Button } from "@/components/common/ui/button";
+import { Switch } from "@/components/common/ui/switch";
+import { Label } from "@/components/common/ui/label";
 import { Link } from "react-router-dom";
-
-// --- FORMATADORES UTC ---
-// Formata o valor do YAxis (eixo vertical)
-const formatYAxisValue = (value: number): string => {
-  if (Math.abs(value) >= 1000000) {
-    return `$${(value / 1000000).toFixed(1)}M`;
-  }
-  if (Math.abs(value) >= 1000) {
-    return `$${(value / 1000).toFixed(1)}K`;
-  }
-  return `$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-};
+import { GroupedSalesChart } from "./GroupedSalesChart";
+import { UngroupedSalesChart } from "./UngroupedSalesChart";
 
 export function SalesTrendChart() {
   const { t } = useTranslation();
-  // 🔑 CONSUMO: Puxando dados e estados dos Contextos
   const { filteredSalesData: data, isLoadingData } = useDashboardData();
   const { currentDateRange: dateRange, isLoading: isDateRangeLoading } =
     useDashboardConfig();
 
   const isLoading = isLoadingData || isDateRangeLoading;
-
-  // Config do gráfico traduzida
-  const chartConfig = useMemo(
-    () => ({
-      revenue: {
-        label: t("dashboard.charts.revenueLabel"),
-        color: "hsl(var(--primary))",
-      },
-    }),
-    [t]
-  ) satisfies ChartConfig;
-
-  // Intl formatters explicitly using UTC for display consistency
-  const timeFormatter = useMemo(
-    () =>
-      new Intl.DateTimeFormat("default", {
-        timeZone: "UTC",
-        hour: "numeric",
-        hour12: true,
-      }),
-    []
-  );
-  const shortDateFormatter = useMemo(
-    () =>
-      new Intl.DateTimeFormat("default", {
-        timeZone: "UTC",
-        month: "short",
-        day: "numeric",
-      }),
-    []
-  );
-
-  // --- LÓGICA DE AGREGAÇÃO E TRANSFORMAÇÃO DE DADOS (useMemo) ---
-  const { chartData, xAxisTickFormatter } = useMemo(() => {
-    // 🚨 Logica de guarda
-    if (!dateRange || !dateRange.from || !dateRange.to) {
-      return {
-        chartData: [],
-        xAxisTickFormatter: (v: string) => v,
-        isSingleDayView: false,
-      };
-    }
-
-    const singleDayView = isSameDay(dateRange.from, dateRange.to);
-    let aggregatedData: Record<
-      string,
-      { name: string; revenue: number; fullDateSortKey: string }
-    > = {};
-    let finalChartData: Array<{ name: string; revenue: number }> = [];
-
-    if (singleDayView) {
-      // --- VISUALIZAÇÃO HORÁRIA (Single Day) ---
-      const hourlyData = Array.from({ length: 24 }, (_, i) => ({
-        name: timeFormatter.format(new Date(Date.UTC(2000, 0, 1, i))),
-        revenue: 0,
-        hourIndex: i,
-      }));
-
-      data.forEach((record: Transaction) => {
-        // Usar createdAt para filtrar por data de criação no sistema
-        const transactionDateObject = parseISO(record.createdAt);
-        const hourInUTC = transactionDateObject.getUTCHours();
-
-        const targetHourEntry = hourlyData.find(
-          (h) => h.hourIndex === hourInUTC
-        );
-        if (
-          targetHourEntry &&
-          record.type === "SALE" &&
-          record.status === "COMPLETED"
-        ) {
-          targetHourEntry.revenue += Number(record.grossAmount);
-        }
-      });
-      finalChartData = hourlyData.map((item) => ({
-        name: item.name,
-        revenue: parseFloat(item.revenue.toFixed(2)),
-      }));
-    } else {
-      // --- VISUALIZAÇÃO DIÁRIA (Multi Day) ---
-      aggregatedData = data.reduce(
-        (
-          acc: Record<
-            string,
-            { name: string; revenue: number; fullDateSortKey: string }
-          >,
-          record: Transaction
-        ) => {
-          // Usar createdAt para filtrar por data de criação no sistema
-          const transactionDateObject = parseISO(record.createdAt);
-          const dateKey = dateFnsFormat(transactionDateObject, "yyyy-MM-dd");
-
-          if (!acc[dateKey]) {
-            acc[dateKey] = {
-              name: shortDateFormatter.format(transactionDateObject),
-              revenue: 0,
-              fullDateSortKey: dateKey,
-            };
-          }
-          // Apenas vendas completadas
-          if (record.type === "SALE" && record.status === "COMPLETED") {
-            acc[dateKey].revenue += Number(record.grossAmount);
-          }
-          return acc;
-        },
-        {} as Record<
-          string,
-          { name: string; revenue: number; fullDateSortKey: string }
-        >
-      );
-
-      finalChartData = Object.values(aggregatedData)
-        .sort((a, b) => a.fullDateSortKey.localeCompare(b.fullDateSortKey))
-        .map((item) => ({
-          name: item.name,
-          revenue: parseFloat(item.revenue.toFixed(2)),
-        }));
-    }
-
-    return {
-      chartData: finalChartData,
-      xAxisTickFormatter: (value: string) => value, // Mantido simples, pois o nome já está formatado
-      isSingleDayView: singleDayView,
-    };
-  }, [data, dateRange, timeFormatter, shortDateFormatter]); // Dependências do useMemo
-
-  // --- RENDERIZAÇÃO CONDICIONAL ---
+  const [groupPlatforms, setGroupPlatforms] = useState(true);
 
   if (isLoading) {
     return (
-      // 🚨 CORES DINÂMICAS E DESIGN RETO
       <Card className="col-span-1 lg:col-span-3">
         <CardHeader>
           <Skeleton className="w-48 mb-1 h-7" />
@@ -195,7 +41,7 @@ export function SalesTrendChart() {
     );
   }
 
-  if (chartData.length === 0) {
+  if (!data || data.length === 0) {
     return (
       <Card className="col-span-1 lg:col-span-3">
         <CardHeader>
@@ -220,7 +66,7 @@ export function SalesTrendChart() {
     >
       <CardHeader className="px-4 py-3 md:px-6 md:py-4">
         <CardTitle className="flex items-center text-base md:text-lg text-foreground">
-          <ChartNoAxesColumnIncreasing className="w-4 h-4 mr-2 md:w-6 md:h-6" />{" "}
+          <ChartNoAxesColumnIncreasing className="w-4 h-4 mr-2 md:w-6 md:h-6" />
           {t("dashboard.charts.salesTrend")}
         </CardTitle>
         <CardDescription className="text-xs md:text-sm">
@@ -228,93 +74,25 @@ export function SalesTrendChart() {
         </CardDescription>
       </CardHeader>
       <CardContent className="h-full pb-4 pl-1 pr-2 md:pb-6 md:pl-2 md:pr-6">
-        <ChartContainer
-          config={chartConfig}
-          className="h-[250px] md:h-[350px] lg:h-[400px] w-full"
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={chartData}
-              margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
+        {groupPlatforms ? (
+          <GroupedSalesChart data={data} dateRange={dateRange} />
+        ) : (
+          <UngroupedSalesChart data={data} dateRange={dateRange} />
+        )}
+        <div className="flex flex-col items-center justify-center gap-3 mt-2 md:flex-row md:mt-4">
+          <div className="flex items-center gap-2">
+            <Switch
+              id="group-platforms"
+              checked={groupPlatforms}
+              onCheckedChange={setGroupPlatforms}
+            />
+            <Label
+              htmlFor="group-platforms"
+              className="text-xs cursor-pointer md:text-sm text-muted-foreground"
             >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-              />
-              <XAxis
-                dataKey="name"
-                tickFormatter={xAxisTickFormatter}
-                stroke="hsl(var(--muted-foreground))"
-                tickLine={false}
-                axisLine={false}
-                dy={10}
-                tick={{ fontSize: 10 }}
-                interval="preserveStartEnd"
-              />
-              <YAxis
-                stroke="hsl(var(--muted-foreground))"
-                tickFormatter={formatYAxisValue}
-                tickLine={false}
-                axisLine={false}
-                dx={-5}
-                tick={{ fontSize: 10 }}
-                width={45}
-              />
-              <Tooltip
-                content={
-                  <ChartTooltipContent
-                    indicator="dot"
-                    hideLabel={false}
-                    formatter={(value, name) => {
-                      // Tooltip formatter para moeda
-                      if (name === "revenue" && typeof value === "number") {
-                        return [
-                          `$${value.toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}`,
-                          chartConfig.revenue.label,
-                        ];
-                      }
-                      return [value, name];
-                    }}
-                  />
-                }
-                // 🚨 CORES DINÂMICAS: Stroke do cursor e sombra do Tooltip
-                cursor={{
-                  stroke: "hsl(var(--accent))",
-                  strokeWidth: 2,
-                  strokeDasharray: "3 3",
-                }}
-                wrapperStyle={{
-                  outline: "none",
-                  boxShadow: "hsl(var(--card-foreground))",
-                }}
-              />
-              <Legend wrapperStyle={{ fontSize: "11px" }} iconSize={10} />
-              <Line
-                type="monotone"
-                dataKey="revenue"
-                // 🚨 COR DINÂMICA: Usa a variável CSS do ChartConfig
-                stroke="var(--color-revenue)"
-                strokeWidth={2}
-                dot={{
-                  r: 3,
-                  fill: "var(--color-revenue)",
-                  stroke: "hsl(var(--background))",
-                  strokeWidth: 1.5,
-                }}
-                activeDot={{
-                  r: 5,
-                  fill: "var(--color-revenue)",
-                  stroke: "hsl(var(--background))",
-                  strokeWidth: 2,
-                }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-        <div className="flex justify-center mt-2 md:mt-4">
+              Agrupar Plataformas
+            </Label>
+          </div>
           <Button
             variant="ghost"
             size="sm"
