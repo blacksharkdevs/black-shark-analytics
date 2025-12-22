@@ -61,9 +61,7 @@ export default function TransactionsPage() {
   }, [filteredSalesData]);
 
   const availableTypes = useMemo(() => {
-    const types = new Set(
-      filteredSalesData.map((t) => t.type).filter(Boolean)
-    );
+    const types = new Set(filteredSalesData.map((t) => t.type).filter(Boolean));
     return Array.from(types).sort();
   }, [filteredSalesData]);
 
@@ -124,8 +122,7 @@ export default function TransactionsPage() {
       switch (sortBy) {
         case "occurredAt":
           compareValue =
-            new Date(a.occurredAt).getTime() -
-            new Date(b.occurredAt).getTime();
+            new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime();
           break;
         case "grossAmount":
           compareValue = Number(a.grossAmount) - Number(b.grossAmount);
