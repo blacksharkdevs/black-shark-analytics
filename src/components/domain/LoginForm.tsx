@@ -14,7 +14,6 @@ import { Label } from "@/components/common/ui/label";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/common/ui/card";
@@ -73,7 +72,6 @@ export function LoginForm() {
   }, [controls]);
 
   const onSubmit = async (data: LoginFormValues) => {
-    console.log("Submitting login form with data:", data);
     const success = await login(data.email, data.password);
 
     if (success) {
@@ -93,7 +91,7 @@ export function LoginForm() {
     if (isLoginSuccess) {
       const timer = setTimeout(() => {
         navigate("/dashboard", { replace: true });
-      }, 2000);
+      }, 3000);
 
       return () => clearTimeout(timer);
     }
@@ -108,7 +106,7 @@ export function LoginForm() {
       variants={fadeVariants}
       animate={controls}
       initial="initial"
-      className="w-full max-w-md bg-transparent border rounded-none shadow-2xl border-border"
+      className="w-full md:w-[450px] bg-transparent border rounded-none shadow-2xl border-border"
     >
       <CardHeader className="text-center">
         <div className="flex justify-center mb-4">
@@ -120,9 +118,6 @@ export function LoginForm() {
         <CardTitle className="text-3xl tracking-tight text-white font-headline">
           Black Shark Analytics
         </CardTitle>
-        <CardDescription className="text-white">
-          Enter your credentials to access the dashboard.
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -198,9 +193,6 @@ export function LoginForm() {
             )}
           </Button>
         </form>
-        <p className="mt-4 text-sm text-center text-blue-600/70">
-          Tip: Use admin@blackshark.com / admin123 for testing.
-        </p>
       </CardContent>
     </AnimatedCard>
   );

@@ -148,7 +148,7 @@ export function TransactionFilters({
                     className="transition-all cursor-pointer hover:scale-105"
                     onClick={() => toggleStatus(status)}
                   >
-                    {t(`transactions.status.${status.toLowerCase()}`)}
+                    {t(`transactions.statuses.${status}`)}
                     {selectedStatuses.includes(status) && (
                       <X className="w-3 h-3 ml-1" />
                     )}

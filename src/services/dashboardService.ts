@@ -79,10 +79,6 @@ export async function fetchSalesDataForDashboard(
       );
     }
 
-    console.log(
-      `✅ ${allData.length} transações carregadas do período selecionado`
-    );
-
     return allData;
   } catch (error) {
     console.error("Erro ao buscar dados do dashboard:", error);

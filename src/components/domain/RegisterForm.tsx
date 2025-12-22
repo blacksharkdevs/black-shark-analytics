@@ -112,7 +112,7 @@ export function RegisterForm() {
       variants={fadeVariants}
       animate={controls}
       initial="initial"
-      className="w-full max-w-md bg-transparent border rounded-none shadow-2xl border-blackshark-accent"
+      className="w-full md:w-[450px] bg-transparent border rounded-none shadow-2xl border-border"
     >
       <CardHeader className="text-center">
         <div className="flex justify-center mb-4">
@@ -154,7 +154,7 @@ export function RegisterForm() {
             <Input
               id="email"
               type="email"
-              placeholder="victor@gmail.com"
+              placeholder="victor@blackshark.com"
               {...form.register("email")}
               disabled={isLoading}
               className="border rounded-none border-border text-foreground focus:ring-accent"

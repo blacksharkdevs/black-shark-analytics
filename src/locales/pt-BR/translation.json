@@ -128,13 +128,6 @@
       "refund": "Reembolso",
       "chargeback": "Chargeback",
       "rebill": "Recorrência"
-    },
-    "status": {
-      "completed": "Completo",
-      "pending": "Pendente",
-      "failed": "Falhou",
-      "refunded": "Reembolsado",
-      "chargeback": "Contestado"
     }
   },
   "performance": {

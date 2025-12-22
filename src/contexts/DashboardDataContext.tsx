@@ -135,11 +135,6 @@ async function fetchTransactionsFromSupabase(
     const queryFromUTC = dateRange.from.toISOString();
     const queryToUTC = dateRange.to.toISOString();
 
-    console.log("🔍 DashboardDataContext - Query Dates:", {
-      from: queryFromUTC,
-      to: queryToUTC,
-    });
-
     let allData: Transaction[] = [];
     let rangeStart = 0;
     let hasMore = true;
@@ -356,8 +351,6 @@ export function DashboardDataProvider({
         currentDateRange,
         dateColumn
       );
-
-      console.log(`Fetched ${transactions.length} transactions for dashboard.`);
       setAllTransactions(transactions);
     } catch (error) {
       console.error("Erro ao buscar dados do Dashboard:", error);
