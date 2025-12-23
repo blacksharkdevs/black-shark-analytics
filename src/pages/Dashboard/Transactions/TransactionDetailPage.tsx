@@ -1,183 +1,435 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabaseClient";
+import { useMemo } from "react";
+import { useDashboardData } from "@/contexts/DashboardDataContext";
+import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/common/ui/card";
 import { Button } from "@/components/common/ui/button";
+import { Badge } from "@/components/common/ui/badge";
 import { Skeleton } from "@/components/common/ui/skeleton";
-import { ArrowLeft, FileText } from "lucide-react";
-import { format as dateFnsFormat, isValid } from "date-fns";
-import { TransactionsProvider } from "@/contexts/TransactionsContext";
+import { ArrowLeft } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
-type TransactionDetails = {
-  [key: string]: any;
-};
-
-function TransactionDetailPageContent() {
+export default function TransactionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { filteredSalesData, isLoadingData } = useDashboardData();
+  const { isLoading: isDateRangeLoading } = useDashboardConfig();
 
-  const [transaction, setTransaction] = useState<TransactionDetails | null>(
-    null
-  );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const isLoading = isLoadingData || isDateRangeLoading;
 
-  const handleBack = useCallback(() => {
-    navigate("/dashboard/transactions");
-  }, [navigate]);
+  // Encontrar a transação pelo ID
+  const transaction = useMemo(() => {
+    return filteredSalesData.find((t) => t.id === id);
+  }, [filteredSalesData, id]);
 
-  const formatLabel = (key: string) => {
-    return key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  if (isLoading) {
+    return (
+      <div className="container p-4 mx-auto space-y-6 md:p-8">
+        <Skeleton className="w-48 h-10" />
+        <div className="grid gap-6 md:grid-cols-2">
+          <Skeleton className="h-64" />
+          <Skeleton className="h-64" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!transaction) {
+    return (
+      <div className="container p-4 mx-auto space-y-6 md:p-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/dashboard/transactions")}
+          className="mb-4"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Voltar para Transações
+        </Button>
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-center text-muted-foreground">
+              Transação não encontrada
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Helper para formatar valores monetários
+  const formatCurrency = (value: number | string) => {
+    const num = typeof value === "string" ? parseFloat(value) : value;
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: transaction.currency || "USD",
+    }).format(num);
   };
 
-  const formatValue = (key: string, value: any) => {
-    if (value === null || value === undefined)
-      return <span className="text-muted-foreground">N/A</span>;
-    if (typeof value === "boolean") return value ? "Yes" : "No";
-
-    if (
-      ["transaction_date", "calc_charged_day", "created_at"].includes(key) &&
-      typeof value === "string"
-    ) {
-      const date = new Date(value);
-      if (isValid(date)) {
-        return dateFnsFormat(date, "MMM dd, yyyy h:mm:ss a") + " (UTC)";
-      }
-      return value;
-    }
-
-    if (
-      key.includes("amount") ||
-      key.includes("commission") ||
-      key.includes("taxes") ||
-      key.includes("fee") ||
-      key.includes("revenue")
-    ) {
-      if (typeof value === "number") {
-        return `$${value.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}`;
-      }
-    }
-    return value.toString();
+  // Helper para formatar data
+  const formatDate = (date: string) => {
+    return format(new Date(date), "dd/MM/yyyy HH:mm", { locale: ptBR });
   };
 
-  useEffect(() => {
-    if (!id) return;
-
-    const fetchTransaction = async () => {
-      setLoading(true);
-      setError(null);
-
-      const { data, error: dbError } = await supabase
-        .from("sales_data")
-        .select("*")
-        .eq("sale_id", id)
-        .single();
-
-      if (dbError) {
-        console.error("Error fetching transaction details:", dbError);
-        setError(
-          "Failed to fetch transaction details. The transaction may not exist or there was a network error."
-        );
-        setTransaction(null);
-      } else if (data) {
-        setTransaction(data);
-      } else {
-        setError("Transaction not found.");
-      }
-
-      setLoading(false);
+  // Helper para badge de status
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, "default" | "secondary" | "destructive"> = {
+      COMPLETED: "default",
+      PENDING: "secondary",
+      FAILED: "destructive",
+      REFUNDED: "destructive",
+      CHARGEBACK: "destructive",
     };
+    return <Badge variant={variants[status] || "secondary"}>{status}</Badge>;
+  };
 
-    fetchTransaction();
-  }, [id]);
+  // Helper para badge de tipo
+  const getTypeBadge = (type: string) => {
+    const variants: Record<string, "default" | "outline" | "destructive"> = {
+      SALE: "default",
+      REFUND: "destructive",
+      CHARGEBACK: "destructive",
+      REBILL: "outline",
+    };
+    return <Badge variant={variants[type] || "outline"}>{type}</Badge>;
+  };
 
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
-      <Button
-        variant="outline"
-        onClick={handleBack}
-        className="mb-4 border rounded-none border-border text-foreground hover:bg-accent/10"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to Transactions
-      </Button>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/dashboard/transactions")}
+          className="mb-4"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Voltar
+        </Button>
+        <div className="flex gap-2">
+          {getStatusBadge(transaction.status)}
+          {getTypeBadge(transaction.type)}
+          {transaction.isTest && <Badge variant="outline">TEST</Badge>}
+        </div>
+      </div>
 
-      <Card className="border rounded-none shadow-lg bg-card border-border">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <FileText className="w-6 h-6 text-primary" />{" "}
-            <div className="flex-1">
-              <CardTitle className="text-foreground">
-                Transaction Details
-              </CardTitle>
-              <CardDescription className="text-muted-foreground">
-                Complete information for Sale ID:{" "}
-                <span className="font-mono font-semibold text-primary">
-                  {id}
-                </span>
-              </CardDescription>
+      {/* Título */}
+      <div>
+        <h1 className="text-3xl font-bold">Detalhes da Transação</h1>
+        <p className="text-muted-foreground">ID: {transaction.id}</p>
+        <p className="text-sm text-muted-foreground">
+          ID Externo: {transaction.externalId}
+        </p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Informações Gerais */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações Gerais</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Plataforma
+              </p>
+              <p className="text-lg">{transaction.platform}</p>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            // 🚨 SKELETON DINÂMICO
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-              {[...Array(16)].map((_, i) => (
-                <div
-                  key={i}
-                  className="flex justify-between pb-2 border-b border-border/50"
-                >
-                  <Skeleton className="w-1/3 h-5 rounded-none bg-accent/20" />
-                  <Skeleton className="w-1/2 h-5 rounded-none bg-accent/30" />
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Data de Ocorrência
+              </p>
+              <p className="text-lg">{formatDate(transaction.occurredAt)}</p>
+            </div>
+            {transaction.refundedAt && (
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Data de Reembolso
+                </p>
+                <p className="text-lg">{formatDate(transaction.refundedAt)}</p>
+              </div>
+            )}
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Tipo de Oferta
+              </p>
+              <p className="text-lg">{transaction.offerType || "N/A"}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Quantidade
+              </p>
+              <p className="text-lg">{transaction.quantity}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Moeda</p>
+              <p className="text-lg">{transaction.currency}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Informações Financeiras */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações Financeiras</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Valor Bruto
+              </p>
+              <p className="text-lg font-bold text-green-600">
+                {formatCurrency(transaction.grossAmount)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Impostos
+              </p>
+              <p className="text-lg">{formatCurrency(transaction.taxAmount)}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Frete</p>
+              <p className="text-lg">
+                {formatCurrency(transaction.shippingAmount)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Taxa da Plataforma
+              </p>
+              <p className="text-lg">
+                {formatCurrency(transaction.platformFee)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                Comissão de Afiliado
+              </p>
+              <p className="text-lg">
+                {formatCurrency(transaction.affiliateCommission)}
+              </p>
+            </div>
+            <div className="pt-3 border-t">
+              <p className="text-sm font-medium text-muted-foreground">
+                Valor Líquido
+              </p>
+              <p className="text-2xl font-bold text-blue-600">
+                {formatCurrency(transaction.netAmount)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Informações do Cliente */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações do Cliente</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {transaction.customer ? (
+              <>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Nome
+                  </p>
+                  <p className="text-lg">
+                    {transaction.customer.firstName}{" "}
+                    {transaction.customer.lastName}
+                  </p>
                 </div>
-              ))}
-            </div>
-          ) : error ? (
-            // 🚨 MENSAGEM DE ERRO
-            <div className="py-10 text-center text-destructive">
-              <p>{error}</p>
-            </div>
-          ) : transaction ? (
-            // 🚨 CONTEÚDO DA TRANSAÇÃO
-            <div className="grid grid-cols-1 text-sm md:grid-cols-2 gap-x-8 gap-y-4">
-              {Object.entries(transaction)
-                .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
-                .map(([key, value]) => (
-                  <div
-                    key={key}
-                    className="flex items-center justify-between py-2 break-words border-b border-border/50"
-                  >
-                    <span className="mr-4 font-medium text-muted-foreground">
-                      {formatLabel(key)}
-                    </span>
-                    <span className="font-medium text-right text-foreground">
-                      {formatValue(key, value)}
-                    </span>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Email
+                  </p>
+                  <p className="text-lg">{transaction.customer.email}</p>
+                </div>
+                {transaction.customer.phone && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Telefone
+                    </p>
+                    <p className="text-lg">{transaction.customer.phone}</p>
                   </div>
-                ))}
-            </div>
-          ) : null}
+                )}
+                {transaction.customer.country && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Localização
+                    </p>
+                    <p className="text-lg">
+                      {[
+                        transaction.customer.city,
+                        transaction.customer.state,
+                        transaction.customer.country,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </p>
+                  </div>
+                )}
+                {transaction.customer.zip && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      CEP
+                    </p>
+                    <p className="text-lg">{transaction.customer.zip}</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-muted-foreground">
+                Informações do cliente não disponíveis
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Informações do Produto */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Informações do Produto</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {transaction.product ? (
+              <>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Nome
+                  </p>
+                  <p className="text-lg">{transaction.product.name}</p>
+                </div>
+                {transaction.product.family && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Família
+                    </p>
+                    <p className="text-lg">{transaction.product.family}</p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Unidades
+                  </p>
+                  <p className="text-lg">{transaction.product.unitCount}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    COGS (Custo)
+                  </p>
+                  <p className="text-lg">
+                    {formatCurrency(transaction.product.cogs)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    ID Externo
+                  </p>
+                  <p className="text-sm">{transaction.product.externalId}</p>
+                </div>
+              </>
+            ) : (
+              <p className="text-muted-foreground">
+                Informações do produto não disponíveis
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Informações do Afiliado */}
+        {transaction.affiliate && (
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle>Informações do Afiliado</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-6 md:grid-cols-2">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Nome
+                </p>
+                <p className="text-lg">{transaction.affiliate.name || "N/A"}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Email
+                </p>
+                <p className="text-lg">
+                  {transaction.affiliate.email || "N/A"}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  ID Externo
+                </p>
+                <p className="text-sm">{transaction.affiliate.externalId}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Plataforma
+                </p>
+                <p className="text-lg">{transaction.affiliate.platform}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Metadados */}
+        {(transaction.metadata || transaction.marketingData) && (
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle>Dados Adicionais</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {transaction.marketingData && (
+                <div>
+                  <p className="mb-2 text-sm font-medium text-muted-foreground">
+                    Dados de Marketing
+                  </p>
+                  <pre className="p-3 overflow-auto text-xs rounded-lg bg-muted">
+                    {JSON.stringify(transaction.marketingData, null, 2)}
+                  </pre>
+                </div>
+              )}
+              {transaction.metadata && (
+                <div>
+                  <p className="mb-2 text-sm font-medium text-muted-foreground">
+                    Metadados
+                  </p>
+                  <pre className="p-3 overflow-auto text-xs rounded-lg bg-muted">
+                    {JSON.stringify(transaction.metadata, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Timestamps */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Histórico</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">
+              Criado em
+            </p>
+            <p className="text-lg">{formatDate(transaction.createdAt)}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">
+              Atualizado em
+            </p>
+            <p className="text-lg">{formatDate(transaction.updatedAt)}</p>
+          </div>
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-export default function TransactionDetailPage() {
-  return (
-    <TransactionsProvider>
-      <TransactionDetailPageContent />
-    </TransactionsProvider>
   );
 }

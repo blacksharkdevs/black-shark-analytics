@@ -43,29 +43,210 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
+    "performance": "Performance",
     "transactions": "Transactions",
     "affiliates": "Affiliates",
     "reports": "Reports",
     "configurations": "Configurations",
     "sales": "Sales",
     "customers": "Customers",
-    "logout": "Logout"
+    "logout": "Logout",
+    "menu": "Menu"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "description": "View and manage all system transactions",
+    "searchPlaceholder": "Search by ID, product, customer, affiliate...",
+    "results": "results",
+    "noResults": "No transactions found",
+    "noResultsDescription": "Try adjusting your filters or search term",
+    "product": "Product",
+    "customer": "Customer",
+    "affiliate": "Affiliate",
+    "revenue": "Revenue",
+    "netSales": "Net",
+    "status": "Status",
+    "quantity": "Qty",
+    "unknownProduct": "Unknown Product",
+    "unknownCustomer": "Unknown Customer",
+    "noAffiliate": "No Affiliate",
+    "types": {
+      "SALE": "Sale",
+      "REFUND": "Refund",
+      "CHARGEBACK": "Chargeback",
+      "REBILL": "Rebill"
+    },
+    "statuses": {
+      "COMPLETED": "Completed",
+      "PENDING": "Pending",
+      "FAILED": "Failed",
+      "REFUNDED": "Refunded",
+      "CHARGEBACK": "Chargeback"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "items": "items"
+    },
+    "viewMode": {
+      "list": "List",
+      "table": "Table"
+    },
+    "itemsPerPage": "Items per page",
+    "table": {
+      "id": "ID",
+      "date": "Date",
+      "type": "Type",
+      "product": "Product",
+      "customer": "Customer",
+      "affiliate": "Affiliate",
+      "platform": "Platform",
+      "revenue": "Revenue",
+      "net": "Net",
+      "status": "Status"
+    },
+    "filters": {
+      "title": "Advanced Filters",
+      "active": "Active",
+      "clear": "Clear",
+      "platforms": "Platforms",
+      "status": "Status",
+      "type": "Type",
+      "grossAmount": "Gross Revenue",
+      "netAmount": "Net Revenue",
+      "min": "Minimum",
+      "max": "Maximum",
+      "sortBy": "Sort By",
+      "sortOrder": "Order",
+      "date": "Date",
+      "desc": "Newest First",
+      "asc": "Oldest First"
+    },
+    "type": {
+      "sale": "Sale",
+      "refund": "Refund",
+      "chargeback": "Chargeback",
+      "rebill": "Rebill"
+    }
+  },
+  "performance": {
+    "title": "Product Performance",
+    "description": "Track individual performance of top-selling products in the selected period",
+    "chartTitle": "Performance by Product",
+    "chartDescription": "Daily/hourly revenue by product",
+    "noProductsSelected": "Select at least one product to view performance",
+    "noData": "No data available for the selected period",
+    "layoutFullWidth": "Full Width",
+    "layoutSideBySide": "Side by Side",
+    "groupExample": "Example",
+    "productSelector": {
+      "title": "Available Products",
+      "description": "Select the products you want to view in the chart",
+      "topProduct": "top selling",
+      "of": "of",
+      "productsSelected": "products selected",
+      "productsGrouped": "grouped products",
+      "ranking": "in ranking"
+    },
+    "insights": {
+      "title": "Shark AI Analysis",
+      "description": "Smart diagnostic of product comparison",
+      "needMoreProducts": "Select at least 2 products to view comparative analysis",
+      "predator": {
+        "title": "The Predator",
+        "subtitle": "Volume Dominance",
+        "description": "{{product}} dominated volume, earning {{percentage}}% more than {{secondPlace}}"
+      },
+      "strategist": {
+        "title": "The Strategist",
+        "subtitle": "Maximum Efficiency",
+        "perSale": "per sale",
+        "description": "{{product}} is the most efficient, generating {{percentage}}% more revenue per sale"
+      },
+      "trend": {
+        "title": "The Trend",
+        "subtitle": "Current Momentum",
+        "last12Hours": "last 12h",
+        "recentPeriod": "last {{days}} days",
+        "descriptionGrowth": "{{product}} is experiencing accelerated growth, up {{percentage}}% in the recent period",
+        "descriptionDecline": "{{product}} showed a {{percentage}}% decline in the recent period",
+        "descriptionNew": "{{product}} started sales in the recent period with {{revenue}}"
+      }
+    },
+    "waterfall": {
+      "title": "Real Cash Flow",
+      "description": "Where every penny comes from and goes to",
+      "grossRevenue": "Gross Revenue",
+      "platformFees": "Platform Fees",
+      "taxes": "Taxes",
+      "affiliateCommissions": "Affiliate Commissions",
+      "shipping": "Shipping",
+      "cogs": "Product Costs",
+      "netProfit": "Net Profit",
+      "totalDeductions": "Total Deductions",
+      "profitMargin": "Profit Margin",
+      "noData": "No data available for cash flow analysis",
+      "deduction": "Deduction",
+      "revenue": "Revenue"
+    },
+    "bundle": {
+      "title": "Offer Battle",
+      "description": "Which kit is winning the war?",
+      "units": "units",
+      "sales": "sales",
+      "ofRevenue": "of revenue",
+      "margin": "margin",
+      "averageTicket": "Average Ticket",
+      "mostProfitable": "Most Profitable Kit",
+      "noData": "No data available for bundle analysis"
+    },
+    "health": {
+      "title": "Risk Radar",
+      "description": "Transaction health monitor",
+      "chargebackRate": "Chargeback Rate",
+      "status": "Status",
+      "statusHealthy": "Healthy",
+      "statusWarning": "Warning",
+      "statusCritical": "Block Risk",
+      "totalSales": "Total Sales",
+      "refunds": "Refunds",
+      "chargebacks": "Chargebacks",
+      "noData": "No data available for risk analysis",
+      "warningMessage": "Chargeback rate between 1-2%. Monitor closely to avoid blocks.",
+      "criticalMessage": "⚠️ CRITICAL ALERT: Rate above 2%! Imminent risk of blocking by payment processors (Visa/Mastercard)."
+    }
   },
   "header": {
     "dateColumns": "DATE COLUMNS",
     "timezone": "TIMEZONE",
-    "administratorAccess": "Administrator Access"
+    "administratorAccess": "Administrator Access",
+    "language": "Language"
   },
   "filters": {
     "product": "Product",
-    "actionType": "Action Type",
+    "offerType": "Offer Type",
     "platform": "Platform",
     "allProducts": "All Products",
-    "allActionTypes": "All Action Types",
+    "allOfferTypes": "All Offer Types",
     "allPlatforms": "All Platforms",
     "dateRange": "Date Range",
+    "period": "Period",
     "status": "Status",
-    "searchPlaceholder": "Search..."
+    "viewPerformanceInPeriod": "View performance in period",
+    "viewAllAffiliates": "View all affiliates",
+    "viewAllProducts": "View all products",
+    "searchPlaceholder": "Search...",
+    "groupProducts": "Group Products",
+    "groupProductsDesc": "Groups products with similar names into a single category. For example: 'Free Sugar Pro 3 bottles', 'Free Sugar Pro 6 bottles' will be grouped as 'Free Sugar'. Hover over grouped products to see included items.",
+    "groupedProducts": "Grouped Products"
+  },
+  "offerTypes": {
+    "all": "All Types",
+    "FRONTEND": "Frontend",
+    "UPSELL": "Upsell",
+    "DOWNSELL": "Downsell",
+    "ORDER_BUMP": "Order Bump"
   },
   "dateRange": {
     "today": "Today",
@@ -118,6 +299,7 @@
     "title": "Dashboard",
     "overview": "Overview",
     "stats": {
+      "mainMetrics": "Main Metrics",
       "totalRevenue": "Total Revenue",
       "totalSales": "Total Sales",
       "averageTicket": "Average Ticket",
@@ -130,8 +312,55 @@
       "netRevenue": "Net Revenue",
       "grossSales": "Gross Sales",
       "grossSalesDesc": "Revenue after platform fees & taxes",
-      "grossSalesFormula": "Total Revenue - Platform Fees - Taxes",
-      "totalSalesDesc": "Total number of transactions",
+      "netSales": "Net Sales",
+      "netSalesDesc": "Final payout after all deductions",
+      "totalSalesCount": "Total Sales",
+      "totalSalesCountDesc": "Number of completed sales transactions",
+      "totalLosses": "Total Losses",
+      "totalLossesDesc": "Total value lost from refunds & chargebacks",
+      "averageOrderValue": "Average Order Value",
+      "averageOrderValueDesc": "Avg. gross sales per front sale",
+      "explanations": {
+        "grossSales": {
+          "totalRevenue": "Total Revenue:",
+          "platformFee": "Platform Fee (%):",
+          "taxes": "Taxes:",
+          "separator": "--------------------",
+          "grossSales": "Gross Sales:",
+          "formula": "Formula: Total Revenue - Platform Fees - Taxes"
+        },
+        "netSales": {
+          "grossSales": "Gross Sales:",
+          "taxes": "(-) Taxes:",
+          "platformFees": "(-) Platform Fees:",
+          "affiliateComm": "(-) Affiliate Comm.:",
+          "separator": "--------------------",
+          "netPayout": "Net Payout:",
+          "formula": "Formula: Gross - Taxes - Platform Fees - Commissions"
+        },
+        "totalSales": {
+          "description": "Total completed sales transactions in the selected period, calculated after all filters are applied.",
+          "salesTransactions": "Sales Transactions:",
+          "frontSales": "Front Sales:",
+          "backSales": "Back Sales:"
+        },
+        "totalLosses": {
+          "description": "Total monetary losses from refunds and chargebacks in the selected period.",
+          "refunds": "Refunds:",
+          "chargebacks": "Chargebacks:",
+          "totalLossEvents": "Total Loss Events:",
+          "transactions": "transactions",
+          "note": "Note: Losses include all negative transactions (refunds, chargebacks, etc.)"
+        },
+        "averageOrderValue": {
+          "description": "The average gross sales generated per front sale transaction, calculated after all filters are applied.",
+          "grossSales": "Gross Sales:",
+          "frontSales": "Front Sales:",
+          "separator": "--------------------",
+          "averageOrderValue": "Average Order Value:",
+          "formula": "Formula: Gross Sales / Front Sales"
+        }
+      },
       "frontSales": "Front Sales",
       "frontSalesDesc": "Number of initial sales (non-upsell new orders)",
       "backSales": "Back Sales",
@@ -167,84 +396,24 @@
       "revenueByPlatform": "Revenue by Platform"
     }
   },
-  "transactions": {
-    "title": "Transactions",
-    "pageTitle": "All Transactions",
-    "pageDescription": "Browse, search, and filter through all sales records (Dates in UTC).",
-    "searchPlaceholder": "Search anything on this page...",
-    "rowsPerPage": "Rows per page",
-    "noData": "No transactions found for the selected filters.",
-    "pageTotal": "Page Total",
-    "noDataMessage": "No transactions found.",
-    "totalTransactions": "Total Transactions",
-    "table": {
-      "saleId": "Sale ID",
-      "dateUtc": "Date (UTC)",
-      "product": "Product",
-      "customer": "Customer",
-      "affiliate": "Affiliate",
-      "platform": "Platform",
-      "revenue": "Revenue",
-      "netSales": "Net Sales",
-      "refundCalc": "Refund Calc",
-      "customerEmail": "Customer Email",
-      "actionType": "Action Type",
-      "transactionId": "Transaction ID",
-      "date": "Date",
-      "amount": "Amount",
-      "status": "Status",
-      "actions": "Actions"
-    },
-    "tooltips": {
-      "notRefund": "Not a refund transaction.",
-      "refundExempt": "Refund Cost Exempt",
-      "refundExemptDesc": "Refund Amount is equal to Taxes, so this cost is not counted here.",
-      "buyGoodsRefund": "BuyGoods Refund Cost",
-      "buyGoodsFormula": "Formula: Revenue - Aff Commission - Taxes - Platform Fees",
-      "revenue": "Revenue",
-      "affCommission": "Aff Commission",
-      "taxes": "Taxes",
-      "platformFeePercent": "Platform Fee (%)",
-      "platformFeeDollar": "Platform Fee ($)",
-      "totalCost": "Total Cost",
-      "refundCost": "Refund Cost ({{platform}})",
-      "merchantFormula": "Formula: ABS(merchant_commission)",
-      "merchantCommission": "Merchant Commission",
-      "netSalesBreakdown": "Net Sales Breakdown"
-    },
-    "pagination": {
-      "page": "Page",
-      "of": "of",
-      "total": "Total",
-      "records": "records"
-    },
-    "status": {
-      "approved": "Approved",
-      "pending": "Pending",
-      "cancelled": "Cancelled",
-      "refunded": "Refunded",
-      "chargeback": "Chargeback"
-    },
-    "details": {
-      "title": "Transaction Details",
-      "transactionInfo": "Transaction Information",
-      "customerInfo": "Customer Information",
-      "productInfo": "Product Information",
-      "paymentInfo": "Payment Information",
-      "backToTransactions": "Back to Transactions",
-      "notFound": "Transaction not found"
-    }
-  },
   "affiliates": {
     "title": "Affiliates",
     "pageTitle": "Affiliate Performance",
     "pageDescription": "Aggregated performance data for affiliates, calculated based on the filters selected below.",
-    "searchPlaceholder": "Search by Affiliate Name...",
+    "searchPlaceholder": "Search by name, email, platform...",
     "noDataMessage": "No affiliates found.",
     "totalAffiliates": "Total Affiliates",
     "showing": "Showing",
     "to": "to",
     "of": "of",
+    "results": "results",
+    "noResults": "No affiliates found",
+    "noResultsDescription": "Try adjusting the filters or search term",
+    "unknownAffiliate": "Unknown Affiliate",
+    "viewMode": {
+      "list": "List",
+      "table": "Table"
+    },
     "table": {
       "name": "Name",
       "email": "Email",
@@ -275,7 +444,25 @@
       "net": "Net",
       "cogsColumn": "COGS",
       "profitColumn": "Profit",
-      "cashFlow": "Cash Flow"
+      "cashFlow": "Cash Flow",
+      "refundsChargebacks": "R+CB"
+    },
+    "tooltips": {
+      "customers": "Total unique customers",
+      "sales": "Total sales transactions",
+      "totalRevenue": "Total gross revenue before deductions",
+      "grossSales": "Total Revenue - Platform Fees - Taxes",
+      "refundsChargebacks": "Total cost of Refunds and Chargebacks",
+      "commission": "Total commissions paid to affiliate",
+      "taxes": "Total taxes on sales",
+      "platformFeePercent": "Average percentage fee charged by platform",
+      "platformFeeDollar": "Total dollar amount of platform fees",
+      "aov": "Gross Sales / Total Sales",
+      "netSales": "Gross Sales - Commission",
+      "net": "Net Sales + R+CB",
+      "cogs": "Cost of Goods Sold",
+      "profit": "Net - COGS",
+      "cashFlow": "Profit - (Gross Sales × 10%)"
     },
     "tableTooltips": {
       "grossSales": "Total Revenue - Platform Fees - Taxes",
@@ -301,6 +488,24 @@
       "statistics": "Statistics",
       "overview": "Performance overview and transaction history",
       "backToAffiliates": "Back to Affiliates"
+    },
+    "filters": {
+      "title": "Advanced Filters",
+      "active": "Active",
+      "clear": "Clear",
+      "platforms": "Platforms",
+      "sales": "Sales",
+      "revenue": "Total Revenue",
+      "commission": "Commission",
+      "profit": "Profit",
+      "customers": "Customers",
+      "aov": "Average Order Value (AOV)",
+      "min": "Minimum",
+      "max": "Maximum",
+      "sortBy": "Sort By",
+      "sortOrder": "Order",
+      "desc": "Highest to Lowest",
+      "asc": "Lowest to Highest"
     }
   },
   "customers": {

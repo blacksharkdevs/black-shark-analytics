@@ -4,9 +4,10 @@ import {
   LayoutDashboard,
   ChevronLeft,
   ChevronRight,
-  List,
   CircleDollarSign,
-  Settings,
+  // List,
+  // Settings,
+  TrendingUp,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
@@ -38,9 +39,9 @@ export function AppSidebar({ width }: { width: string }) {
       isRoot: true,
     },
     {
-      href: "/dashboard/transactions",
-      label: t("navigation.transactions"),
-      icon: CircleDollarSign,
+      href: "/dashboard/performance",
+      label: t("navigation.performance"),
+      icon: TrendingUp,
     },
     {
       href: "/dashboard/affiliates",
@@ -48,15 +49,20 @@ export function AppSidebar({ width }: { width: string }) {
       icon: Users,
     },
     {
-      href: "/dashboard/reports",
-      label: t("navigation.reports"),
-      icon: List,
+      href: "/dashboard/transactions",
+      label: t("navigation.transactions"),
+      icon: CircleDollarSign,
     },
-    {
-      href: "/dashboard/configurations",
-      label: t("navigation.configurations"),
-      icon: Settings,
-    },
+    // {
+    //   href: "/dashboard/reports",
+    //   label: t("navigation.reports"),
+    //   icon: List,
+    // },
+    // {
+    //   href: "/dashboard/configurations",
+    //   label: t("navigation.configurations"),
+    //   icon: Settings,
+    // },
   ];
 
   const isActive = (href: string) => {
@@ -77,15 +83,13 @@ export function AppSidebar({ width }: { width: string }) {
     <motion.div
       initial={false}
       animate={{
-        width: isSidebarOpen && !isMobile ? width : isMobile ? "280px" : "72px",
+        width: isSidebarOpen && !isMobile ? width : "72px",
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className={cn(
-        "fixed top-0 left-0 h-full border-r border-gray-400 dark:bg-[#1a2342]  transition-transform duration-300 z-50 flex flex-col",
-        {
-          "transform -translate-x-full": !isSidebarOpen && isMobile,
-          "w-[280px]": isSidebarOpen && isMobile,
-        }
+        "fixed top-0 left-0 h-full border-r border-gray-400/10 transition-transform duration-300 z-50 flex flex-col bg-black/30 backdrop-blur-xl",
+        // Esconde completamente no mobile
+        "hidden md:flex"
       )}
     >
       <SidebarHeader className="p-3 py-10">
@@ -108,11 +112,11 @@ export function AppSidebar({ width }: { width: string }) {
               }}
               transition={{ duration: 0.2 }}
               className={cn(
-                "text-xl font-black text-foreground whitespace-nowrap overflow-hidden",
+                "text-xl text-center font-black text-foreground whitespace-nowrap overflow-hidden",
                 !isSidebarOpen && "hidden md:flex"
               )}
             >
-              BlackShark
+              Black Shark <br /> Analytics
             </motion.h1>
           )}
         </Link>

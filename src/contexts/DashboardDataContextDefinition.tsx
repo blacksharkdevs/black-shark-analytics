@@ -1,19 +1,39 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { SaleRecord } from "@/types/index";
-import { type Product as ProductConfig } from "@/lib/config";
+import type { SaleRecord, Product } from "@/types/index";
 import { createContext } from "react";
+
+interface OfferTypeConfig {
+  id: string;
+  name: string;
+}
+
+interface AffiliateConfig {
+  id: string;
+  name: string;
+}
+
+interface PlatformConfig {
+  id: string;
+  name: string;
+}
 
 interface DashboardDataContextType {
   filteredSalesData: SaleRecord[];
-  availableProducts: ProductConfig[];
+  availableProducts: Product[];
+  availableOfferTypes: OfferTypeConfig[];
+  availablePlatforms: PlatformConfig[];
+  availableAffiliates: AffiliateConfig[];
   selectedProduct: string;
   setSelectedProduct: React.Dispatch<React.SetStateAction<string>>;
-  selectedActionType: string;
-  setSelectedActionType: React.Dispatch<React.SetStateAction<string>>;
+  selectedOfferType: string;
+  setSelectedOfferType: React.Dispatch<React.SetStateAction<string>>;
+  selectedPlatform: string;
+  setSelectedPlatform: React.Dispatch<React.SetStateAction<string>>;
+  isProductsGrouped: boolean;
+  setIsProductsGrouped: React.Dispatch<React.SetStateAction<boolean>>;
   stats: any;
   isLoadingData: boolean;
-  isFetchingProducts: boolean;
 }
 
 export const DashboardDataContext = createContext<

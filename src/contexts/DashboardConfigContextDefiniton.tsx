@@ -4,7 +4,7 @@ interface DashboardConfigContextType {
   // Configuração da Coluna (Origem: DateConfigProvider)
   selectedDateConfig: string;
   setDateConfig: (optionId: string) => void;
-  getCurrentDateDbColumn: () => "transaction_date" | "calc_charged_day";
+  getCurrentDateDbColumn: () => "createdAt";
 
   // Período Selecionado (Origem: DateRangeProvider)
   selectedDateRangeOptionId: string;

@@ -1,174 +1,140 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/common/ui/card";
+import { useMemo } from "react";
+import { useDashboardData } from "@/contexts/DashboardDataContext";
+import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { Button } from "@/components/common/ui/button";
-import { Skeleton } from "@/components/common/ui/skeleton";
-import {
-  DollarSign,
-  ShoppingCart,
-  TrendingUp,
-  TrendingDown,
-  Wallet,
-  HandCoins,
-  Target,
-  ArrowLeft,
-  User,
-} from "lucide-react";
-import { AffiliateDetailProvider } from "@/contexts/AffiliateDetailContext";
-import { useAffiliateDetail } from "@/hooks/useAffiliateDetail";
-import { useDashboardConfig } from "@/hooks/useDashboardConfig";
-import { AffiliateTransactionsTable } from "@/components/dashboard/affiliates/AffiliateTransactionsTable";
-import { AffiliateProductPerformanceTable } from "@/components/dashboard/affiliates/AffiliateProductPerformanceTable";
-import { AffiliateSalesTrendChart } from "@/components/dashboard/affiliates/AffiliateSalesTrendChart";
-import { formatCurrency } from "@/utils/index";
+import { ArrowLeft, Users } from "lucide-react";
+import { AffiliateMetricsSection } from "@/components/affiliates/AffiliateMetricsSection";
+import { AffiliateTransactionsSection } from "@/components/affiliates/AffiliateTransactionsSection";
 
-function AffiliateDetailContent() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
+export default function AffiliateDetailPage() {
   const { name } = useParams<{ name: string }>();
-  const affiliateName = decodeURIComponent(name || "");
-  const { stats, incomeTransactions, isLoading } = useAffiliateDetail();
-  const { currentDateRange } = useDashboardConfig();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { filteredSalesData, isLoadingData } = useDashboardData();
+  const { isLoading: isDateRangeLoading } = useDashboardConfig();
 
-  function SimpleStatsCard({
-    title,
-    value,
-    icon: Icon,
-    isLoading,
-  }: {
-    title: string;
-    value: string;
-    icon: React.ElementType;
-    isLoading: boolean;
-  }) {
-    if (isLoading) {
-      return (
-        <Card className="border rounded-none shadow-lg border-white/30">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <Skeleton className="w-3/4 h-4 rounded-none bg-accent/20" />
-            <Skeleton className="w-6 h-6 rounded-none bg-accent/20" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="w-1/2 h-8 mb-1 rounded-none bg-accent/30" />
-          </CardContent>
-        </Card>
-      );
-    }
+  const isLoading = isLoadingData || isDateRangeLoading;
 
-    return (
-      <Card className="transition-shadow duration-300 border rounded-none shadow-lg hover:shadow-xl border-white/30">
-        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            {title}
-          </CardTitle>
-          <div className="text-blue-600 dark:text-white">
-            <Icon className="w-7 h-7" />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-foreground">{value}</div>
-        </CardContent>
-      </Card>
+  // Filtrar transações do afiliado
+  const affiliateTransactions = useMemo(() => {
+    return filteredSalesData.filter(
+      (transaction) => transaction.affiliateId === name
     );
-  }
+  }, [filteredSalesData, name]);
+
+  // Pegar o primeiro para ter o nome
+  const affiliate = affiliateTransactions[0]?.affiliate;
+  const affiliateName =
+    affiliate?.name || affiliate?.email || t("affiliates.unknownAffiliate");
+
+  // Calcular métricas do afiliado
+  const metrics = useMemo(() => {
+    let totalSales = 0;
+    let totalRevenue = 0;
+    let grossSales = 0;
+    let refundsAndChargebacks = 0;
+    let commission = 0;
+    let taxes = 0;
+    let platformFeeDollar = 0;
+    let cogs = 0;
+    const uniqueCustomers = new Set<string>();
+
+    affiliateTransactions.forEach((transaction) => {
+      if (transaction.customerId) {
+        uniqueCustomers.add(transaction.customerId);
+      }
+
+      if (transaction.type === "SALE" && transaction.status === "COMPLETED") {
+        totalSales += 1;
+        totalRevenue += Number(transaction.grossAmount);
+        commission += Number(transaction.affiliateCommission);
+        taxes += Number(transaction.taxAmount);
+        platformFeeDollar += Number(transaction.platformFee);
+
+        const revenue = Number(transaction.grossAmount);
+        const tax = Number(transaction.taxAmount);
+        const platformFee = Number(transaction.platformFee);
+        grossSales += revenue - tax - platformFee;
+
+        if (transaction.product?.cogs) {
+          cogs += Number(transaction.product.cogs) * transaction.quantity;
+        }
+      }
+
+      if (transaction.type === "REFUND" || transaction.type === "CHARGEBACK") {
+        refundsAndChargebacks += Number(transaction.grossAmount);
+      }
+    });
+
+    const netSales = grossSales - commission;
+    const net = netSales + refundsAndChargebacks;
+    const profit = net - cogs;
+    const allowance = grossSales * 0.1;
+    const cashFlow = profit - allowance;
+    const aov = totalSales > 0 ? grossSales / totalSales : 0;
+    const platformFeePercent =
+      totalRevenue > 0 ? (platformFeeDollar / totalRevenue) * 100 : 0;
+
+    return {
+      totalCustomers: uniqueCustomers.size,
+      totalSales,
+      totalRevenue,
+      grossSales,
+      refundsAndChargebacks,
+      commission,
+      taxes,
+      platformFeePercent,
+      platformFeeDollar,
+      aov,
+      netSales,
+      net,
+      cogs,
+      profit,
+      cashFlow,
+    };
+  }, [affiliateTransactions]);
 
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
       {/* Header */}
-      <Button
-        variant="outline"
-        onClick={() => navigate("/dashboard/affiliates")}
-        className="mb-4 border rounded-none border-border text-foreground hover:bg-accent/10"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        {t("common.backToAffiliates")}
-      </Button>
-      <div className="flex items-center gap-4">
-        <User className="w-8 h-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold dark:text-white">
-            {t("affiliates.details.title", { name: affiliateName })}
-          </h1>
-          <p className="text-foreground">
-            {t("affiliates.details.description")}
-          </p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/dashboard/affiliates")}
+            className="shark-button"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {t("common.backToAffiliates")}
+          </Button>
+          <div className="flex items-center gap-3">
+            <Users className="w-8 h-8 text-cyan-400" />
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">
+                {affiliateName}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {t("affiliates.details.description")}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <SimpleStatsCard
-          title={t("dashboard.stats.grossSales")}
-          value={formatCurrency(stats.grossSales)}
-          icon={DollarSign}
-          isLoading={isLoading}
-        />
-        <SimpleStatsCard
-          title={t("dashboard.stats.totalSales")}
-          value={stats.totalSales.toString()}
-          icon={ShoppingCart}
-          isLoading={isLoading}
-        />
-        <SimpleStatsCard
-          title={t("dashboard.stats.aov")}
-          value={formatCurrency(stats.aov)}
-          icon={TrendingUp}
-          isLoading={isLoading}
-        />
-        <SimpleStatsCard
-          title={t("dashboard.stats.refunds")}
-          value={formatCurrency(stats.totalRefunds)}
-          icon={TrendingDown}
-          isLoading={isLoading}
-        />
-        <SimpleStatsCard
-          title={t("dashboard.stats.netFinal")}
-          value={formatCurrency(stats.netFinal)}
-          icon={Wallet}
-          isLoading={isLoading}
-        />
-        <SimpleStatsCard
-          title={t("dashboard.stats.totalCOGS")}
-          value={formatCurrency(stats.totalCOGS)}
-          icon={HandCoins}
-          isLoading={isLoading}
-        />
-        <SimpleStatsCard
-          title={t("dashboard.stats.profit")}
-          value={formatCurrency(stats.totalProfit)}
-          icon={Target}
-          isLoading={isLoading}
-        />
-      </div>
-
-      {/* Sales Trend Chart */}
-      <AffiliateSalesTrendChart
-        data={incomeTransactions}
+      {/* Seção de Métricas */}
+      <AffiliateMetricsSection
+        metrics={metrics}
+        totalTransactions={affiliateTransactions.length}
         isLoading={isLoading}
-        dateRange={currentDateRange}
       />
 
-      {/* Product Performance Table */}
-      <AffiliateProductPerformanceTable />
-
-      {/* Transaction History */}
-      <AffiliateTransactionsTable />
+      {/* Seção de Transações */}
+      <AffiliateTransactionsSection
+        transactions={affiliateTransactions}
+        isLoading={isLoading}
+      />
     </div>
-  );
-}
-
-export default function AffiliateDetailPage() {
-  const { name } = useParams<{ name: string }>();
-  const affiliateName = decodeURIComponent(name || "");
-
-  return (
-    <AffiliateDetailProvider affiliateName={affiliateName}>
-      <AffiliateDetailContent />
-    </AffiliateDetailProvider>
   );
 }

@@ -14,11 +14,9 @@ import { Label } from "@/components/common/ui/label";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/common/ui/card";
-import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, Eye, EyeOff } from "lucide-react";
 import { DotLoader } from "../common/ui/DotLoader";
@@ -26,9 +24,13 @@ import { SharkSwim } from "../common/SharkSwin";
 import { useNavigate } from "react-router-dom";
 import { LoadingScreen } from "../common/LoadingScreen";
 import { useThemeToggle } from "@/hooks/useThemeToggle";
+import { useAuth } from "@/contexts/AuthContext";
 
 const loginSchema = z.object({
-  username: z.string().min(1, { message: "O nome de usuário é obrigatório" }),
+  email: z
+    .string()
+    .min(1, { message: "O email é obrigatório" })
+    .email({ message: "Email inválido" }),
   password: z.string().min(1, { message: "A senha é obrigatória" }),
 });
 
@@ -62,7 +64,7 @@ export function LoginForm() {
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { username: "", password: "" },
+    defaultValues: { email: "", password: "" },
   });
 
   useEffect(() => {
@@ -70,7 +72,7 @@ export function LoginForm() {
   }, [controls]);
 
   const onSubmit = async (data: LoginFormValues) => {
-    const success = await login(data.username, data.password);
+    const success = await login(data.email, data.password);
 
     if (success) {
       setIsLoginSuccess(true);
@@ -79,7 +81,7 @@ export function LoginForm() {
 
       toast({
         title: "Falha no Login",
-        description: "Nome de usuário ou senha inválidos.",
+        description: "Email ou senha inválidos.",
         variant: "destructive",
       });
     }
@@ -89,7 +91,7 @@ export function LoginForm() {
     if (isLoginSuccess) {
       const timer = setTimeout(() => {
         navigate("/dashboard", { replace: true });
-      }, 2000);
+      }, 3000);
 
       return () => clearTimeout(timer);
     }
@@ -104,7 +106,7 @@ export function LoginForm() {
       variants={fadeVariants}
       animate={controls}
       initial="initial"
-      className="w-full max-w-md bg-transparent border rounded-none shadow-2xl border-border"
+      className="w-full md:w-[450px] bg-transparent border rounded-none shadow-2xl border-border"
     >
       <CardHeader className="text-center">
         <div className="flex justify-center mb-4">
@@ -116,29 +118,26 @@ export function LoginForm() {
         <CardTitle className="text-3xl tracking-tight text-white font-headline">
           Black Shark Analytics
         </CardTitle>
-        <CardDescription className="text-white">
-          Enter your credentials to access the dashboard.
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2">
             {/* 🚨 TEXTO: text-foreground */}
-            <Label htmlFor="username" className="text-white">
-              Username
+            <Label htmlFor="email" className="text-white">
+              Email
             </Label>
             <Input
-              id="username"
-              type="text"
-              placeholder="blackshark"
-              {...form.register("username")}
+              id="email"
+              type="email"
+              placeholder="admin@blackshark.com"
+              {...form.register("email")}
               disabled={isLoading}
               className="border rounded-none border-border text-foreground focus:ring-accent"
-              aria-invalid={form.formState.errors.username ? "true" : "false"}
+              aria-invalid={form.formState.errors.email ? "true" : "false"}
             />
-            {form.formState.errors.username && (
+            {form.formState.errors.email && (
               <p className="text-sm text-destructive">
-                {form.formState.errors.username.message}
+                {form.formState.errors.email.message}
               </p>
             )}
           </div>
@@ -194,9 +193,6 @@ export function LoginForm() {
             )}
           </Button>
         </form>
-        <p className="mt-4 text-sm text-center text-blue-600/70">
-          Tip: Use the `blackshark` user or your DB migration credentials.
-        </p>
       </CardContent>
     </AnimatedCard>
   );

@@ -1,57 +1,147 @@
-export type ProductConfig = {
-  id: string; // merchant_id
-  name: string; // product_name
-};
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-export interface SaleRecord {
+// ----------------------------------------------------------------------
+// 🔹 UTILITÁRIOS (Pra lidar com a serialização do JSON)
+// ----------------------------------------------------------------------
+
+// No frontend, o Decimal do Prisma geralmente chega como string ou number.
+// Se você usa JSON.stringify, vira string. Se converte antes, vira number.
+export type Decimal = number | string;
+
+// Datas no JSON viram string ISO (ex: "2023-12-25T00:00:00.000Z")
+export type ISODate = string;
+
+// ----------------------------------------------------------------------
+// 🔹 ENUMS (Espelhos do Prisma)
+// ----------------------------------------------------------------------
+
+export type Platform = "BUYGOODS" | "CLICKBANK" | "CARTPANDA" | "DIGISTORE";
+
+export type TransactionType = "SALE" | "REFUND" | "CHARGEBACK" | "REBILL";
+
+export type OfferType = "FRONTEND" | "UPSELL" | "DOWNSELL" | "ORDER_BUMP";
+
+export type TransactionStatus =
+  | "COMPLETED"
+  | "PENDING"
+  | "FAILED"
+  | "REFUNDED"
+  | "CHARGEBACK";
+
+export type Role = "ADMIN" | "EDITOR" | "VIEWER";
+
+// ----------------------------------------------------------------------
+// 🔹 MODELOS DE ACESSO
+// ----------------------------------------------------------------------
+
+export interface User {
   id: string;
-  transaction_date: string; // This is a UTC string from Supabase
-  calc_charged_day?: string | null; // Optional UTC string from Supabase
-  revenue: number;
-  sales_count: number;
-  product_id: string;
-  product_name: string; // This will be from config_products
-  product_name_from_sale?: string | null; // This will be from sales_data
-  action_type: string;
-  customer_name?: string | null;
-  customer_email?: string | null;
-  aff_commission?: number | null;
-  taxes?: number | null;
-  aff_name?: string | null;
-  platform?: string | null;
-  // Fields for refund calculation
-  merchant_commission?: number | null;
-  refund_amount?: number | null;
-  payout_model_check?: string | null; // To check if it's CPA
-  initial_revenue_for_refund?: number | null; // The original total_amount_charged for a refund line
-  // Fields for Gross Sales calculation
-  platform_tax?: number | null;
-  platform_transaction_tax?: number | null;
-  // Field for COGS
-  temp_cogs_per_user?: number | null;
-  net_sales: number;
-}
-
-export type SortColumn = keyof SaleRecord | "calc_charged_day" | "net_sales";
-
-// SKU Mapping types
-export interface SkuConfig {
-  merchant_id: string;
-  original_name: string;
-  display_name?: string | null;
-  main_product_id?: number | null;
-  unit_count?: number | null;
-  item_type?: string | null;
-  upsell?: boolean;
-}
-
-export interface MainProduct {
-  id: number;
+  email: string;
+  // passwordHash removido! O front nunca deve saber disso 🚫
   name: string;
+  role: Role;
+  lastLogin?: ISODate | null;
+  createdAt: ISODate;
+  updatedAt: ISODate;
 }
 
-export interface UnconfiguredSkuFromRpc {
-  merchant_id: string;
-  original_product_name: string;
-  upsell: boolean;
+// ----------------------------------------------------------------------
+// 🔹 MODELOS DE NEGÓCIO
+// ----------------------------------------------------------------------
+
+export interface Customer {
+  id: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
+
+  country?: string | null;
+  state?: string | null;
+  city?: string | null;
+  zip?: string | null;
+
+  createdAt: ISODate;
+  updatedAt: ISODate;
+
+  // Relações Opcionais (depende se você fez o include no backend)
+  transactions?: Transaction[];
 }
+
+export interface Affiliate {
+  id: string;
+  externalId: string;
+  platform: Platform;
+  name?: string | null;
+  email?: string | null;
+
+  transactions?: Transaction[];
+}
+
+export interface Product {
+  id: string;
+  externalId: string;
+  platform: Platform;
+  name: string;
+  family?: string | null;
+  unitCount: number;
+  cogs: Decimal; // Custo do produto
+  createdAt: ISODate;
+
+  transactions?: Transaction[];
+}
+
+export interface Transaction {
+  id: string;
+  externalId: string;
+  platform: Platform;
+  type: TransactionType;
+  offerType?: OfferType | null;
+  status: TransactionStatus;
+
+  occurredAt: ISODate;
+  refundedAt?: ISODate | null;
+
+  // --- FINANCEIRO ---
+  grossAmount: Decimal;
+
+  // Deduções
+  taxAmount: Decimal;
+  shippingAmount: Decimal;
+  platformFee: Decimal;
+  affiliateCommission: Decimal;
+
+  // Resultado Final
+  netAmount: Decimal;
+  currency: string;
+
+  // --- RELACIONAMENTOS (IDs) ---
+  customerId: string;
+  productId?: string | null;
+  affiliateId?: string | null;
+
+  // --- RELACIONAMENTOS (Objetos Populados) ---
+  customer?: Customer;
+  product?: Product;
+  affiliate?: Affiliate;
+
+  quantity: number;
+
+  // Json fields no frontend viram objetos genéricos ou tipados se você souber a estrutura
+  marketingData?: Record<string, any> | null;
+  metadata?: Record<string, any> | null;
+
+  isTest: boolean;
+  createdAt: ISODate;
+  updatedAt: ISODate;
+}
+
+// ----------------------------------------------------------------------
+// 🔹 ALIASES (Para compatibilidade com código legado)
+// ----------------------------------------------------------------------
+
+// SaleRecord é um alias de Transaction para manter compatibilidade
+export type SaleRecord = Transaction;
+
+// Tipo para ordenação de colunas
+export type SortColumn = keyof Transaction | "net_sales";

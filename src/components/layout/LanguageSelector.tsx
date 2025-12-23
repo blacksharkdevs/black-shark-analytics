@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/common/ui/dropdown-menu";
-import { useDashboardConfig } from "@/hooks/useDashboardConfig";
+import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { useTranslation } from "react-i18next";
 
 export function LanguageSelector() {
@@ -26,7 +26,7 @@ export function LanguageSelector() {
           size="icon"
           className="relative border-none rounded-full"
         >
-          <Languages className="h-[1.2rem] w-[1.2rem] dark:text-white" />
+          <Languages className="h-[1.2rem] w-[1.2rem]" />
           <span className="sr-only">{t("language.selector")}</span>
         </Button>
       </DropdownMenuTrigger>
@@ -36,7 +36,7 @@ export function LanguageSelector() {
             key={lang.code}
             onClick={() => setLanguage(lang.code)}
             className={`flex items-center gap-2 ${
-              language === lang.code ? "bg-blue-700" : ""
+              language === lang.code ? "bg-black/60" : ""
             }`}
           >
             <span>{lang.flag}</span>

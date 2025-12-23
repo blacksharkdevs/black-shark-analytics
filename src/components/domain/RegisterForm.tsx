@@ -18,7 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/common/ui/card";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Eye, EyeOff } from "lucide-react"; // Usamos UserPlus para registro
 import { DotLoader } from "../common/ui/DotLoader";
@@ -26,15 +26,22 @@ import { SharkSwim } from "../common/SharkSwin";
 import { useNavigate } from "react-router-dom";
 import { LoadingScreen } from "../common/LoadingScreen";
 
-// 🚨 NOVO SCHEMA: Adiciona a validação do token secreto
 const registerSchema = z.object({
-  username: z.string().min(1, { message: "O nome de usuário é obrigatório" }),
+  name: z.string().min(1, { message: "O nome é obrigatório" }),
+  email: z
+    .string()
+    .min(1, { message: "O email é obrigatório" })
+    .email({ message: "Email inválido" }),
   password: z
     .string()
-    .min(8, { message: "A senha deve ter pelo menos 8 caracteres" }),
-  secretToken: z
+    .min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
+  role: z.enum(["ADMIN", "USER"]),
+  adminToken: z
     .string()
-    .min(1, { message: "O token secreto é obrigatório para registro" }),
+    .min(1, { message: "O token de administrador é obrigatório" })
+    .refine((token) => token === "123asdFF", {
+      message: "Token de administrador inválido",
+    }),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -61,14 +68,18 @@ export function RegisterForm() {
   const navigate = useNavigate();
   const controls = useAnimation();
 
-  const REGISTRATION_SECRET = import.meta.env.VITE_REGISTRATION_SECRET;
-
   const [showPassword, setShowPassword] = useState(false);
   const [isRegisterSuccess, setIsRegisterSuccess] = useState(false);
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { username: "", password: "", secretToken: "" },
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      role: "ADMIN",
+      adminToken: "",
+    },
   });
 
   useEffect(() => {
@@ -76,25 +87,20 @@ export function RegisterForm() {
   }, [controls]);
 
   const onSubmit = async (data: RegisterFormValues) => {
-    if (data.secretToken !== REGISTRATION_SECRET) {
-      controls.start(shakeAnimation);
-      toast({
-        title: "Registration Failure",
-        description: "User already exists or database error.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const success = await registerUser(data.username, data.password);
+    const success = await registerUser(
+      data.name,
+      data.email,
+      data.password,
+      data.role
+    );
 
     if (success) {
       setIsRegisterSuccess(true);
     } else {
       controls.start(shakeAnimation);
       toast({
-        title: "Registration Failure",
-        description: "User already exists or database error.",
+        title: "Falha no Registro",
+        description: "Usuário já existe ou erro no servidor.",
         variant: "destructive",
       });
     }
@@ -118,44 +124,64 @@ export function RegisterForm() {
       variants={fadeVariants}
       animate={controls}
       initial="initial"
-      className="w-full max-w-md bg-transparent border rounded-none shadow-2xl border-blackshark-accent"
+      className="w-full md:w-[450px] bg-transparent border rounded-none shadow-2xl border-border"
     >
       <CardHeader className="text-center">
         <div className="flex justify-center mb-4">
           <SharkSwim width={170} />
         </div>
         <CardTitle className="text-3xl tracking-tight text-white font-headline">
-          Administrator Registration
+          Registro de Usuário
         </CardTitle>
         <CardDescription className="text-white">
-          Create your access user. Requires Secret Token.
+          Crie sua conta de acesso ao sistema.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="username" className="text-white">
-              Username
+            <Label htmlFor="name" className="text-white">
+              Nome
             </Label>
             <Input
-              id="username"
+              id="name"
               type="text"
-              placeholder="new username"
-              {...form.register("username")}
+              placeholder="Victor Silva"
+              {...form.register("name")}
               disabled={isLoading}
-              className="border rounded-none border-blackshark-accent text-blackshark-primary focus:ring-blackshark-accent"
-              aria-invalid={form.formState.errors.username ? "true" : "false"}
+              className="border rounded-none border-border text-foreground focus:ring-accent"
+              aria-invalid={form.formState.errors.name ? "true" : "false"}
             />
-            {form.formState.errors.username && (
-              <p className="text-sm text-blackshark-destructive">
-                {form.formState.errors.username.message}
+            {form.formState.errors.name && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.name.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-white">
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="victor@blackshark.com"
+              {...form.register("email")}
+              disabled={isLoading}
+              className="border rounded-none border-border text-foreground focus:ring-accent"
+              aria-invalid={form.formState.errors.email ? "true" : "false"}
+            />
+            {form.formState.errors.email && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.email.message}
               </p>
             )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password" className="text-white">
-              Password
+              Senha
             </Label>
             <div className="relative">
               <Input
@@ -164,14 +190,14 @@ export function RegisterForm() {
                 placeholder="••••••••"
                 disabled={isLoading}
                 {...form.register("password")}
-                className="pr-10 border rounded-none bg-blackshark-card border-blackshark-accent text-blackshark-primary focus:ring-blackshark-accent"
+                className="pr-10 border rounded-none border-border text-foreground focus:ring-accent"
                 aria-invalid={form.formState.errors.password ? "true" : "false"}
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="absolute inset-y-0 right-0 h-full px-3 text-blackshark-accent hover:bg-transparent"
+                className="absolute inset-y-0 right-0 h-full px-3 text-muted-foreground hover:bg-transparent"
                 onClick={() => setShowPassword((prev) => !prev)}
                 disabled={isLoading}
               >
@@ -183,30 +209,48 @@ export function RegisterForm() {
               </Button>
             </div>
             {form.formState.errors.password && (
-              <p className="text-sm text-blackshark-destructive">
+              <p className="text-sm text-destructive">
                 {form.formState.errors.password.message}
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="secretToken" className="text-white">
-              Token
+            <Label htmlFor="role" className="text-white">
+              Função
+            </Label>
+            <select
+              id="role"
+              {...form.register("role")}
+              disabled={isLoading}
+              className="flex w-full h-10 px-3 py-2 text-sm border rounded-none border-border bg-background text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="ADMIN">Administrador</option>
+              <option value="USER">Usuário</option>
+            </select>
+            {form.formState.errors.role && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.role.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="adminToken" className="text-white">
+              Token de Administrador
             </Label>
             <Input
-              id="secretToken"
+              id="adminToken"
               type="password"
-              placeholder="myaccesstoken123"
-              {...form.register("secretToken")}
+              placeholder="Digite o token de administrador"
+              {...form.register("adminToken")}
               disabled={isLoading}
-              className="border rounded-none"
-              aria-invalid={
-                form.formState.errors.secretToken ? "true" : "false"
-              }
+              className="border rounded-none border-border text-foreground focus:ring-accent"
+              aria-invalid={form.formState.errors.adminToken ? "true" : "false"}
             />
-            {form.formState.errors.secretToken && (
-              <p className="text-sm text-blackshark-destructive">
-                {form.formState.errors.secretToken.message}
+            {form.formState.errors.adminToken && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.adminToken.message}
               </p>
             )}
           </div>
@@ -221,18 +265,18 @@ export function RegisterForm() {
             ) : (
               <>
                 <UserPlus className="w-4 h-4 mr-2" />
-                Register
+                Registrar
               </>
             )}
           </Button>
 
           <p className="mt-4 text-sm text-center text-blue-600/70">
-            Already have an account?{" "}
+            Já tem uma conta?{" "}
             <a
               onClick={() => navigate("/login")}
               className="font-medium cursor-pointer hover:underline"
             >
-              Log In
+              Fazer Login
             </a>
           </p>
         </form>

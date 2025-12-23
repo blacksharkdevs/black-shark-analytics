@@ -1,23 +1,19 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import LoginPage from "@/pages/Login/Login";
-import DashboardPage from "./pages/Dashboard/DashboardPage"; // 🚨 Conteúdo Principal (Stats/Charts)
+import LoginPage from "@/pages/Auth/Login";
+import DashboardPage from "./pages/Dashboard/DashboardPage";
+import PerformancePage from "./pages/Dashboard/PerformancePage";
+import ProductsPerformancePage from "./pages/Dashboard/Performance/ProductsPerformancePage";
+import AffiliatesPerformancePage from "./pages/Dashboard/Performance/AffiliatesPerformancePage";
+import TransactionsPage from "./pages/Dashboard/TransactionsPage";
+import TransactionDetailPage from "./pages/Dashboard/Transactions/TransactionDetailPage";
+import AffiliatesPage from "./pages/Dashboard/AffiliatesPage";
+import AffiliateDetailPage from "./pages/Dashboard/Affiliates/AffiliateDetailPage";
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/common/ui/toaster";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
-import RegisterPage from "./pages/Register/Register";
+import RegisterPage from "./pages/Auth/Register";
 import DashboardLayout from "./pages/Dashboard/DashboardLayout";
-import TransactionsPage from "./pages/Dashboard/Transactions/TransactionsPage";
-import TransactionDetailPage from "./pages/Dashboard/Transactions/TransactionDetailPage";
-import CustomersDetailPage from "./pages/Dashboard/Customers/CustomersDetailPage";
-import AffiliatesPage from "./pages/Dashboard/Affiliates/AffiliatesPage";
-import AffiliateDetailPage from "./pages/Dashboard/Affiliates/AffiliateDetailPage";
-import ReportsPage from "./pages/Dashboard/Reports/ReportsPage";
-import ItemsPage from "./pages/Dashboard/Reports/Items";
-import ConfigurationsPage from "./pages/Dashboard/Configurations/ConfigurationsPage";
-import SkuMappingPage from "./pages/Dashboard/SkuMapping/SkuMappingPage";
-import MainProductsPage from "./pages/Dashboard/MainProducts/MainProductsPage";
-import { SkuMappingProvider } from "@/contexts/SkuMappingContext";
 
 function RootProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -47,29 +43,19 @@ export default function App() {
           }
         >
           <Route index element={<DashboardPage />} />
+          <Route path="performance" element={<PerformancePage />} />
+          <Route
+            path="performance/products"
+            element={<ProductsPerformancePage />}
+          />
+          <Route
+            path="performance/affiliates"
+            element={<AffiliatesPerformancePage />}
+          />
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="transactions/:id" element={<TransactionDetailPage />} />
-          <Route path="customers/:email" element={<CustomersDetailPage />} />
-
           <Route path="affiliates" element={<AffiliatesPage />} />
           <Route path="affiliates/:name" element={<AffiliateDetailPage />} />
-
-          <Route path="reports" element={<ReportsPage />} />
-          <Route path="reports/items" element={<ItemsPage />} />
-
-          <Route path="configurations" element={<ConfigurationsPage />} />
-          <Route
-            path="configurations/sku-mapping"
-            element={
-              <SkuMappingProvider>
-                <SkuMappingPage />
-              </SkuMappingProvider>
-            }
-          />
-          <Route
-            path="configurations/main-products"
-            element={<MainProductsPage />}
-          />
         </Route>
 
         <Route path="*" element={<div>404 | Página Não Encontrada</div>} />

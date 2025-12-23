@@ -2,31 +2,35 @@ import { Outlet } from "react-router-dom";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Header } from "@/components/layout/Header";
 import { SidebarProvider } from "@/contexts/SidebarContext";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { DashboardSkeleton } from "@/components/layout/DashboardSkeleton";
 import { useSidebar } from "@/hooks/useSidebar";
 import { DashboardConfigProvider } from "@/contexts/DashboardConfigContext";
 import { TooltipProvider } from "@/components/common/ui/tooltip";
 import { LoadingScreen } from "@/components/common/LoadingScreen";
-import { useDashboardData } from "@/hooks/useDashboardData";
-import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
+import {
+  DashboardDataProvider,
+  useDashboardData,
+} from "@/contexts/DashboardDataContext";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 const SIDEBAR_WIDTH = "280px";
 
 function DashboardLayoutContent() {
   const { isSidebarOpen } = useSidebar();
   const { isLoadingData } = useDashboardData();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const currentSidebarWidth = isSidebarOpen ? SIDEBAR_WIDTH : "72px";
 
   return (
-    <div className="flex w-full min-h-screen bg-background">
+    <div className="flex w-full min-h-screen">
       <AppSidebar width={SIDEBAR_WIDTH} />
       <div
         className="relative flex flex-col flex-1 transition-all duration-300"
         style={{
-          marginLeft: currentSidebarWidth,
-          width: `calc(100% - ${currentSidebarWidth})`,
+          marginLeft: isDesktop ? currentSidebarWidth : "0",
+          width: isDesktop ? `calc(100% - ${currentSidebarWidth})` : "100%",
         }}
       >
         <Header />

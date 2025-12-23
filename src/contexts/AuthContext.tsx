@@ -1,18 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabaseClient";
 import { AuthContext } from "./AuthContextDefinition";
+import { AuthService } from "@/services/authService";
 
 // --- Tipagens ---
 
 interface User {
-  id: string;
-  username: string;
+  email: string;
+  role?: string;
 }
-
-// --- Constantes ---
-
-const ADMIN_USER_LOCAL_STORAGE_KEY = "blackshark_admin_user";
 
 // --- Provider ---
 
@@ -22,111 +19,115 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const navigate = useNavigate();
 
-  // 1. Efeito para carregar o usuário do LocalStorage
+  // 1. Efeito para carregar o usuário do LocalStorage e validar token
   useEffect(() => {
     try {
-      const storedUserString = localStorage.getItem(
-        ADMIN_USER_LOCAL_STORAGE_KEY
-      );
-      if (storedUserString) {
-        const storedUser = JSON.parse(storedUserString) as User;
-        if (storedUser && storedUser.id && storedUser.username) {
-          setUser(storedUser);
-        }
+      const token = AuthService.getToken();
+      const storedUser = AuthService.getUser();
+
+      if (token && storedUser && !AuthService.isTokenExpired(token)) {
+        setUser(storedUser);
+      } else {
+        // Token expirado ou inválido, limpar dados
+        AuthService.logout();
+        setUser(null);
       }
     } catch (error) {
       console.error("Falha ao carregar usuário do localStorage", error);
-      localStorage.removeItem(ADMIN_USER_LOCAL_STORAGE_KEY);
+      AuthService.logout();
+      setUser(null);
     }
     setIsLoading(false);
   }, []);
 
   // 2. Função de Login
   const login = useCallback(
-    async (usernameInput: string, passwordInput: string): Promise<boolean> => {
+    async (emailInput: string, passwordInput: string): Promise<boolean> => {
       setIsLoading(true);
       try {
-        const { data, error } = await supabase.rpc("verify_password", {
-          user_name: usernameInput,
-          password_param: passwordInput,
+        // Faz a requisição de login
+        const response = await AuthService.login({
+          email: emailInput,
+          password: passwordInput,
         });
 
-        if (error) {
-          console.error("RPC verify_password error:", error);
-          localStorage.removeItem(ADMIN_USER_LOCAL_STORAGE_KEY);
-          setUser(null);
-          setIsLoading(false);
-          return false;
-        }
+        // Decodifica o token para extrair informações do usuário
+        const userInfo = AuthService.decodeToken(response.access_token);
 
-        const rpcUser = data?.[0] as User | undefined;
+        if (userInfo) {
+          // Armazena o token e dados do usuário
+          AuthService.setToken(response.access_token);
+          AuthService.setUser(userInfo);
 
-        if (rpcUser && rpcUser.id && rpcUser.username) {
-          const userData = { id: rpcUser.id, username: rpcUser.username };
-          localStorage.setItem(
-            ADMIN_USER_LOCAL_STORAGE_KEY,
-            JSON.stringify(userData)
-          );
-          setUser(userData);
+          setUser(userInfo);
           setIsLoading(false);
-          navigate("/dashboard", { replace: true });
           return true;
         } else {
-          console.warn(
-            "Login falhou: Credenciais inválidas ou usuário não encontrado."
-          );
-          localStorage.removeItem(ADMIN_USER_LOCAL_STORAGE_KEY);
+          console.warn("Login falhou: Token inválido");
+          AuthService.logout();
           setUser(null);
           setIsLoading(false);
           return false;
         }
-      } catch (e) {
-        console.error("Exceção no Login:", e);
-        localStorage.removeItem(ADMIN_USER_LOCAL_STORAGE_KEY);
+      } catch (error) {
+        console.error("Exceção no Login:", error);
+        AuthService.logout();
         setUser(null);
         setIsLoading(false);
         return false;
       }
     },
-    [navigate]
+    []
   );
 
   const registerUser = useCallback(
-    async (usernameInput: string, passwordInput: string): Promise<boolean> => {
+    async (
+      nameInput: string,
+      emailInput: string,
+      passwordInput: string,
+      roleInput: "ADMIN" | "USER" = "ADMIN"
+    ): Promise<boolean> => {
       setIsLoading(true);
       try {
-        const { data, error } = await supabase.rpc("register_new_admin", {
-          new_username: usernameInput,
-          new_password: passwordInput,
+        // Faz a requisição de registro
+        const response = await AuthService.register({
+          name: nameInput,
+          email: emailInput,
+          password: passwordInput,
+          role: roleInput,
         });
 
-        if (error) {
-          console.error("RPC register_new_admin error:", error);
-          setIsLoading(false);
-          return false;
-        }
-        const rpcUser = data as User | undefined;
+        // Armazena o token e dados do usuário
+        AuthService.setToken(response.access_token);
+        AuthService.setUser({
+          id: response.user.id,
+          email: response.user.email,
+          name: response.user.name,
+          role: response.user.role,
+        });
 
-        if (rpcUser && rpcUser.id) {
-          const success = await login(usernameInput, passwordInput);
-          return success;
-        }
+        setUser({
+          email: response.user.email,
+          role: response.user.role,
+        });
 
         setIsLoading(false);
-        return false;
-      } catch (e) {
-        console.error("Exceção no Registro:", e);
+        return true;
+      } catch (error) {
+        console.error("Exceção no Registro:", error);
+        AuthService.logout();
+        setUser(null);
         setIsLoading(false);
         return false;
       }
     },
-    [login]
+    []
   );
 
   // 3. Função de Logout
   const logout = useCallback(() => {
     setIsLoading(true);
-    localStorage.removeItem(ADMIN_USER_LOCAL_STORAGE_KEY);
+    AuthService.logout();
     setUser(null);
     navigate("/login", { replace: true });
     setIsLoading(false);
@@ -139,4 +140,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };

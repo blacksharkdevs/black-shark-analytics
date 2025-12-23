@@ -15,35 +15,15 @@ export const formatTransactionDate = (dateString: string) => {
   }
 };
 
+// Função atualizada para usar a nova estrutura Transaction
 export const calculateRefund = (item: SaleRecord): number => {
-  const isRefundAction = [
-    "refund",
-    "chargeback",
-    "chargebackrefundtime",
-  ].includes(item.action_type);
+  // Verifica se é uma ação de reembolso baseado no novo campo 'type'
+  const isRefundAction = ["REFUND", "CHARGEBACK"].includes(item.type);
   if (!isRefundAction) return 0;
-  if (
-    item.refund_amount !== null &&
-    item.taxes !== null &&
-    item.refund_amount === item.taxes
-  ) {
-    return 0;
-  }
-  let cost = 0;
-  if (item.platform === "buygoods") {
-    const baseRevenue = Math.abs(item.revenue);
-    const affCommission = item.aff_commission || 0;
-    const taxes = item.taxes || 0;
-    const platformFeePercentageAmount = baseRevenue * (item.platform_tax || 0);
-    const platformFeeTransactionAmount = item.platform_transaction_tax || 0;
-    cost =
-      baseRevenue -
-      affCommission -
-      taxes -
-      platformFeePercentageAmount -
-      platformFeeTransactionAmount;
-  } else {
-    cost = Math.abs(item.merchant_commission || 0);
-  }
+
+  // O custo do reembolso agora é baseado no netAmount (valor líquido)
+  // que já considera taxas, comissões e fees da plataforma
+  const cost = Math.abs(Number(item.netAmount || 0));
+
   return cost;
 };

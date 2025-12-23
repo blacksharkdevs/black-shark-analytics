@@ -1,79 +1,87 @@
 import { supabase } from "@/lib/supabaseClient";
-import { transformSupabaseSaleToRecord } from "@/lib/data";
-import { applyActionTypeFilter } from "@/lib/transactionFilters";
-import { type SaleRecord } from "@/types/index"; // Assumindo que os tipos estão aqui
+import { type Transaction } from "@/types/index";
 
-// Definição do limite máximo de registros para garantir performance do cálculo no cliente
 const MAX_RECORDS_FOR_DASHBOARD_STATS = 50000;
+const BATCH_SIZE = 1000;
 
-// Tipagem necessária
 type DateRange = { from: Date; to: Date };
 
-/**
- * Define a estrutura dos parâmetros necessários para buscar dados do Dashboard.
- */
 export interface FetchDashboardDataParams {
   currentDateRange: DateRange;
   getCurrentDateDbColumn: () => string;
-  selectedProduct: string;
-  selectedActionType: string;
 }
 
 /**
- * Busca e filtra os dados de vendas para o Dashboard.
- * Aplica filtros de data, produto e tipo de ação, limitando o número de registros.
- *
- * @param params Os parâmetros de filtro.
- * @returns {Promise<SaleRecord[]>} Uma Promise com os dados transformados.
+ * Busca todas as transações do período usando Supabase.
+ * Retorna dados com relações de produto, afiliado e customer.
+ * Usa paginação para contornar limite de 1000 registros do Supabase.
  */
 export async function fetchSalesDataForDashboard(
   params: FetchDashboardDataParams
-): Promise<SaleRecord[]> {
-  const {
-    currentDateRange,
-    getCurrentDateDbColumn,
-    selectedProduct,
-    selectedActionType,
-  } = params;
+): Promise<Transaction[]> {
+  const { currentDateRange, getCurrentDateDbColumn } = params;
 
-  const queryFromUTC = currentDateRange.from.toISOString();
-  const queryToUTC = currentDateRange.to.toISOString();
-  const dateDbColumn = getCurrentDateDbColumn();
-
-  let query = supabase
-    .from("sales_data")
-    .select(
-      // Seleção de colunas otimizada para os cálculos do dashboard
-      "*,config_products!inner(merchant_id,product_name,platform_tax,platform_transaction_tax)"
-    )
-    .gte(dateDbColumn, queryFromUTC)
-    .lte(dateDbColumn, queryToUTC);
-
-  // Aplicação de filtros de Produto
-  if (selectedProduct !== "all") {
-    query = query.eq("merchant_id", selectedProduct);
-  }
-
-  // Aplicação de filtros de Ação (reutilizando a lógica do Transactions)
-  query = applyActionTypeFilter(query, selectedActionType);
-
-  // Limitação e Ordenação
-  query = query.limit(MAX_RECORDS_FOR_DASHBOARD_STATS);
-  query = query.order(dateDbColumn, { ascending: true }); // Ordena para gráficos de tendência
-
-  const { data: rawSalesData, error } = await query;
-
-  if (error) {
-    console.error("Error fetching sales data:", error);
+  if (!currentDateRange?.from || !currentDateRange?.to) {
     return [];
   }
 
-  if (rawSalesData && rawSalesData.length === MAX_RECORDS_FOR_DASHBOARD_STATS) {
-    console.warn(
-      `Warning: Dashboard query reached the maximum limit of ${MAX_RECORDS_FOR_DASHBOARD_STATS} records.`
-    );
-  }
+  try {
+    const queryFromUTC = currentDateRange.from.toISOString();
+    const queryToUTC = currentDateRange.to.toISOString();
+    const dateColumn = getCurrentDateDbColumn();
 
-  // Transforma e retorna
-  return rawSalesData ? rawSalesData.map(transformSupabaseSaleToRecord) : [];
+    let allData: Transaction[] = [];
+    let rangeStart = 0;
+    let hasMore = true;
+
+    // Buscar em lotes para contornar limite do Supabase
+    while (hasMore && allData.length < MAX_RECORDS_FOR_DASHBOARD_STATS) {
+      const rangeEnd = rangeStart + BATCH_SIZE - 1;
+
+      const { data, error } = await supabase
+        .from("transactions")
+        .select(
+          `
+          *,
+          product:products(*),
+          affiliate:affiliates(*),
+          customer:customers(*)
+        `
+        )
+        .gte(dateColumn, queryFromUTC)
+        .lte(dateColumn, queryToUTC)
+        .order(dateColumn, { ascending: false })
+        .range(rangeStart, rangeEnd);
+
+      if (error) {
+        console.error("Erro ao buscar transações do Supabase:", error);
+        break;
+      }
+
+      if (!data || data.length === 0) {
+        hasMore = false;
+        break;
+      }
+
+      allData = [...allData, ...(data as Transaction[])];
+
+      // Se recebemos menos que o tamanho do lote, não há mais dados
+      if (data.length < BATCH_SIZE) {
+        hasMore = false;
+      } else {
+        rangeStart += BATCH_SIZE;
+      }
+    }
+
+    if (allData.length >= MAX_RECORDS_FOR_DASHBOARD_STATS) {
+      console.warn(
+        `Aviso: Limite de ${MAX_RECORDS_FOR_DASHBOARD_STATS} registros atingido.`
+      );
+    }
+
+    return allData;
+  } catch (error) {
+    console.error("Erro ao buscar dados do dashboard:", error);
+    return [];
+  }
 }
