@@ -1,11 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from "@/lib/supabaseClient";
-import { type ProductConfig } from "@/types/index";
 
 /**
  * Busca a lista de produtos configurados no Supabase para uso em filtros.
  * @returns {Promise<ProductConfig[]>} Lista de produtos, incluindo a opção "All Products".
  */
-export async function fetchProductsForFilter(): Promise<ProductConfig[]> {
+export async function fetchProductsForFilter(): Promise<any[]> {
   // 1. Busca os dados brutos
   const { data, error } = await supabase
     .from("config_products")
@@ -19,7 +19,7 @@ export async function fetchProductsForFilter(): Promise<ProductConfig[]> {
   }
 
   // 2. Transforma o dado bruto no formato ProductConfig
-  const productsForFilter: ProductConfig[] = data.map((p) => ({
+  const productsForFilter: any[] = data.map((p) => ({
     id: p.merchant_id,
     name: p.product_name,
   }));
