@@ -145,6 +145,12 @@ npm install
 npm run dev
 ```
 
+### 4. Build e Deploy
+
+```
+npx wrangler pages deploy dist
+```
+
 Acesse **http://localhost:5173** (ou porta semelhante).
 
 ---
