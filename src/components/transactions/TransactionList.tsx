@@ -101,10 +101,6 @@ export function TransactionList({ transactions }: TransactionListProps) {
     return format(date, "dd MMM yyyy • HH:mm", { locale });
   };
 
-  const handleNavigateToSale = (transactionId: string) => {
-    navigate(`/dashboard/transactions/${transactionId}`);
-  };
-
   const handleNavigateToCustomer = (customerId: string) => {
     navigate(`/dashboard/customers/${customerId}`);
   };
@@ -128,10 +124,11 @@ export function TransactionList({ transactions }: TransactionListProps) {
               {/* Linha 1: ID, Data, Badges de Status */}
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 {/* ID da Venda (Clicável) */}
-                <button
-                  onClick={() => handleNavigateToSale(transaction.id)}
+                <a
+                  target="_blank"
+                  href={`/dashboard/transactions/${transaction.id}`}
                   className={cn(
-                    "flex items-center gap-2 text-sm font-mono",
+                    "flex items-center gap-2 text-sm font-mono cursor-pointer",
                     "text-cyan-400 hover:text-cyan-300",
                     "transition-colors group w-fit"
                   )}
@@ -140,7 +137,7 @@ export function TransactionList({ transactions }: TransactionListProps) {
                   <span className="font-semibold">
                     #{transaction.externalId}
                   </span>
-                </button>
+                </a>
 
                 {/* Data e Hora */}
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">

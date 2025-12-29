@@ -69,10 +69,6 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
     return format(date, "dd/MM/yy HH:mm", { locale });
   };
 
-  const handleNavigateToSale = (transactionId: string) => {
-    navigate(`/dashboard/transactions/${transactionId}`);
-  };
-
   const handleNavigateToCustomer = (customerId: string) => {
     navigate(`/dashboard/customers/${customerId}`);
   };
@@ -128,17 +124,18 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                 >
                   {/* ID */}
                   <td className="px-4 py-3 whitespace-nowrap">
-                    <button
-                      onClick={() => handleNavigateToSale(transaction.id)}
+                    <a
+                      target="_blank"
+                      href={`/dashboard/transactions/${transaction.id}`}
                       className={cn(
-                        "flex items-center gap-1.5 text-xs font-mono",
+                        "flex items-center gap-1.5 text-xs font-mono cursor-pointer",
                         "text-cyan-400 hover:text-cyan-300",
                         "transition-colors group"
                       )}
                     >
                       <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                       <span>#{transaction.externalId.slice(0, 8)}</span>
-                    </button>
+                    </a>
                   </td>
 
                   {/* Data */}
