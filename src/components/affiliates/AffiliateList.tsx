@@ -26,11 +26,10 @@ interface AffiliateMetrics {
   platformFeePercent: number;
   platformFeeDollar: number;
   aov: number;
+  realAov: number;
   netSales: number;
-  net: number;
   cogs: number;
   profit: number;
-  cashFlow: number;
 }
 
 interface AffiliateListProps {
@@ -312,6 +311,25 @@ export function AffiliateList({ affiliates }: AffiliateListProps) {
                       <TooltipTrigger asChild>
                         <div className="p-1.5 rounded bg-white/5 cursor-help">
                           <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {t("affiliates.table.realAov")}
+                            <HelpCircle className="w-2.5 h-2.5" />
+                          </div>
+                          <div className="font-semibold text-cyan-400">
+                            {formatCurrency(item.realAov)}
+                          </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{t("affiliates.tooltips.realAov")}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="p-1.5 rounded bg-white/5 cursor-help">
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
                             {t("affiliates.table.netSales")}
                             <HelpCircle className="w-2.5 h-2.5" />
                           </div>
@@ -325,29 +343,10 @@ export function AffiliateList({ affiliates }: AffiliateListProps) {
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="p-1.5 rounded bg-white/5 cursor-help">
-                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
-                            {t("affiliates.table.net")}
-                            <HelpCircle className="w-2.5 h-2.5" />
-                          </div>
-                          <div className="font-semibold text-foreground">
-                            {formatCurrency(item.net)}
-                          </div>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{t("affiliates.tooltips.net")}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
                 </div>
 
                 {/* Linha 5: Métricas finais */}
-                <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="grid grid-cols-2 gap-2 text-xs">
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -382,25 +381,6 @@ export function AffiliateList({ affiliates }: AffiliateListProps) {
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>{t("affiliates.tooltips.profit")}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="p-1.5 rounded bg-white/5 cursor-help">
-                          <div className="text-[10px] text-muted-foreground flex items-center gap-1">
-                            {t("affiliates.table.cashFlow")}
-                            <HelpCircle className="w-2.5 h-2.5" />
-                          </div>
-                          <div className="font-semibold text-green-400">
-                            {formatCurrency(item.cashFlow)}
-                          </div>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{t("affiliates.tooltips.cashFlow")}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

@@ -25,11 +25,10 @@ interface AffiliateMetrics {
   platformFeePercent: number;
   platformFeeDollar: number;
   aov: number;
+  realAov: number;
   netSales: number;
-  net: number;
   cogs: number;
   profit: number;
-  cashFlow: number;
 }
 
 interface AffiliateTableProps {
@@ -107,7 +106,7 @@ export function AffiliateTable({ affiliates }: AffiliateTableProps) {
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-white/5 border-b border-white/10">
+            <thead className="border-b bg-white/5 border-white/10">
               <tr>
                 <TableHeader label={t("affiliates.table.name")} />
                 <TableHeader label={t("affiliates.table.platform")} />
@@ -152,12 +151,12 @@ export function AffiliateTable({ affiliates }: AffiliateTableProps) {
                   tooltip={t("affiliates.tooltips.aov")}
                 />
                 <TableHeader
-                  label={t("affiliates.table.netSales")}
-                  tooltip={t("affiliates.tooltips.netSales")}
+                  label={t("affiliates.table.realAov")}
+                  tooltip={t("affiliates.tooltips.realAov")}
                 />
                 <TableHeader
-                  label={t("affiliates.table.net")}
-                  tooltip={t("affiliates.tooltips.net")}
+                  label={t("affiliates.table.netSales")}
+                  tooltip={t("affiliates.tooltips.netSales")}
                 />
                 <TableHeader
                   label={t("affiliates.table.cogs")}
@@ -166,10 +165,6 @@ export function AffiliateTable({ affiliates }: AffiliateTableProps) {
                 <TableHeader
                   label={t("affiliates.table.profit")}
                   tooltip={t("affiliates.tooltips.profit")}
-                />
-                <TableHeader
-                  label={t("affiliates.table.cashFlow")}
-                  tooltip={t("affiliates.tooltips.cashFlow")}
                 />
               </tr>
             </thead>
@@ -196,7 +191,7 @@ export function AffiliateTable({ affiliates }: AffiliateTableProps) {
                         <span className="truncate max-w-[200px]">
                           {affiliateName}
                         </span>
-                        <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                        <ExternalLink className="flex-shrink-0 w-3 h-3" />
                       </button>
                     </td>
 
@@ -226,12 +221,12 @@ export function AffiliateTable({ affiliates }: AffiliateTableProps) {
                     </td>
 
                     {/* Gross Sales */}
-                    <td className="px-3 py-3 text-sm font-medium text-right tabular-nums text-green-400">
+                    <td className="px-3 py-3 text-sm font-medium text-right text-green-400 tabular-nums">
                       {formatCurrency(item.grossSales)}
                     </td>
 
                     {/* R+CB */}
-                    <td className="px-3 py-3 text-sm font-medium text-right tabular-nums text-red-400">
+                    <td className="px-3 py-3 text-sm font-medium text-right text-red-400 tabular-nums">
                       {formatCurrency(item.refundsAndChargebacks)}
                     </td>
 
@@ -260,14 +255,14 @@ export function AffiliateTable({ affiliates }: AffiliateTableProps) {
                       {formatCurrency(item.aov)}
                     </td>
 
+                    {/* Real AOV */}
+                    <td className="px-3 py-3 text-sm font-medium text-right tabular-nums text-foreground">
+                      {formatCurrency(item.realAov)}
+                    </td>
+
                     {/* Net Sales */}
                     <td className="px-3 py-3 text-sm font-medium text-right tabular-nums text-foreground">
                       {formatCurrency(item.netSales)}
-                    </td>
-
-                    {/* Net */}
-                    <td className="px-3 py-3 text-sm font-medium text-right tabular-nums text-foreground">
-                      {formatCurrency(item.net)}
                     </td>
 
                     {/* COGS */}
@@ -278,11 +273,6 @@ export function AffiliateTable({ affiliates }: AffiliateTableProps) {
                     {/* Profit */}
                     <td className="px-3 py-3 text-sm font-medium text-right tabular-nums text-cyan-400">
                       {formatCurrency(item.profit)}
-                    </td>
-
-                    {/* Cash Flow */}
-                    <td className="px-3 py-3 text-sm font-medium text-right tabular-nums text-green-400">
-                      {formatCurrency(item.cashFlow)}
                     </td>
                   </tr>
                 );

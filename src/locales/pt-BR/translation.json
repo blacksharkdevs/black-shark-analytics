@@ -439,11 +439,10 @@
       "platformFeePercent": "Taxa Plataforma (%)",
       "platformFeeDollar": "Taxa Plataforma ($)",
       "aov": "AOV",
+      "realAov": "AOV Real",
       "netSales": "Vendas Líquidas",
-      "net": "Líquido",
       "cogsColumn": "COGS",
       "profitColumn": "Lucro",
-      "cashFlow": "Fluxo de Caixa",
       "refundsChargebacks": "R+CB"
     },
     "tooltips": {
@@ -456,12 +455,11 @@
       "taxes": "Total de impostos sobre as vendas",
       "platformFeePercent": "Percentual médio de taxa cobrada pela plataforma",
       "platformFeeDollar": "Valor total em dólar de taxas da plataforma",
-      "aov": "Vendas Brutas / Vendas Totais",
-      "netSales": "Vendas Brutas - Comissão",
-      "net": "Vendas Líquidas + R+CB",
+      "aov": "Receita Bruta / Total de Clientes",
+      "realAov": "(Receita Bruta - R+CB) / Total de Clientes",
+      "netSales": "Receita Bruta - Comissão",
       "cogs": "Custo dos Produtos Vendidos (Cost of Goods Sold)",
-      "profit": "Líquido - COGS",
-      "cashFlow": "Lucro - (Vendas Brutas × 10%)"
+      "profit": "Venda Líquida - COGS"
     },
     "tableTooltips": {
       "grossSales": "Receita Total - Taxas da Plataforma - Impostos",

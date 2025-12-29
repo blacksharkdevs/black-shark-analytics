@@ -22,11 +22,10 @@ interface AffiliateMetrics {
   platformFeePercent: number;
   platformFeeDollar: number;
   aov: number;
+  realAov: number;
   netSales: number;
-  net: number;
   cogs: number;
   profit: number;
-  cashFlow: number;
 }
 
 export default function AffiliatesPage() {
@@ -111,11 +110,10 @@ export default function AffiliatesPage() {
           platformFeePercent: 0,
           platformFeeDollar: 0,
           aov: 0,
+          realAov: 0,
           netSales: 0,
-          net: 0,
           cogs: 0,
           profit: 0,
-          cashFlow: 0,
         });
       }
 
@@ -158,24 +156,27 @@ export default function AffiliatesPage() {
       // Total de clientes únicos
       metrics.totalCustomers = metrics.customerIds.size;
 
-      // Net Sales = Gross Sales - Commission
-      metrics.netSales = metrics.grossSales - metrics.commission;
-
-      // Net = Net Sales + R+CB (R+CB é negativo geralmente)
-      metrics.net = metrics.netSales + metrics.refundsAndChargebacks;
-
-      // Profit = Net - COGS
-      metrics.profit = metrics.net - metrics.cogs;
-
-      // Cash Flow = Profit - Allowance (10% de Gross Sales)
-      const allowance = metrics.grossSales * 0.1;
-      metrics.cashFlow = metrics.profit - allowance;
-
-      // AOV = Gross Sales / Front Sales
+      // AOV = Receita Bruta / Total de Clientes
       metrics.aov =
-        metrics.totalSales > 0 ? metrics.grossSales / metrics.totalSales : 0;
+        metrics.totalCustomers > 0
+          ? metrics.totalRevenue / metrics.totalCustomers
+          : 0;
 
-      // Platform Fee Percent (média aproximada)
+      // AOV Real = (Receita Bruta - Refund e Chargeback) / Clientes
+      const adjustedRevenue =
+        metrics.totalRevenue - metrics.refundsAndChargebacks;
+      metrics.realAov =
+        metrics.totalCustomers > 0
+          ? adjustedRevenue / metrics.totalCustomers
+          : 0;
+
+      // Net Sales = Receita Bruta - Comissão
+      metrics.netSales = metrics.totalRevenue - metrics.commission;
+
+      // Profit = Venda Líquida - COGS
+      metrics.profit = metrics.netSales - metrics.cogs;
+
+      // Platform Fee Percent
       if (metrics.totalRevenue > 0) {
         metrics.platformFeePercent =
           (metrics.platformFeeDollar / metrics.totalRevenue) * 100;
@@ -290,10 +291,6 @@ export default function AffiliatesPage() {
         case "profit":
           valueA = a.profit;
           valueB = b.profit;
-          break;
-        case "cashFlow":
-          valueA = a.cashFlow;
-          valueB = b.cashFlow;
           break;
         case "customers":
           valueA = a.totalCustomers;

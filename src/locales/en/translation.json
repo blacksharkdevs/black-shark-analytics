@@ -440,11 +440,10 @@
       "platformFeePercent": "Platform Fee (%)",
       "platformFeeDollar": "Platform Fee ($)",
       "aov": "AOV",
+      "realAov": "Real AOV",
       "netSales": "Net Sales",
-      "net": "Net",
       "cogsColumn": "COGS",
       "profitColumn": "Profit",
-      "cashFlow": "Cash Flow",
       "refundsChargebacks": "R+CB"
     },
     "tooltips": {
@@ -457,12 +456,11 @@
       "taxes": "Total taxes on sales",
       "platformFeePercent": "Average percentage fee charged by platform",
       "platformFeeDollar": "Total dollar amount of platform fees",
-      "aov": "Gross Sales / Total Sales",
-      "netSales": "Gross Sales - Commission",
-      "net": "Net Sales + R+CB",
+      "aov": "Total Revenue / Total Customers",
+      "realAov": "(Total Revenue - R+CB) / Total Customers",
+      "netSales": "Total Revenue - Commission",
       "cogs": "Cost of Goods Sold",
-      "profit": "Net - COGS",
-      "cashFlow": "Profit - (Gross Sales × 10%)"
+      "profit": "Net Sales - COGS"
     },
     "tableTooltips": {
       "grossSales": "Total Revenue - Platform Fees - Taxes",
