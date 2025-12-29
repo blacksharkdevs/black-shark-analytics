@@ -79,7 +79,7 @@ export default function DashboardPage() {
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-1">
+        <div className="h-full lg:col-span-1">
           <StatsCards />
         </div>
 

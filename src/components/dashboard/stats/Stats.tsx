@@ -228,7 +228,7 @@ ${t("dashboard.stats.explanations.averageOrderValue.formula")}`;
   }, [STATS_MAP, safeStats, isLoading]);
 
   return (
-    <div className="shark-card">
+    <div className="h-full shark-card">
       <CardHeader className="px-4 py-3 md:px-6 md:py-4">
         <CardTitle className="flex items-center text-base md:text-lg text-foreground">
           <ChartArea className="w-4 h-4 mr-2 text-blue-600 md:w-6 md:h-6 dark:text-white" />{" "}

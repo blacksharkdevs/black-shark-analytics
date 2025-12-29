@@ -24,7 +24,6 @@ export function StatsCard({
   title,
   rawValue,
   icon: Icon,
-  description,
   isLoading,
   explanation,
   isMonetary = false,
@@ -83,9 +82,6 @@ export function StatsCard({
           <h3 className="text-xs font-semibold leading-tight md:text-base text-foreground">
             {title}
           </h3>
-          <p className="text-[10px] md:text-sm text-muted-foreground leading-tight">
-            {description}
-          </p>
         </div>
       </div>
       <div className="text-base font-bold text-blue-700 md:text-xl xl:text-2xl tabular-nums">
