@@ -1,71 +1,86 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { AffiliatePerformanceChart } from "@/components/dashboard/charts/AffiliatePerformanceChart";
+import { AffiliateSummaryCards } from "@/components/dashboard/performance/AffiliateSummaryCards";
+import { AffiliateRevenueBarChart } from "@/components/dashboard/performance/AffiliateRevenueBarChart";
+import { AffiliateRiskScatterPlot } from "@/components/dashboard/performance/AffiliateRiskScatterPlot";
+import { AffiliateDetailTable } from "@/components/dashboard/performance/AffiliateDetailTable";
 import { AffiliateSelector } from "@/components/dashboard/performance/AffiliateSelector";
-import { AffiliateSharkInsights } from "@/components/dashboard/performance/AffiliateSharkInsights";
-import { AffiliateCommissionAnalyzer } from "@/components/dashboard/performance/AffiliateCommissionAnalyzer";
-import { AffiliateQualityMonitor } from "@/components/dashboard/performance/AffiliateQualityMonitor";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
-import { cn } from "@/lib/utils";
+import type { Transaction } from "@/types/index";
 
-interface Affiliate {
+interface AffiliateMetrics {
   id: string;
   name: string;
   totalRevenue: number;
-  totalCommission: number;
+  totalNet: number;
   salesCount: number;
+  commissionPaid: number;
+  refundCount: number;
+  refundRate: number;
 }
 
 export default function AffiliatesPerformancePage() {
   const { t } = useTranslation();
   const { filteredSalesData, isLoadingData } = useDashboardData();
-  const { isLoading: isDateRangeLoading, currentDateRange } =
-    useDashboardConfig();
+  const { isLoading: isDateRangeLoading } = useDashboardConfig();
 
   const isLoading = isLoadingData || isDateRangeLoading;
-  const [isFullWidth, setIsFullWidth] = useState(false);
 
-  const availableAffiliates = useMemo(() => {
-    const affiliateMap = new Map<string, Affiliate>();
+  // Calcular métricas agregadas por afiliado
+  const affiliateMetrics = useMemo(() => {
+    const metricsMap = new Map<string, AffiliateMetrics>();
 
-    filteredSalesData.forEach((record) => {
-      if (
-        !record.affiliateId ||
-        record.type !== "SALE" ||
-        record.status !== "COMPLETED"
-      ) {
-        return;
-      }
+    filteredSalesData.forEach((record: Transaction) => {
+      if (!record.affiliateId) return;
 
       const affiliateId = record.affiliateId;
       const affiliateName =
         record.affiliate?.name || `Affiliate ${affiliateId}`;
 
-      if (!affiliateMap.has(affiliateId)) {
-        affiliateMap.set(affiliateId, {
+      if (!metricsMap.has(affiliateId)) {
+        metricsMap.set(affiliateId, {
           id: affiliateId,
           name: affiliateName,
           totalRevenue: 0,
-          totalCommission: 0,
+          totalNet: 0,
           salesCount: 0,
+          commissionPaid: 0,
+          refundCount: 0,
+          refundRate: 0,
         });
       }
 
-      const affiliate = affiliateMap.get(affiliateId)!;
-      affiliate.totalRevenue += Number(record.grossAmount);
-      affiliate.totalCommission += Number(record.affiliateCommission);
-      affiliate.salesCount += 1;
+      const metrics = metricsMap.get(affiliateId)!;
+
+      if (record.type === "SALE" && record.status === "COMPLETED") {
+        metrics.salesCount += 1;
+        metrics.totalRevenue += Number(record.grossAmount);
+        metrics.totalNet += Number(record.netAmount);
+        metrics.commissionPaid += Number(record.affiliateCommission);
+      }
+
+      if (record.type === "REFUND") {
+        metrics.refundCount += 1;
+      }
     });
 
-    return Array.from(affiliateMap.values()).sort(
+    // Calcular refund rate
+    metricsMap.forEach((metrics) => {
+      metrics.refundRate =
+        metrics.salesCount > 0
+          ? (metrics.refundCount / metrics.salesCount) * 100
+          : 0;
+    });
+
+    return Array.from(metricsMap.values()).sort(
       (a, b) => b.totalRevenue - a.totalRevenue
     );
   }, [filteredSalesData]);
 
   const topAffiliates = useMemo(() => {
-    return availableAffiliates.slice(0, 5);
-  }, [availableAffiliates]);
+    return affiliateMetrics.slice(0, 10);
+  }, [affiliateMetrics]);
 
   const [selectedAffiliateIds, setSelectedAffiliateIds] = useState<string[]>(
     []
@@ -97,65 +112,54 @@ export default function AffiliatesPerformancePage() {
         </p>
       </div>
 
-      {/* Gráfico e Afiliados - Layout Dinâmico */}
-      <div
-        className={cn(
-          "flex gap-6",
-          isFullWidth ? "flex-col" : "flex-col lg:flex-row"
-        )}
-      >
-        {/* Gráfico de Performance */}
-        <div className={cn(isFullWidth ? "w-full" : "w-full lg:w-2/3")}>
-          <AffiliatePerformanceChart
-            selectedAffiliateIds={selectedAffiliateIds}
-            isLoading={isLoading}
-            availableAffiliates={availableAffiliates}
-            isFullWidth={isFullWidth}
-            onToggleFullWidth={() => setIsFullWidth(!isFullWidth)}
-          />
-        </div>
+      {/* Top Row - Summary Cards */}
+      <AffiliateSummaryCards
+        affiliateMetrics={affiliateMetrics}
+        isLoading={isLoading}
+      />
 
-        {/* Seletor de Afiliados */}
-        <div className={cn(isFullWidth ? "w-full" : "w-full lg:w-1/3")}>
+      {/* Middle Row - Layout with Selector and Visualizations */}
+      <div className="flex flex-col gap-6 lg:flex-row">
+        {/* Affiliate Selector - Sidebar */}
+        <div className="w-full lg:w-1/4">
           <AffiliateSelector
-            availableAffiliates={availableAffiliates}
+            availableAffiliates={affiliateMetrics.map((m) => ({
+              id: m.id,
+              name: m.name,
+              totalRevenue: m.totalRevenue,
+              totalCommission: m.commissionPaid,
+              salesCount: m.salesCount,
+            }))}
             selectedAffiliateIds={selectedAffiliateIds}
             onToggleAffiliate={handleToggleAffiliate}
             isLoading={isLoading}
           />
         </div>
+
+        {/* Charts Column */}
+        <div className="flex-1 space-y-6">
+          {/* Horizontal Bar Chart */}
+          <AffiliateRevenueBarChart
+            affiliateMetrics={affiliateMetrics}
+            isLoading={isLoading}
+            selectedAffiliateIds={selectedAffiliateIds}
+          />
+
+          {/* Scatter Plot - Risk Analysis */}
+          <AffiliateRiskScatterPlot
+            affiliateMetrics={affiliateMetrics}
+            isLoading={isLoading}
+            selectedAffiliateIds={selectedAffiliateIds}
+          />
+        </div>
       </div>
 
-      {/* Shark AI Analysis */}
-      <AffiliateSharkInsights
+      {/* Bottom Row - Detailed Table */}
+      <AffiliateDetailTable
+        affiliateMetrics={affiliateMetrics}
+        isLoading={isLoading}
         selectedAffiliateIds={selectedAffiliateIds}
-        availableAffiliates={availableAffiliates}
-        filteredSalesData={filteredSalesData}
-        dateRange={currentDateRange}
       />
-
-      {/* Grid de Análise Técnica */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Coluna 1: Commission Analyzer */}
-        <div className="lg:col-span-1">
-          <AffiliateCommissionAnalyzer
-            selectedAffiliateIds={selectedAffiliateIds}
-            availableAffiliates={availableAffiliates}
-            filteredSalesData={filteredSalesData}
-            isLoading={isLoading}
-          />
-        </div>
-
-        {/* Coluna 2: Quality Monitor */}
-        <div className="lg:col-span-1">
-          <AffiliateQualityMonitor
-            selectedAffiliateIds={selectedAffiliateIds}
-            availableAffiliates={availableAffiliates}
-            filteredSalesData={filteredSalesData}
-            isLoading={isLoading}
-          />
-        </div>
-      </div>
     </div>
   );
 }

@@ -263,6 +263,30 @@
       "revenue": "Revenue",
       "atRisk": "at risk",
       "warningLine": "Warning Line"
+    },
+    "affiliates": {
+      "topByRevenue": "Top by Revenue",
+      "topByRevenueDesc": "Affiliate with highest revenue volume",
+      "topByVolume": "Top by Volume",
+      "topByVolumeDesc": "Affiliate with most sales",
+      "highestRefundRate": "Highest Refund Rate",
+      "highestRefundRateDesc": "Affiliate with highest refund index",
+      "sales": "sales",
+      "commission": "commission",
+      "revenue": "revenue",
+      "refundRate": "refund rate",
+      "refunds": "refunds",
+      "revenueByAffiliate": "Revenue by Affiliate",
+      "revenueByAffiliateDesc": "Top 10 affiliates sorted by gross revenue",
+      "riskAnalysis": "Risk Analysis",
+      "riskAnalysisDesc": "Sales volume vs. Refund rate",
+      "salesVolume": "Sales Volume",
+      "detailTable": "Detailed Table",
+      "detailTableDesc": "Complete metrics per affiliate with visual indicators",
+      "affiliateName": "Affiliate Name",
+      "salesCount": "Sales",
+      "grossRevenue": "Gross Revenue",
+      "netRevenue": "Net Revenue"
     }
   },
   "header": {

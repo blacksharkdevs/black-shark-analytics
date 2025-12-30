@@ -263,6 +263,30 @@
       "revenue": "Receita",
       "atRisk": "em risco",
       "warningLine": "Linha de Atenção"
+    },
+    "affiliates": {
+      "topByRevenue": "Top em Receita",
+      "topByRevenueDesc": "Afiliado com maior volume de receita",
+      "topByVolume": "Top em Volume",
+      "topByVolumeDesc": "Afiliado com maior número de vendas",
+      "highestRefundRate": "Maior Taxa de Reembolso",
+      "highestRefundRateDesc": "Afiliado com maior índice de reembolsos",
+      "sales": "vendas",
+      "commission": "comissão",
+      "revenue": "receita",
+      "refundRate": "taxa de reembolso",
+      "refunds": "reembolsos",
+      "revenueByAffiliate": "Receita por Afiliado",
+      "revenueByAffiliateDesc": "Top 10 afiliados ordenados por receita bruta",
+      "riskAnalysis": "Análise de Risco",
+      "riskAnalysisDesc": "Volume de vendas vs. Taxa de reembolso",
+      "salesVolume": "Volume de Vendas",
+      "detailTable": "Tabela Detalhada",
+      "detailTableDesc": "Métricas completas por afiliado com indicadores visuais",
+      "affiliateName": "Nome do Afiliado",
+      "salesCount": "Vendas",
+      "grossRevenue": "Receita Bruta",
+      "netRevenue": "Receita Líquida"
     }
   },
   "header": {
