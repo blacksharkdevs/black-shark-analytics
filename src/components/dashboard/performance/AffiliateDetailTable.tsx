@@ -220,7 +220,7 @@ export function AffiliateDetailTable({
                   </Button>
                 </TableHead>
                 {onFocusAffiliate && (
-                  <TableHead className="text-center text-white w-24">
+                  <TableHead className="w-24 text-center text-white">
                     {t("performance.affiliates.actions")}
                   </TableHead>
                 )}
@@ -238,10 +238,10 @@ export function AffiliateDetailTable({
                   <TableCell className="text-right text-muted-foreground">
                     {affiliate.salesCount}
                   </TableCell>
-                  <TableCell className="text-right font-semibold text-cyan-400">
+                  <TableCell className="font-semibold text-right text-cyan-400">
                     {formatCurrency(affiliate.totalRevenue)}
                   </TableCell>
-                  <TableCell className="text-right font-semibold text-magenta-400">
+                  <TableCell className="font-semibold text-right text-magenta-400">
                     {formatCurrency(affiliate.commissionPaid)}
                   </TableCell>
                   <TableCell className="text-right">
@@ -275,15 +275,15 @@ export function AffiliateDetailTable({
         {/* Legenda para heatmap */}
         <div className="flex items-center justify-end gap-4 mt-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-950/50 border border-green-400/30"></div>
+            <div className="w-4 h-4 border rounded bg-green-950/50 border-green-400/30"></div>
             <span>{"< 1%"} (Excelente)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-yellow-950/50 border border-yellow-400/30"></div>
+            <div className="w-4 h-4 border rounded bg-yellow-950/50 border-yellow-400/30"></div>
             <span>1-3% (Atenção)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-red-950/50 border border-red-400/30"></div>
+            <div className="w-4 h-4 border rounded bg-red-950/50 border-red-400/30"></div>
             <span>{"> 3%"} (Crítico)</span>
           </div>
         </div>

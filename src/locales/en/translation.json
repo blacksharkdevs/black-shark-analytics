@@ -565,6 +565,7 @@
       "netSales": "Net Sales",
       "cogsColumn": "COGS",
       "profitColumn": "Profit",
+      "cashFlow": "Cash Flow",
       "refundsChargebacks": "R+CB"
     },
     "tooltips": {
@@ -581,7 +582,8 @@
       "realAov": "(Total Revenue - R+CB) / Total Customers",
       "netSales": "Total Revenue - Commission",
       "cogs": "Cost of Goods Sold",
-      "profit": "Net Sales - COGS"
+      "profit": "Net Sales - COGS",
+      "cashFlow": "Profit minus 10% reserve on gross sales"
     },
     "tableTooltips": {
       "grossSales": "Total Revenue - Platform Fees - Taxes",

@@ -120,7 +120,6 @@ function StatsCard({
 
 export function AffiliateMetricsSection({
   metrics,
-  totalTransactions,
   isLoading,
 }: AffiliateMetricsSectionProps) {
   const { t } = useTranslation();
@@ -194,7 +193,7 @@ export function AffiliateMetricsSection({
       </div>
 
       {/* Terceira linha de stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title={t("affiliates.table.aov")}
           value={formatCurrency(metrics.aov)}
@@ -208,13 +207,6 @@ export function AffiliateMetricsSection({
           value={formatCurrency(metrics.netSales)}
           icon={Package}
           tooltip={t("affiliates.tooltips.netSales")}
-          isLoading={isLoading}
-        />
-        <StatsCard
-          title={t("affiliates.table.net")}
-          value={formatCurrency(metrics.net)}
-          icon={Wallet}
-          tooltip={t("affiliates.tooltips.net")}
           isLoading={isLoading}
         />
         <StatsCard
@@ -234,7 +226,7 @@ export function AffiliateMetricsSection({
       </div>
 
       {/* Quarta linha - métricas finais */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <StatsCard
           title={t("affiliates.table.profit")}
           value={formatCurrency(metrics.profit)}
@@ -251,16 +243,6 @@ export function AffiliateMetricsSection({
           color="text-green-400"
           isLoading={isLoading}
         />
-        <Card className="flex items-center justify-center shark-card">
-          <CardContent className="pt-6 text-center">
-            <div className="text-sm font-medium text-muted-foreground">
-              {t("transactions.results")}
-            </div>
-            <div className="text-3xl font-bold text-cyan-400">
-              {totalTransactions}
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

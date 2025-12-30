@@ -564,6 +564,7 @@
       "netSales": "Vendas Líquidas",
       "cogsColumn": "COGS",
       "profitColumn": "Lucro",
+      "cashFlow": "Fluxo de Caixa",
       "refundsChargebacks": "R+CB"
     },
     "tooltips": {
@@ -580,7 +581,8 @@
       "realAov": "(Receita Bruta - R+CB) / Total de Clientes",
       "netSales": "Receita Bruta - Comissão",
       "cogs": "Custo dos Produtos Vendidos (Cost of Goods Sold)",
-      "profit": "Venda Líquida - COGS"
+      "profit": "Venda Líquida - COGS",
+      "cashFlow": "Lucro menos reserva de 10% sobre vendas brutas"
     },
     "tableTooltips": {
       "grossSales": "Receita Total - Taxas da Plataforma - Impostos",
