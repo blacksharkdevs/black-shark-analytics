@@ -54,6 +54,7 @@ export default function AffiliatePerformanceDetailPage() {
 
   // 1. CARTÃO DE VISITA FINANCEIRO - 4 cards principais
   const financialMetrics = useMemo(() => {
+    let grossRevenue = 0;
     let netRevenue = 0;
     let commission = 0;
     let totalSales = 0;
@@ -62,6 +63,7 @@ export default function AffiliatePerformanceDetailPage() {
 
     affiliateData.data.forEach((transaction) => {
       if (transaction.type === "SALE" && transaction.status === "COMPLETED") {
+        grossRevenue += Number(transaction.grossAmount);
         netRevenue += Number(transaction.netAmount);
         commission += Number(transaction.affiliateCommission);
         totalSales += 1;
@@ -70,8 +72,11 @@ export default function AffiliatePerformanceDetailPage() {
       if (transaction.type === "CHARGEBACK") totalChargebacks += 1;
     });
 
+    // ROI = (Lucro / Investimento) * 100
+    // Lucro = Receita Bruta - Comissão
+    // Investimento = Comissão
     const roi =
-      commission > 0 ? ((netRevenue - commission) / commission) * 100 : 0;
+      commission > 0 ? ((grossRevenue - commission) / commission) * 100 : 0;
     const bleedingRate =
       totalSales > 0
         ? ((totalRefunds + totalChargebacks) / totalSales) * 100

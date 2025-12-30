@@ -22,9 +22,11 @@ import {
   ArrowUp,
   ArrowDown,
   Focus,
+  List,
 } from "lucide-react";
 import { formatCurrency } from "@/utils/index";
 import { Button } from "@/components/common/ui/button";
+import { AffiliateDetailList } from "./AffiliateDetailList";
 
 interface AffiliateMetrics {
   id: string;
@@ -61,6 +63,7 @@ export function AffiliateDetailTable({
   const { t } = useTranslation();
   const [sortField, setSortField] = useState<SortField>("totalRevenue");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [viewMode, setViewMode] = useState<"list" | "table">("table");
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -131,13 +134,37 @@ export function AffiliateDetailTable({
     return (
       <Card className="shark-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TableIcon className="w-5 h-5 text-cyan-400" />
-            {t("performance.affiliates.detailTable")}
-          </CardTitle>
-          <CardDescription>
-            {t("performance.affiliates.detailTableDesc")}
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <TableIcon className="w-5 h-5 text-cyan-400" />
+                {t("performance.affiliates.detailTable")}
+              </CardTitle>
+              <CardDescription>
+                {t("performance.affiliates.detailTableDesc")}
+              </CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant={viewMode === "list" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("list")}
+                className="gap-2"
+              >
+                <List className="w-4 h-4" />
+                {t("transactions.viewMode.list")}
+              </Button>
+              <Button
+                variant={viewMode === "table" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("table")}
+                className="gap-2"
+              >
+                <TableIcon className="w-4 h-4" />
+                {t("transactions.viewMode.table")}
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-40 text-muted-foreground">
@@ -151,142 +178,176 @@ export function AffiliateDetailTable({
   return (
     <Card className="shark-card">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TableIcon className="w-5 h-5 text-cyan-400" />
-          {t("performance.affiliates.detailTable")}
-        </CardTitle>
-        <CardDescription>
-          {t("performance.affiliates.detailTableDesc")}
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <TableIcon className="w-5 h-5 text-cyan-400" />
+              {t("performance.affiliates.detailTable")}
+            </CardTitle>
+            <CardDescription>
+              {t("performance.affiliates.detailTableDesc")}
+            </CardDescription>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant={viewMode === "list" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("list")}
+              className="gap-2"
+            >
+              <List className="w-4 h-4" />
+              {t("transactions.viewMode.list")}
+            </Button>
+            <Button
+              variant={viewMode === "table" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setViewMode("table")}
+              className="gap-2"
+            >
+              <TableIcon className="w-4 h-4" />
+              {t("transactions.viewMode.table")}
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-border hover:bg-transparent">
-                <TableHead className="text-white">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center h-auto p-0 hover:bg-transparent"
-                    onClick={() => handleSort("name")}
-                  >
-                    {t("performance.affiliates.affiliateName")}
-                    <SortIcon field="name" />
-                  </Button>
-                </TableHead>
-                <TableHead className="text-right text-white">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center h-auto p-0 ml-auto hover:bg-transparent"
-                    onClick={() => handleSort("salesCount")}
-                  >
-                    {t("performance.affiliates.salesCount")}
-                    <SortIcon field="salesCount" />
-                  </Button>
-                </TableHead>
-                <TableHead className="text-right text-white">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center h-auto p-0 ml-auto hover:bg-transparent"
-                    onClick={() => handleSort("totalRevenue")}
-                  >
-                    {t("performance.affiliates.grossRevenue")}
-                    <SortIcon field="totalRevenue" />
-                  </Button>
-                </TableHead>
-                <TableHead className="text-right text-white">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center h-auto p-0 ml-auto hover:bg-transparent"
-                    onClick={() => handleSort("commissionPaid")}
-                  >
-                    {t("performance.affiliates.commission")}
-                    <SortIcon field="commissionPaid" />
-                  </Button>
-                </TableHead>
-                <TableHead className="text-right text-white">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center h-auto p-0 ml-auto hover:bg-transparent"
-                    onClick={() => handleSort("refundRate")}
-                  >
-                    {t("performance.affiliates.refundRate")}
-                    <SortIcon field="refundRate" />
-                  </Button>
-                </TableHead>
-                {onFocusAffiliate && (
-                  <TableHead className="w-24 text-center text-white">
-                    {t("performance.affiliates.actions")}
-                  </TableHead>
-                )}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedData.map((affiliate) => (
-                <TableRow
-                  key={affiliate.id}
-                  className="transition-colors border-border hover:bg-white/5"
-                >
-                  <TableCell className="font-medium text-white">
-                    {affiliate.name}
-                  </TableCell>
-                  <TableCell className="text-right text-muted-foreground">
-                    {affiliate.salesCount}
-                  </TableCell>
-                  <TableCell className="font-semibold text-right text-cyan-400">
-                    {formatCurrency(affiliate.totalRevenue)}
-                  </TableCell>
-                  <TableCell className="font-semibold text-right text-magenta-400">
-                    {formatCurrency(affiliate.commissionPaid)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div
-                      className={`inline-block px-3 py-1 rounded-md ${getRefundRateClass(
-                        affiliate.refundRate
-                      )}`}
+        {viewMode === "list" ? (
+          <AffiliateDetailList
+            affiliateMetrics={sortedData}
+            isLoading={isLoading}
+            onFocusAffiliate={onFocusAffiliate}
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-white">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center h-auto p-0 hover:bg-transparent"
+                      onClick={() => handleSort("name")}
                     >
-                      {affiliate.refundRate.toFixed(1)}%
-                    </div>
-                  </TableCell>
+                      {t("performance.affiliates.affiliateName")}
+                      <SortIcon field="name" />
+                    </Button>
+                  </TableHead>
+                  <TableHead className="text-right text-white">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center h-auto p-0 ml-auto hover:bg-transparent"
+                      onClick={() => handleSort("salesCount")}
+                    >
+                      {t("performance.affiliates.salesCount")}
+                      <SortIcon field="salesCount" />
+                    </Button>
+                  </TableHead>
+                  <TableHead className="text-right text-white">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center h-auto p-0 ml-auto hover:bg-transparent"
+                      onClick={() => handleSort("totalRevenue")}
+                    >
+                      {t("performance.affiliates.grossRevenue")}
+                      <SortIcon field="totalRevenue" />
+                    </Button>
+                  </TableHead>
+                  <TableHead className="text-right text-white">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center h-auto p-0 ml-auto hover:bg-transparent"
+                      onClick={() => handleSort("commissionPaid")}
+                    >
+                      {t("performance.affiliates.commission")}
+                      <SortIcon field="commissionPaid" />
+                    </Button>
+                  </TableHead>
+                  <TableHead className="text-right text-white">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center h-auto p-0 ml-auto hover:bg-transparent"
+                      onClick={() => handleSort("refundRate")}
+                    >
+                      {t("performance.affiliates.refundRate")}
+                      <SortIcon field="refundRate" />
+                    </Button>
+                  </TableHead>
                   {onFocusAffiliate && (
-                    <TableCell className="text-center">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onFocusAffiliate(affiliate.id)}
-                        className="gap-2 hover:bg-cyan-500/20 hover:text-cyan-400"
-                      >
-                        <Focus className="w-4 h-4" />
-                        {t("common.focus")}
-                      </Button>
-                    </TableCell>
+                    <TableHead className="w-24 text-center text-white">
+                      {t("performance.affiliates.actions")}
+                    </TableHead>
                   )}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {sortedData.map((affiliate) => (
+                  <TableRow
+                    key={affiliate.id}
+                    className="transition-colors border-border hover:bg-white/5"
+                  >
+                    <TableCell className="font-medium text-white">
+                      {affiliate.name}
+                    </TableCell>
+                    <TableCell className="text-right text-muted-foreground">
+                      {affiliate.salesCount}
+                    </TableCell>
+                    <TableCell className="font-semibold text-right text-cyan-400">
+                      {formatCurrency(affiliate.totalRevenue)}
+                    </TableCell>
+                    <TableCell className="font-semibold text-right text-magenta-400">
+                      {formatCurrency(affiliate.commissionPaid)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div
+                        className={`inline-block px-3 py-1 rounded-md ${getRefundRateClass(
+                          affiliate.refundRate
+                        )}`}
+                      >
+                        {affiliate.refundRate.toFixed(1)}%
+                      </div>
+                    </TableCell>
+                    {onFocusAffiliate && (
+                      <TableCell className="text-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onFocusAffiliate(affiliate.id)}
+                          className="gap-2 hover:bg-cyan-500/20 hover:text-cyan-400"
+                        >
+                          <Focus className="w-4 h-4" />
+                          {t("common.focus")}
+                        </Button>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
 
-        {/* Legenda para heatmap */}
-        <div className="flex items-center justify-end gap-4 mt-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 border rounded bg-green-950/50 border-green-400/30"></div>
-            <span>{"< 1%"} (Excelente)</span>
+        {/* Legenda para heatmap - só mostra na view de tabela */}
+        {viewMode === "table" && (
+          <div className="flex items-center justify-end gap-4 mt-4 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border rounded bg-green-950/50 border-green-400/30"></div>
+              <span>{"< 1%"} (Excelente)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border rounded bg-yellow-950/50 border-yellow-400/30"></div>
+              <span>1-3% (Atenção)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border rounded bg-red-950/50 border-red-400/30"></div>
+              <span>{"> 3%"} (Crítico)</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 border rounded bg-yellow-950/50 border-yellow-400/30"></div>
-            <span>1-3% (Atenção)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 border rounded bg-red-950/50 border-red-400/30"></div>
-            <span>{"> 3%"} (Crítico)</span>
-          </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
