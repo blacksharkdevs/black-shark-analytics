@@ -59,7 +59,7 @@ export function AffiliateSelector({
   }
 
   return (
-    <Card className="shark-card">
+    <Card className="max-h-[600px] lg:max-h-[1200px] overflow-y-auto shark-card">
       <CardHeader className="px-4 py-3 md:px-6 md:py-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
@@ -76,9 +76,9 @@ export function AffiliateSelector({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6 flex-shrink-0"
+                className="flex-shrink-0 w-6 h-6"
               >
-                <Info className="h-4 w-4" />
+                <Info className="w-4 h-4" />
               </Button>
             </HoverCardTrigger>
             <HoverCardContent className="w-56 text-xs md:text-sm">
@@ -88,9 +88,9 @@ export function AffiliateSelector({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3 px-4 pb-4 md:px-6 md:pb-6">
+      <CardContent className="px-4 pb-4 space-y-3 md:px-6 md:pb-6">
         {availableAffiliates.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground text-sm">
+          <div className="py-8 text-sm text-center text-muted-foreground">
             {t("performance.noAffiliates")}
           </div>
         ) : (
@@ -118,12 +118,12 @@ export function AffiliateSelector({
                 }}
               >
                 <div
-                  className="h-4 w-4 rounded flex-shrink-0"
+                  className="flex-shrink-0 w-4 h-4 rounded"
                   style={{ backgroundColor: color }}
                 />
                 <div className="flex-1 min-w-0">
                   <div
-                    className="font-medium text-sm truncate"
+                    className="text-sm font-medium truncate"
                     style={{
                       color: isSelected ? color : "#e2e8f0",
                     }}
@@ -143,9 +143,9 @@ export function AffiliateSelector({
                   )}
                 </div>
                 {isSelected ? (
-                  <Minus className="h-4 w-4 flex-shrink-0 text-slate-400" />
+                  <Minus className="flex-shrink-0 w-4 h-4 text-slate-400" />
                 ) : (
-                  <Plus className="h-4 w-4 flex-shrink-0 text-slate-500" />
+                  <Plus className="flex-shrink-0 w-4 h-4 text-slate-500" />
                 )}
               </button>
             );

@@ -81,7 +81,7 @@ export function AffiliateSummaryCards({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Top Affiliate by Revenue */}
       <Card className="shark-card border-cyan-500/20">
         <CardHeader className="pb-3">
