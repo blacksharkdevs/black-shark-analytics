@@ -156,7 +156,7 @@ export function AffiliateRiskScatterPlot({
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={400}>
-          <ScatterChart margin={{ top: 20, right: 30, bottom: 40, left: 60 }}>
+          <ScatterChart margin={{ top: 20, right: 30, bottom: 40, left: 30 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
             <XAxis
               type="number"
@@ -246,17 +246,17 @@ export function AffiliateRiskScatterPlot({
         {/* Legenda */}
         <div className="flex items-center justify-center gap-6 mt-4 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-400"></div>
+            <div className="w-3 h-3 bg-green-400 rounded-full"></div>
             <span className="text-muted-foreground">
               {"< 1%"} - Baixo Risco
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+            <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
             <span className="text-muted-foreground">1-3% - Médio Risco</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-400"></div>
+            <div className="w-3 h-3 bg-red-400 rounded-full"></div>
             <span className="text-muted-foreground">{"> 3%"} - Alto Risco</span>
           </div>
         </div>
