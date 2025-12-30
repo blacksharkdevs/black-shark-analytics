@@ -21,6 +21,7 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
+  Focus,
 } from "lucide-react";
 import { formatCurrency } from "@/utils/index";
 import { Button } from "@/components/common/ui/button";
@@ -40,6 +41,7 @@ interface AffiliateDetailTableProps {
   affiliateMetrics: AffiliateMetrics[];
   isLoading: boolean;
   selectedAffiliateIds: string[];
+  onFocusAffiliate?: (affiliateId: string) => void;
 }
 
 type SortField =
@@ -54,6 +56,7 @@ export function AffiliateDetailTable({
   affiliateMetrics,
   isLoading,
   selectedAffiliateIds,
+  onFocusAffiliate,
 }: AffiliateDetailTableProps) {
   const { t } = useTranslation();
   const [sortField, setSortField] = useState<SortField>("totalRevenue");
@@ -216,6 +219,11 @@ export function AffiliateDetailTable({
                     <SortIcon field="refundRate" />
                   </Button>
                 </TableHead>
+                {onFocusAffiliate && (
+                  <TableHead className="text-center text-white w-24">
+                    {t("performance.affiliates.actions")}
+                  </TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -245,6 +253,19 @@ export function AffiliateDetailTable({
                       {affiliate.refundRate.toFixed(1)}%
                     </div>
                   </TableCell>
+                  {onFocusAffiliate && (
+                    <TableCell className="text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onFocusAffiliate(affiliate.id)}
+                        className="gap-2 hover:bg-cyan-500/20 hover:text-cyan-400"
+                      >
+                        <Focus className="w-4 h-4" />
+                        {t("common.focus")}
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

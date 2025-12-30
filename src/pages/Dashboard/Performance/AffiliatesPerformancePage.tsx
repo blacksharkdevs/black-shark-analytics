@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AffiliateSummaryCards } from "@/components/dashboard/performance/AffiliateSummaryCards";
 import { AffiliateRevenueBarChart } from "@/components/dashboard/performance/AffiliateRevenueBarChart";
@@ -22,6 +23,7 @@ interface AffiliateMetrics {
 
 export default function AffiliatesPerformancePage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { filteredSalesData, isLoadingData } = useDashboardData();
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
 
@@ -100,6 +102,10 @@ export default function AffiliatesPerformancePage() {
     );
   };
 
+  const handleFocusAffiliate = (affiliateId: string) => {
+    navigate(`/dashboard/performance/affiliates/${affiliateId}`);
+  };
+
   return (
     <div className="container p-4 mx-auto space-y-6 md:p-8">
       {/* Header */}
@@ -159,6 +165,7 @@ export default function AffiliatesPerformancePage() {
         affiliateMetrics={affiliateMetrics}
         isLoading={isLoading}
         selectedAffiliateIds={selectedAffiliateIds}
+        onFocusAffiliate={handleFocusAffiliate}
       />
     </div>
   );

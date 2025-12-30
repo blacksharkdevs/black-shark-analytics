@@ -4,6 +4,7 @@ import DashboardPage from "./pages/Dashboard/DashboardPage";
 import PerformancePage from "./pages/Dashboard/PerformancePage";
 import ProductsPerformancePage from "./pages/Dashboard/Performance/ProductsPerformancePage";
 import AffiliatesPerformancePage from "./pages/Dashboard/Performance/AffiliatesPerformancePage";
+import AffiliatePerformanceDetailPage from "./pages/Dashboard/Performance/AffiliatePerformanceDetailPage";
 import TransactionsPage from "./pages/Dashboard/TransactionsPage";
 import TransactionDetailPage from "./pages/Dashboard/Transactions/TransactionDetailPage";
 import AffiliatesPage from "./pages/Dashboard/AffiliatesPage";
@@ -51,6 +52,10 @@ export default function App() {
           <Route
             path="performance/affiliates"
             element={<AffiliatesPerformancePage />}
+          />
+          <Route
+            path="performance/affiliates/:id"
+            element={<AffiliatePerformanceDetailPage />}
           />
           <Route path="transactions" element={<TransactionsPage />} />
           <Route path="transactions/:id" element={<TransactionDetailPage />} />
