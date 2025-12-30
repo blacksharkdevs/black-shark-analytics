@@ -133,9 +133,17 @@
   "performance": {
     "title": "Product Performance",
     "description": "Track individual performance of top-selling products in the selected period",
+    "affiliatesTitle": "Affiliate Performance",
+    "affiliatesDescription": "Detailed analysis of your affiliates' performance and quality in the selected period",
     "chartTitle": "Performance by Product",
     "chartDescription": "Daily/hourly revenue by product",
+    "affiliateChart": {
+      "title": "Affiliate Performance",
+      "description": "Daily/hourly revenue by affiliate"
+    },
     "noProductsSelected": "Select at least one product to view performance",
+    "noDataSelected": "Select at least one item to view performance",
+    "noAffiliates": "No affiliates available for the selected period",
     "noData": "No data available for the selected period",
     "layoutFullWidth": "Full Width",
     "layoutSideBySide": "Side by Side",
@@ -148,6 +156,13 @@
       "productsSelected": "products selected",
       "productsGrouped": "grouped products",
       "ranking": "in ranking"
+    },
+    "affiliateSelector": {
+      "title": "Available Affiliates",
+      "description": "Select the affiliates you want to analyze",
+      "hint": "Click on an affiliate to add it to the chart. You can monitor multiple affiliates at once.",
+      "commission": "commission",
+      "sales": "sales"
     },
     "insights": {
       "title": "Shark AI Analysis",
@@ -215,6 +230,39 @@
       "noData": "No data available for risk analysis",
       "warningMessage": "Chargeback rate between 1-2%. Monitor closely to avoid blocks.",
       "criticalMessage": "⚠️ CRITICAL ALERT: Rate above 2%! Imminent risk of blocking by payment processors (Visa/Mastercard)."
+    },
+    "sharkInsights": {
+      "topByRevenue": "Top Performer",
+      "topByRevenueDesc": "Affiliate with highest revenue",
+      "topByCommission": "Commission Leader",
+      "topByCommissionDesc": "Affiliate generating most commissions",
+      "topByCustomers": "Customer Champion",
+      "topByCustomersDesc": "Affiliate bringing most customers",
+      "bestAOV": "Best AOV",
+      "bestAOVDesc": "Affiliate with highest average order value",
+      "sales": "sales",
+      "rate": "commission rate",
+      "customers": "total customers",
+      "perSale": "per sale"
+    },
+    "commissionAnalyzer": {
+      "title": "Commission Analysis",
+      "description": "Distribution and comparison of commissions paid",
+      "commission": "Commission",
+      "totalCommission": "Total Commissions",
+      "totalRevenue": "Total Revenue",
+      "avgRate": "Avg Rate"
+    },
+    "qualityMonitor": {
+      "title": "Quality Monitor",
+      "description": "Quality and risk assessment of affiliates",
+      "healthScore": "Health Score",
+      "sales": "Sales",
+      "refunds": "Refunds",
+      "chargebacks": "Chargebacks",
+      "revenue": "Revenue",
+      "atRisk": "at risk",
+      "warningLine": "Warning Line"
     }
   },
   "header": {

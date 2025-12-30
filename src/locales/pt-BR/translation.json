@@ -133,9 +133,17 @@
   "performance": {
     "title": "Performance de Produtos",
     "description": "Acompanhe a performance individual dos produtos mais vendidos no período selecionado",
+    "affiliatesTitle": "Performance de Afiliados",
+    "affiliatesDescription": "Análise detalhada da performance e qualidade dos seus afiliados no período selecionado",
     "chartTitle": "Performance por Produto",
     "chartDescription": "Receita diária/horária por produto",
+    "affiliateChart": {
+      "title": "Performance de Afiliados",
+      "description": "Receita diária/horária por afiliado"
+    },
     "noProductsSelected": "Selecione pelo menos um produto para visualizar a performance",
+    "noDataSelected": "Selecione pelo menos um item para visualizar a performance",
+    "noAffiliates": "Nenhum afiliado disponível para o período selecionado",
     "noData": "Sem dados disponíveis para o período selecionado",
     "layoutFullWidth": "Largura Total",
     "layoutSideBySide": "Lado a Lado",
@@ -148,6 +156,13 @@
       "productsSelected": "produtos selecionados",
       "productsGrouped": "produtos agrupados",
       "ranking": "no ranking"
+    },
+    "affiliateSelector": {
+      "title": "Afiliados Disponíveis",
+      "description": "Selecione os afiliados que deseja analisar",
+      "hint": "Clique em um afiliado para adicioná-lo ao gráfico. Você pode monitorar vários afiliados ao mesmo tempo.",
+      "commission": "comissão",
+      "sales": "vendas"
     },
     "insights": {
       "title": "Shark AI Analysis",
@@ -215,6 +230,39 @@
       "noData": "Sem dados disponíveis para análise de risco",
       "warningMessage": "Taxa de chargeback entre 1-2%. Monitore de perto para evitar bloqueios.",
       "criticalMessage": "⚠️ ALERTA CRÍTICO: Taxa acima de 2%! Risco iminente de bloqueio pelos processadores de pagamento (Visa/Mastercard)."
+    },
+    "sharkInsights": {
+      "topByRevenue": "Melhor Desempenho",
+      "topByRevenueDesc": "Afiliado com maior receita",
+      "topByCommission": "Líder em Comissões",
+      "topByCommissionDesc": "Afiliado gerando mais comissões",
+      "topByCustomers": "Campeão de Clientes",
+      "topByCustomersDesc": "Afiliado trazendo mais clientes",
+      "bestAOV": "Melhor Ticket Médio",
+      "bestAOVDesc": "Afiliado com maior valor por venda",
+      "sales": "vendas",
+      "rate": "taxa de comissão",
+      "customers": "clientes totais",
+      "perSale": "por venda"
+    },
+    "commissionAnalyzer": {
+      "title": "Análise de Comissões",
+      "description": "Distribuição e comparação de comissões pagas",
+      "commission": "Comissão",
+      "totalCommission": "Total de Comissões",
+      "totalRevenue": "Receita Total",
+      "avgRate": "Taxa Média"
+    },
+    "qualityMonitor": {
+      "title": "Monitor de Qualidade",
+      "description": "Avaliação de qualidade e risco dos afiliados",
+      "healthScore": "Score de Saúde",
+      "sales": "Vendas",
+      "refunds": "Reembolsos",
+      "chargebacks": "Chargebacks",
+      "revenue": "Receita",
+      "atRisk": "em risco",
+      "warningLine": "Linha de Atenção"
     }
   },
   "header": {
