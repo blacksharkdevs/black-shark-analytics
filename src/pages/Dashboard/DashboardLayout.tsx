@@ -12,6 +12,7 @@ import {
   DashboardDataProvider,
   useDashboardData,
 } from "@/contexts/DashboardDataContext";
+import { ArsenalProvider } from "@/contexts/ArsenalContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 const SIDEBAR_WIDTH = "280px";
@@ -56,11 +57,13 @@ export default function DashboardLayout() {
   return (
     <TooltipProvider delayDuration={300}>
       <DashboardConfigProvider>
-        <DashboardDataProvider>
-          <SidebarProvider>
-            <DashboardLayoutContent />
-          </SidebarProvider>
-        </DashboardDataProvider>
+        <ArsenalProvider>
+          <DashboardDataProvider>
+            <SidebarProvider>
+              <DashboardLayoutContent />
+            </SidebarProvider>
+          </DashboardDataProvider>
+        </ArsenalProvider>
       </DashboardConfigProvider>
     </TooltipProvider>
   );

@@ -8,6 +8,7 @@ import {
   // List,
   // Settings,
   TrendingUp,
+  Zap,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
@@ -52,6 +53,11 @@ export function AppSidebar({ width }: { width: string }) {
       href: "/dashboard/transactions",
       label: t("navigation.transactions"),
       icon: CircleDollarSign,
+    },
+    {
+      href: "/dashboard/arsenal",
+      label: "Arsenal",
+      icon: Zap,
     },
     // {
     //   href: "/dashboard/reports",

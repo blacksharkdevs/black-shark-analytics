@@ -9,6 +9,7 @@ import TransactionsPage from "./pages/Dashboard/TransactionsPage";
 import TransactionDetailPage from "./pages/Dashboard/Transactions/TransactionDetailPage";
 import AffiliatesPage from "./pages/Dashboard/AffiliatesPage";
 import AffiliateDetailPage from "./pages/Dashboard/Affiliates/AffiliateDetailPage";
+import ArsenalPage from "./pages/Dashboard/ArsenalPage";
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/common/ui/toaster";
@@ -61,6 +62,7 @@ export default function App() {
           <Route path="transactions/:id" element={<TransactionDetailPage />} />
           <Route path="affiliates" element={<AffiliatesPage />} />
           <Route path="affiliates/:name" element={<AffiliateDetailPage />} />
+          <Route path="arsenal" element={<ArsenalPage />} />
         </Route>
 
         <Route path="*" element={<div>404 | Página Não Encontrada</div>} />
