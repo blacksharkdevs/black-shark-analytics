@@ -122,15 +122,8 @@ export function AffiliateProductBreakdown({ products }: Props) {
           </Table>
         </div>
 
-        <div className="p-4 mt-6 border rounded-lg bg-purple-950/20 border-purple-500/30">
-          <p className="text-sm text-purple-200">
-            💬 <strong>{t("affiliate.recommendedAction")}</strong>{" "}
-            {t("affiliate.callAffiliate")}
-          </p>
-        </div>
-
         {/* Gráfico de barras dos top produtos */}
-        <div className="mt-6">
+        <div className="mt-12">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={products.slice(0, 5)}>
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
