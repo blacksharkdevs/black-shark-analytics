@@ -235,18 +235,18 @@ export default function AffiliatesPage() {
       // Total de clientes únicos
       metrics.totalCustomers = metrics.customerIds.size;
 
-      // AOV = Receita Bruta / Total de Clientes
+      // AOV = Vendas Brutas / Total de Clientes
       metrics.aov =
         metrics.totalCustomers > 0
-          ? metrics.totalRevenue / metrics.totalCustomers
+          ? metrics.grossSales / metrics.totalCustomers
           : 0;
 
-      // AOV Real = (Receita Bruta - Refund e Chargeback) / Clientes
-      const adjustedRevenue =
-        metrics.totalRevenue - metrics.refundsAndChargebacks;
+      // AOV Real = (Vendas Brutas - Refund e Chargeback) / Clientes
+      const adjustedGrossSales =
+        metrics.grossSales - metrics.refundsAndChargebacks;
       metrics.realAov =
         metrics.totalCustomers > 0
-          ? adjustedRevenue / metrics.totalCustomers
+          ? adjustedGrossSales / metrics.totalCustomers
           : 0;
 
       // Net Sales = Receita Bruta - Comissão

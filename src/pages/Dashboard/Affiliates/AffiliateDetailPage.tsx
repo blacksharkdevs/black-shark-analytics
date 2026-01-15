@@ -73,7 +73,8 @@ export default function AffiliateDetailPage() {
     const profit = net - cogs;
     const allowance = grossSales * 0.1;
     const cashFlow = profit - allowance;
-    const aov = totalSales > 0 ? grossSales / totalSales : 0;
+    const aov =
+      uniqueCustomers.size > 0 ? grossSales / uniqueCustomers.size : 0;
     const platformFeePercent =
       totalRevenue > 0 ? (platformFeeDollar / totalRevenue) * 100 : 0;
 
