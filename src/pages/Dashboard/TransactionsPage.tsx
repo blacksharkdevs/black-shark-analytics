@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { TransactionList } from "@/components/transactions/TransactionList";
@@ -10,25 +11,90 @@ import { Skeleton } from "@/components/common/ui/skeleton";
 export default function TransactionsPage() {
   const { filteredSalesData, isLoadingData } = useDashboardData();
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const isLoading = isLoadingData || isDateRangeLoading;
 
-  // Estado para pesquisa, paginação e view mode
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState<"list" | "table">("table");
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  // Inicializar estados a partir da URL
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
+  const [currentPage, setCurrentPage] = useState(
+    Number(searchParams.get("page")) || 1
+  );
+  const [viewMode, setViewMode] = useState<"list" | "table">(
+    (searchParams.get("view") as "list" | "table") || "table"
+  );
+  const [itemsPerPage, setItemsPerPage] = useState(
+    Number(searchParams.get("perPage")) || 20
+  );
 
-  // Estados para filtros avançados
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
-  const [minGrossAmount, setMinGrossAmount] = useState("");
-  const [maxGrossAmount, setMaxGrossAmount] = useState("");
-  const [minNetAmount, setMinNetAmount] = useState("");
-  const [maxNetAmount, setMaxNetAmount] = useState("");
-  const [sortBy, setSortBy] = useState("occurredAt");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  // Estados para filtros avançados - ler da URL
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(
+    searchParams.get("platforms")?.split(",").filter(Boolean) || []
+  );
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(
+    searchParams.get("statuses")?.split(",").filter(Boolean) || []
+  );
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(
+    searchParams.get("types")?.split(",").filter(Boolean) || []
+  );
+  const [minGrossAmount, setMinGrossAmount] = useState(
+    searchParams.get("minGross") || ""
+  );
+  const [maxGrossAmount, setMaxGrossAmount] = useState(
+    searchParams.get("maxGross") || ""
+  );
+  const [minNetAmount, setMinNetAmount] = useState(
+    searchParams.get("minNet") || ""
+  );
+  const [maxNetAmount, setMaxNetAmount] = useState(
+    searchParams.get("maxNet") || ""
+  );
+  const [sortBy, setSortBy] = useState(
+    searchParams.get("sortBy") || "occurredAt"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(
+    (searchParams.get("sortOrder") as "asc" | "desc") || "desc"
+  );
+
+  // Sincronizar estado com URL
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchQuery) params.set("search", searchQuery);
+    if (currentPage > 1) params.set("page", currentPage.toString());
+    if (viewMode !== "table") params.set("view", viewMode);
+    if (itemsPerPage !== 20) params.set("perPage", itemsPerPage.toString());
+    if (selectedPlatforms.length > 0)
+      params.set("platforms", selectedPlatforms.join(","));
+    if (selectedStatuses.length > 0)
+      params.set("statuses", selectedStatuses.join(","));
+    if (selectedTypes.length > 0) params.set("types", selectedTypes.join(","));
+    if (minGrossAmount) params.set("minGross", minGrossAmount);
+    if (maxGrossAmount) params.set("maxGross", maxGrossAmount);
+    if (minNetAmount) params.set("minNet", minNetAmount);
+    if (maxNetAmount) params.set("maxNet", maxNetAmount);
+    if (sortBy !== "occurredAt") params.set("sortBy", sortBy);
+    if (sortOrder !== "desc") params.set("sortOrder", sortOrder);
+
+    setSearchParams(params, { replace: true });
+  }, [
+    searchQuery,
+    currentPage,
+    viewMode,
+    itemsPerPage,
+    selectedPlatforms,
+    selectedStatuses,
+    selectedTypes,
+    minGrossAmount,
+    maxGrossAmount,
+    minNetAmount,
+    maxNetAmount,
+    sortBy,
+    sortOrder,
+    setSearchParams,
+  ]);
 
   // Resetar para página 1 quando qualquer filtro mudar
   useEffect(() => {

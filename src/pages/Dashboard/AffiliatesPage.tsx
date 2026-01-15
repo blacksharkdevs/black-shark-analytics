@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useDashboardData } from "@/contexts/DashboardDataContext";
 import { useDashboardConfig } from "@/contexts/DashboardConfigContext";
 import { AffiliateList } from "@/components/affiliates/AffiliateList";
@@ -31,31 +32,109 @@ interface AffiliateMetrics {
 export default function AffiliatesPage() {
   const { filteredSalesData, isLoadingData } = useDashboardData();
   const { isLoading: isDateRangeLoading } = useDashboardConfig();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const isLoading = isLoadingData || isDateRangeLoading;
 
-  // Estados para pesquisa, paginação e view mode
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState<"list" | "table">("table");
-  const [itemsPerPage, setItemsPerPage] = useState(50);
+  // Inicializar estados a partir da URL
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
+  const [currentPage, setCurrentPage] = useState(
+    Number(searchParams.get("page")) || 1
+  );
+  const [viewMode, setViewMode] = useState<"list" | "table">(
+    (searchParams.get("view") as "list" | "table") || "table"
+  );
+  const [itemsPerPage, setItemsPerPage] = useState(
+    Number(searchParams.get("perPage")) || 50
+  );
 
-  // Estados para filtros
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
-  const [minSales, setMinSales] = useState("");
-  const [maxSales, setMaxSales] = useState("");
-  const [minRevenue, setMinRevenue] = useState("");
-  const [maxRevenue, setMaxRevenue] = useState("");
-  const [minCommission, setMinCommission] = useState("");
-  const [maxCommission, setMaxCommission] = useState("");
-  const [minProfit, setMinProfit] = useState("");
-  const [maxProfit, setMaxProfit] = useState("");
-  const [minCustomers, setMinCustomers] = useState("");
-  const [maxCustomers, setMaxCustomers] = useState("");
-  const [minAov, setMinAov] = useState("");
-  const [maxAov, setMaxAov] = useState("");
-  const [sortBy, setSortBy] = useState("sales");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  // Estados para filtros - ler da URL
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(
+    searchParams.get("platforms")?.split(",").filter(Boolean) || []
+  );
+  const [minSales, setMinSales] = useState(searchParams.get("minSales") || "");
+  const [maxSales, setMaxSales] = useState(searchParams.get("maxSales") || "");
+  const [minRevenue, setMinRevenue] = useState(
+    searchParams.get("minRevenue") || ""
+  );
+  const [maxRevenue, setMaxRevenue] = useState(
+    searchParams.get("maxRevenue") || ""
+  );
+  const [minCommission, setMinCommission] = useState(
+    searchParams.get("minCommission") || ""
+  );
+  const [maxCommission, setMaxCommission] = useState(
+    searchParams.get("maxCommission") || ""
+  );
+  const [minProfit, setMinProfit] = useState(
+    searchParams.get("minProfit") || ""
+  );
+  const [maxProfit, setMaxProfit] = useState(
+    searchParams.get("maxProfit") || ""
+  );
+  const [minCustomers, setMinCustomers] = useState(
+    searchParams.get("minCustomers") || ""
+  );
+  const [maxCustomers, setMaxCustomers] = useState(
+    searchParams.get("maxCustomers") || ""
+  );
+  const [minAov, setMinAov] = useState(searchParams.get("minAov") || "");
+  const [maxAov, setMaxAov] = useState(searchParams.get("maxAov") || "");
+  const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "sales");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(
+    (searchParams.get("sortOrder") as "asc" | "desc") || "desc"
+  );
+
+  // Sincronizar estado com URL
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (searchQuery) params.set("search", searchQuery);
+    if (currentPage > 1) params.set("page", currentPage.toString());
+    if (viewMode !== "table") params.set("view", viewMode);
+    if (itemsPerPage !== 50) params.set("perPage", itemsPerPage.toString());
+    if (selectedPlatforms.length > 0)
+      params.set("platforms", selectedPlatforms.join(","));
+    if (minSales) params.set("minSales", minSales);
+    if (maxSales) params.set("maxSales", maxSales);
+    if (minRevenue) params.set("minRevenue", minRevenue);
+    if (maxRevenue) params.set("maxRevenue", maxRevenue);
+    if (minCommission) params.set("minCommission", minCommission);
+    if (maxCommission) params.set("maxCommission", maxCommission);
+    if (minProfit) params.set("minProfit", minProfit);
+    if (maxProfit) params.set("maxProfit", maxProfit);
+    if (minCustomers) params.set("minCustomers", minCustomers);
+    if (maxCustomers) params.set("maxCustomers", maxCustomers);
+    if (minAov) params.set("minAov", minAov);
+    if (maxAov) params.set("maxAov", maxAov);
+    if (sortBy !== "sales") params.set("sortBy", sortBy);
+    if (sortOrder !== "desc") params.set("sortOrder", sortOrder);
+
+    setSearchParams(params, { replace: true });
+  }, [
+    searchQuery,
+    currentPage,
+    viewMode,
+    itemsPerPage,
+    selectedPlatforms,
+    minSales,
+    maxSales,
+    minRevenue,
+    maxRevenue,
+    minCommission,
+    maxCommission,
+    minProfit,
+    maxProfit,
+    minCustomers,
+    maxCustomers,
+    minAov,
+    maxAov,
+    sortBy,
+    sortOrder,
+    setSearchParams,
+  ]);
 
   // Resetar para página 1 quando qualquer filtro mudar
   useEffect(() => {

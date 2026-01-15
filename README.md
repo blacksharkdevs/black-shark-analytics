@@ -10,6 +10,13 @@ Seja você um dev experiente ou alguém que acabou de chegar, este README é o s
 
 ---
 
+## 💥 Deploy na Cloudflare
+
+npm run build
+npx wrangler pages deploy dist
+
+---
+
 ## 🛠️ Stack Tecnológica
 
 Aqui é onde a mágica acontece. A performance do Black Shark é garantida por essa combinação de ferramentas:

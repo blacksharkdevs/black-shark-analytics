@@ -6,7 +6,6 @@ import {
   CardHeader,
 } from "@/components/common/ui/card";
 import { Skeleton } from "@/components/common/ui/skeleton";
-import { Badge } from "@/components/common/ui/badge";
 import { Button } from "@/components/common/ui/button";
 import { Focus } from "lucide-react";
 import { formatCurrency } from "@/utils/index";
@@ -34,14 +33,6 @@ export function AffiliateDetailList({
   onFocusAffiliate,
 }: AffiliateDetailListProps) {
   const { t } = useTranslation();
-
-  const getRefundRateBadgeVariant = (
-    refundRate: number
-  ): "default" | "secondary" | "destructive" => {
-    if (refundRate < 1) return "default";
-    if (refundRate < 3) return "secondary";
-    return "destructive";
-  };
 
   const getRefundRateClass = (refundRate: number) => {
     if (refundRate < 1)
